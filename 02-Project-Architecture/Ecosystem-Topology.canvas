@@ -1,0 +1,12 @@
+{
+	"nodes":[
+		{"id":"node_facade","type":"file","file":"obsidian-brain/02-Architecture-and-Design/01-Facade-Pattern.md","x":-640,"y":-700,"width":840,"height":950},
+		{"id":"node_decouple","type":"file","file":"obsidian-brain/02-Architecture-and-Design/02-Decoupling-and-Interfaces.md","x":300,"y":-700,"width":560,"height":900},
+		{"id":"node_repo","type":"file","file":"obsidian-brain/02-Architecture-and-Design/03-Repository-Structure.md","x":-580,"y":340,"width":780,"height":580},
+		{"id":"node_map","type":"file","file":"obsidian-brain/02-Architecture-and-Design/05-Microservice-Map.md","x":300,"y":340,"width":720,"height":1020}
+	],
+	"edges":[
+		{"id":"edge_facade_decouple","fromNode":"node_facade","fromSide":"right","toNode":"node_decouple","toSide":"left"},
+		{"id":"edge_facade_repo","fromNode":"node_facade","fromSide":"bottom","toNode":"node_repo","toSide":"top"}
+	]
+}
