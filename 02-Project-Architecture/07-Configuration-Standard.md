@@ -4,6 +4,8 @@
 Our microservices avoid hardcoded parameters. All settings are sourced from a layered configuration system managed by `microservice-toolbox`.
 
 ### 1. Configuration Loading via Microservice-Toolbox
+- **The Interface**: `microservice-toolbox` is the **Universal Entry Point** for all services. To ensure performance and portability, it provides native implementations for each language while maintaining strict API parity.
+- **The Engine**: In Go, the toolbox wraps `distributed-config`. In Python and Rust, the toolbox provides a native implementation of the same standard.
 - **Entry Point**: ALL services must use `microservice-toolbox` to load configuration:
   - Go: `config.LoadConfig("standalone", nil)` → returns `*AppConfig`
   - Rust: `microservice_toolbox::config::load_config("standalone")` → returns `Result<AppConfig>`
@@ -30,6 +32,12 @@ The toolbox provides these flags automatically in all languages:
 | `--grpc_port` | int | gRPC binding port |
 | `--conf` | string | Path to configuration file |
 | `--log_level` | string | Logging level (DEBUG, INFO, etc.) |
+| `--key` | string | Path to RSA Public/Private key (Utilities only) |
+
+#### **Utility Tooling Convention**
+Utilities located in `/cmd` (e.g., `config-tool`) MUST follow the same flag-based philosophy. Positional arguments should be avoided.
+- **Incorrect**: `config-tool encrypt public.pem "secret"`
+- **Correct**: `config-tool encrypt --key public.pem --token "secret"`
 
 ### 4. Docker Guard
 When running inside Docker (detected via `/.dockerenv` or `DOCKER_ENV` env var), all CLI network overrides (`--host`, `--port`, `--grpc_host`, `--grpc_port`) are **silently ignored** to preserve Docker's DNS-based service discovery.
@@ -57,4 +65,27 @@ YAML files support environment variable templates using `${VAR_NAME:-default}` s
 
 ### 7. Service Metadata
 - **Name**: Always include a `common.name` field for service identification. This is set automatically by the `--name` CLI flag.
-- **Config Server**: For production deployments, services sync their configuration from the centralized `config-server` via gRPC.
+
+### 8. Secret Encryption (v1.9.1+)
+`distributed-config` supports native RSA encryption for sensitive fields in YAML files.
+- **Pattern**: Wrap encrypted values in `ENC(...)`. Example: `password: "ENC(base64_blob)"`.
+- **On-Demand Decryption**: By default, the library **stores secrets in their encrypted form**. The service must explicitly decrypt them when needed using the toolbox helpers.
+- **Public Key Discovery**: At boot, the system searches for `public.pem` (following the standard discovery chain) and, if found, embeds its content into the `common.public_key` config field. This allows the service to share its public identity without manual configuration.
+- **Key Locations**:
+  - **Public Key (`public.pem`)**: Non-Sensitive. Used by developers to encrypt secrets.
+  - **Private Key (`private.pem`)**: Critical Secret. **MUST NOT** be committed to Git. loaded from `BASTIEN_PRIVATE_KEY_PATH` or `/etc/bastien/`.
+- **Volatility Rule**: Decrypted values must never be written to disk, logs, or databases. Services should keep decrypted secrets in volatile variables for the shortest time possible.
+- **Utilities**: All repositories must include or reference the standard **`config-tool`** found in the `distributed-config/cmd` directory for managing these secrets.
+
+### 9. Polyglot Feature Parity Matrix
+
+| Feature | Go | Python | Rust |
+| :--- | :---: | :---: | :---: |
+| Layered YAML Loading | ✅ | ✅ | ✅ |
+| CLI Flag Overrides | ✅ | ✅ | ✅ |
+| Environment Var Expansion | ✅ | ✅ | ✅ |
+| **RSA Secret Decryption** | ✅ | ✅ | ✅ |
+| **Remote Config Sync** | ✅ | ❌ | ❌ |
+
+> [!NOTE]
+> **RSA Encryption (`ENC(...)`)** is now a cross-language standard. You can safely use encrypted secrets in shared configuration files across the entire fleet.

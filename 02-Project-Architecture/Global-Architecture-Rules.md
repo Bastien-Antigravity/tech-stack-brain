@@ -22,14 +22,15 @@ You are an expert Systems Architect for the Bastien-Antigravity project—a poly
 - **Rules File**: [Coding Style Standards](../03-Coding-and-Libraries/00-Coding-Style-Guide.md)
 
 ### 3. Shared Libraries & Toolbox
-- **microservice-toolbox**: Polyglot (Go/Rust/Python) library providing standardized CLI argument parsing, configuration loading, and networking primitives. **Go is the source of truth** for API parity.
+- **microservice-toolbox**: Polyglot (Go/Rust/Python) library providing standardized CLI argument parsing, **RSA secret decryption (v1.9.1+)**, and networking primitives. **Go is the source of truth for API parity.**
 - **universal-logger**: Standardized logging facade (Go/C++) with bootstrap initialization. Can be used alongside `flexible-logger`.
-- **distributed-config**: Go library for YAML-based configuration with environment variable expansion, capability mapping, and config-server sync.
-- **safe-socket**: Lightweight Cap'n Proto transport for log transmission.
+- **distributed-config**: Go library for YAML-based configuration with environment variable expansion, **native RSA secret decryption (ENC(...) pattern)**, and config-server sync.
+- **safe-socket**: Universal high-performance transport (TCP/UDP/SHM) for cross-language communication, optimized for persistent connections with "Infinite Wait" (v1.8.2+).
 - **Rules File**: [Shared Libraries Reference](Core-Libraries-and-Toolbox.md)
 
 ### 4. Configuration & Deployment
-- **YAML Config**: No hardcoding. All configuration flows through `microservice-toolbox` using `LoadConfig(profile)`.
+- **YAML Config**: No hardcoding. All configuration flows through `microservice-toolbox` using `LoadConfig(profile)`. 
+- **Secret Encryption**: Sensitive values MUST be wrapped in `ENC(...)` and decrypted at boot using the standardized RSA key lifecycle.
 - **Profiles**: `standalone` (dev, file-first), `production` (server-first).
 - **Docker Guard**: CLI network overrides are ignored inside containers to preserve DNS-based service discovery.
 - **Rules File**: [Configuration Standards](07-Configuration-Standard.md) | [Deployment Standards](Deployment-Strategies.md)
