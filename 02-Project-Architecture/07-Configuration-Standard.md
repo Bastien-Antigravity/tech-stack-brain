@@ -63,12 +63,14 @@ capabilities:
 ### 6. Environment Variable Expansion
 YAML files support environment variable templates using `${VAR_NAME:-default}` syntax. These are expanded at load time by `distributed-config`.
 
-### 8. Private Configuration (Local Only)
-For settings that do not fit the `ip/port` capability pattern (e.g., custom service-specific flags, internal paths), use the `private:` block. This section is **Toolbox-Specific** and is strictly **Local-Only**:
-- **Non-Synchronized**: Unlike `capabilities`, the `private:` block is **never** synchronized with the Config Server. It remains private to the service instance.
-- **Access Pattern (Go)**: Access via `ac.Private` (e.g., `ac.GetPrivate("worker_count")`).
-- **Access Pattern (Rust/Python)**: Access via `ac.data["private"]`.
-- **Decryption**: Private values are eligible for on-demand `ENC(...)` decryption using toolbox helpers.
+### 8. Local Configuration (Service-Specific)
+For settings that do not fit the `ip/port` capability pattern (e.g., custom service-specific flags, internal paths), use the `local:` block. This section is **Toolbox-Specific** and is strictly **Local-Only**:
+- **Non-Synchronized**: Unlike `capabilities`, the `local:` block is **never** synchronized with the Config Server. It remains local to the service instance.
+- **Access Pattern (Go)**: Access via `ac.Local` (e.g., `ac.GetLocal("worker_count")`).
+- **Access Pattern (Python)**: Access via `ac.get_local("worker_count")`.
+- **Access Pattern (Rust)**: Access via `ac.get_local("worker_count")`.
+- **Access Pattern (C++)**: Access via `ac->GetLocal("worker_count")`.
+- **Decryption**: Local values are eligible for on-demand `ENC(...)` decryption using toolbox helpers.
 
 ### 9. Secret Encryption (v1.9.1+)
 `distributed-config` supports native RSA encryption for sensitive fields in YAML files.
@@ -88,8 +90,14 @@ For settings that do not fit the `ip/port` capability pattern (e.g., custom serv
 | Layered YAML Loading | ✅ | ✅ | ✅ | ✅ | ✅ |
 | CLI Flag Overrides | ✅ | ✅ | ✅ | ✅ | ✅ |
 | Environment Var Expansion | ✅ | ✅ | ✅ | ✅ | ✅ |
-| **RSA Secret Decryption** | ✅ | ✅ | ✅ | ✅ | ✅ |
+| RSA Secret Decryption | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **Error Transparency** | ✅ | ✅ | ✅ | ✅ | ✅ |
 | **Remote Config Sync** | ✅ | ✅ (CGO) | ✅ (CGO) | ✅ (CGO) | ✅ (CGO) |
+
+### 11. Error Transparency (v1.9.9+)
+All `microservice-toolbox` implementations must surface raw engine-level errors from the underlying `distributed-config` bridge.
+- **Strict Exception Handling**: Toolboxes should **throw/raise/return** the exact error string retrieved from `GetLastError()` on bridge failure.
+- **No Silencing**: Swallowing bridge errors (e.g., returning original ciphertext on decryption failure) is strictly forbidden.
 
 > [!NOTE]
 > **RSA Encryption (`ENC(...)`)** is now a cross-language standard. You can safely use encrypted secrets in shared configuration files across the entire fleet.
