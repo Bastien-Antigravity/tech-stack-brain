@@ -63,10 +63,14 @@ capabilities:
 ### 6. Environment Variable Expansion
 YAML files support environment variable templates using `${VAR_NAME:-default}` syntax. These are expanded at load time by `distributed-config`.
 
-### 7. Service Metadata
-- **Name**: Always include a `common.name` field for service identification. This is set automatically by the `--name` CLI flag.
+### 8. Private Configuration (Local Only)
+For settings that do not fit the `ip/port` capability pattern (e.g., custom service-specific flags, internal paths), use the `private:` block. This section is **Toolbox-Specific** and is strictly **Local-Only**:
+- **Non-Synchronized**: Unlike `capabilities`, the `private:` block is **never** synchronized with the Config Server. It remains private to the service instance.
+- **Access Pattern (Go)**: Access via `ac.Private` (e.g., `ac.GetPrivate("worker_count")`).
+- **Access Pattern (Rust/Python)**: Access via `ac.data["private"]`.
+- **Decryption**: Private values are eligible for on-demand `ENC(...)` decryption using toolbox helpers.
 
-### 8. Secret Encryption (v1.9.1+)
+### 9. Secret Encryption (v1.9.1+)
 `distributed-config` supports native RSA encryption for sensitive fields in YAML files.
 - **Pattern**: Wrap encrypted values in `ENC(...)`. Example: `password: "ENC(base64_blob)"`.
 - **On-Demand Decryption**: By default, the library **stores secrets in their encrypted form**. The service must explicitly decrypt them when needed using the toolbox helpers.
@@ -77,15 +81,15 @@ YAML files support environment variable templates using `${VAR_NAME:-default}` s
 - **Volatility Rule**: Decrypted values must never be written to disk, logs, or databases. Services should keep decrypted secrets in volatile variables for the shortest time possible.
 - **Utilities**: All repositories must include or reference the standard **`config-tool`** found in the `distributed-config/cmd` directory for managing these secrets.
 
-### 9. Polyglot Feature Parity Matrix
+### 10. Polyglot Feature Parity Matrix
 
-| Feature | Go | Python | Rust |
-| :--- | :---: | :---: | :---: |
-| Layered YAML Loading | ✅ | ✅ | ✅ |
-| CLI Flag Overrides | ✅ | ✅ | ✅ |
-| Environment Var Expansion | ✅ | ✅ | ✅ |
-| **RSA Secret Decryption** | ✅ | ✅ | ✅ |
-| **Remote Config Sync** | ✅ | ❌ | ❌ |
+| Feature | Go | Python | Rust | C++ | VBA |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| Layered YAML Loading | ✅ | ✅ | ✅ | ✅ | ✅ |
+| CLI Flag Overrides | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Environment Var Expansion | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **RSA Secret Decryption** | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **Remote Config Sync** | ✅ | ✅ (CGO) | ✅ (CGO) | ✅ (CGO) | ✅ (CGO) |
 
 > [!NOTE]
 > **RSA Encryption (`ENC(...)`)** is now a cross-language standard. You can safely use encrypted secrets in shared configuration files across the entire fleet.
