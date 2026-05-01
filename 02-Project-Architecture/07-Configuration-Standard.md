@@ -12,7 +12,8 @@ Our microservices avoid hardcoded parameters. All settings are sourced from a la
   - Python: `load_config("standalone")` → returns `AppConfig`
 - **Profiles**:
   - `standalone` / `test` → **Dev Mode**: Local YAML file is the hard override.
-  - Any other profile → **Production Mode**: Config Server is authoritative; local file fills gaps.
+  - Any other profile → **Production Mode**: Config Server is authoritative; local file fills gaps (e.g., local overrides).
+- **Search Paths**: All loaders must search for YAML files in the **current directory** and the **`config/` sub-directory** sequentially.
 
 ### 2. Priority Hierarchy (Highest → Lowest)
 1. **CLI Flags** (parsed by `microservice-toolbox` automatically)
@@ -66,11 +67,10 @@ YAML files support environment variable templates using `${VAR_NAME:-default}` s
 ### 8. Local Configuration (Service-Specific)
 For settings that do not fit the `ip/port` capability pattern (e.g., custom service-specific flags, internal paths), use the `local:` block. This section is **Toolbox-Specific** and is strictly **Local-Only**:
 - **Non-Synchronized**: Unlike `capabilities`, the `local:` block is **never** synchronized with the Config Server. It remains local to the service instance.
-- **Access Pattern (Go)**: Access via `ac.Local` (e.g., `ac.GetLocal("worker_count")`).
-- **Access Pattern (Python)**: Access via `ac.get_local("worker_count")`.
-- **Access Pattern (Rust)**: Access via `ac.get_local("worker_count")`.
-- **Access Pattern (C++)**: Access via `ac->GetLocal("worker_count")`.
+- **Access Pattern (Go/C++)**: Access via `ac.GetLocal("key")` or unmarshal the entire section into a struct using `UnmarshalLocal(target)`.
+- **Access Pattern (Python/Rust)**: Access via `ac.get_local("key")` or use `unmarshal_local::<T>()`.
 - **Decryption**: Local values are eligible for on-demand `ENC(...)` decryption using toolbox helpers.
+- **In-Memory Mirroring**: C++ and VBA implement full in-memory mirroring for high-performance access without repeated disk I/O.
 
 ### 9. Secret Encryption (v1.9.1+)
 `distributed-config` supports native RSA encryption for sensitive fields in YAML files.
@@ -88,9 +88,12 @@ For settings that do not fit the `ip/port` capability pattern (e.g., custom serv
 | Feature | Go | Python | Rust | C++ | VBA |
 | :--- | :---: | :---: | :---: | :---: | :---: |
 | Layered YAML Loading | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `config/` Directory Fallback | ✅ | ✅ | ✅ | ✅ | ✅ |
 | CLI Flag Overrides | ✅ | ✅ | ✅ | ✅ | ✅ |
 | Environment Var Expansion | ✅ | ✅ | ✅ | ✅ | ✅ |
 | RSA Secret Decryption | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **Absolute Parity (v1.9.9)** | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **UnmarshalLocal** | ✅ | ✅ | ✅ | ✅ | ✅ |
 | **Error Transparency** | ✅ | ✅ | ✅ | ✅ | ✅ |
 | **Remote Config Sync** | ✅ | ✅ (CGO) | ✅ (CGO) | ✅ (CGO) | ✅ (CGO) |
 
