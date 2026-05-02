@@ -15,13 +15,19 @@ Our microservices avoid hardcoded parameters. All settings are sourced from a la
   - Any other profile → **Production Mode**: Config Server is authoritative; local file fills gaps (e.g., local overrides).
 - **Search Paths**: All loaders must search for YAML files in the **current directory** and the **`config/` sub-directory** sequentially.
 
-### 2. Priority Hierarchy (Highest → Lowest)
+### 2. Unified Shared Engine Architecture (v1.9.92+)
+- To ensure absolute behavioral parity and memory-space unification, all non-Go languages (Python, Rust, C++, VBA) utilize the **Unified Shared Engine** (`libdistconf` / `libunilog`).
+- **Single Memory State**: The shared engine ensures that multiple configuration sessions (e.g., one in the Logger and one in the Toolbox) share the same handle store and runtime environment.
+- **Shared Logic**: By converging on the `src/cgo_bridge` core in `distributed-config`, all languages benefit from the exact same environment expansion, path discovery, and network sync logic.
+- **Critical Rule (FFI Stability)**: When wrapping the shared engine, the library MUST NOT be unloaded (`dlclose`). See [Hidden Patterns and Gotchas](../../03-Project-Coding/07-Hidden-Patterns-and-Gotchas.md) for details.
+
+### 3. Priority Hierarchy (Highest → Lowest)
 1. **CLI Flags** (parsed by `microservice-toolbox` automatically)
 2. **Local YAML File** (profile-dependent merge)
 3. **Config Server** (via `distributed-config` sync)
 4. **Environment Variables** (template expansion in YAML)
 
-### 3. Standard CLI Arguments
+### 4. Standard CLI Arguments
 The toolbox provides these flags automatically in all languages:
 
 | Flag | Type | Description |
@@ -40,10 +46,10 @@ Utilities located in `/cmd` (e.g., `config-tool`) MUST follow the same flag-base
 - **Incorrect**: `config-tool encrypt public.pem "secret"`
 - **Correct**: `config-tool encrypt --key public.pem --token "secret"`
 
-### 4. Docker Guard
+### 5. Docker Guard
 When running inside Docker (detected via `/.dockerenv` or `DOCKER_ENV` env var), all CLI network overrides (`--host`, `--port`, `--grpc_host`, `--grpc_port`) are **silently ignored** to preserve Docker's DNS-based service discovery.
 
-### 5. Capability-Based Configuration
+### 6. Capability-Based Configuration
 Configuration is organized around **capabilities** — named service entries in YAML:
 ```yaml
 capabilities:
@@ -61,7 +67,7 @@ capabilities:
 - **Access Pattern (Rust)**: Use `ac.get_listen_addr("log_server")` to get `ip:port` strings.
 - **Access Pattern (Python)**: Use `ac.get_listen_addr("log_server")` for the same.
 
-### 6. Environment Variable Expansion
+### 7. Environment Variable Expansion
 YAML files support environment variable templates using `${VAR_NAME:-default}` syntax. These are expanded at load time by `distributed-config`.
 
 ### 8. Local Configuration (Service-Specific)

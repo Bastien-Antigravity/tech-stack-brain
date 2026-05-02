@@ -33,8 +33,17 @@ This means Python may break in scenarios where Go/Rust would degrade gracefully.
 ## 6. Config Profile Detection
 Dev mode check is hardcoded: `profile == "standalone" || profile == "test"`. Profiles `"production"` and `"preprod"` fall through to the else branch without explicit check.
 
-## 7. CGO Bridge Isolation
-`universal-logger` exposes a CGO shared library (`libunilog.dll`). Language wrappers (C++, Python, Rust, VBA) go through the CGO bridge, not Go directly. The Go signature can change without breaking wrappers, as long as `src/cgo_bridge/initialize.go` remains stable.
+## 7. CGO Bridge & Shared Engine
+The FFI logic is decoupled into a "Smart Bridge" (`src/cgo_bridge` in `distributed-config`). Multiple libraries (`libdistconf`, `libunilog`) import this same package.
+*   **Why**: Ensures memory space unification. If both libraries are linked, they share the same handles and global state.
+*   **Rule**: Never put `//export` statements in the core logic package; keep them in the standalone `main` entry points.
+
+...
+
+## 11. Go Shared Library Unloading (`dlclose`)
+**CRITICAL**: Never unload a Go-based shared library (`dlclose` in C, `drop` of `Library` in Rust) once loaded.
+*   **Why**: The Go runtime starts background threads (GC/Scheduler) that do not support shutdown. Unloading the library while these threads are active causes an indefinite hang or crash.
+*   **Solution**: Use "load-once" patterns (e.g., leaked static references in Rust).
 
 ## 8. Domain-Specific Log Levels
 Custom levels beyond standard: `Stream`, `Logon`, `Logout`, `Trade`, `Schedule`, `Report`. These are **financial services / market data** domain levels.
