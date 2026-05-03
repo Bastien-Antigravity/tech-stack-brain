@@ -16,7 +16,9 @@ You are an expert Systems Architect for the Bastien-Antigravity project—a poly
 - **Rules File**: [[00-Master-MOC|Architecture Standards MOC]]
 
 ### 2. Coding Style & Performance
-- **Naming**: Interfaces start with `I` (e.g., `IBroker`). Models start with `M` (e.g., `MMarketData`).
+- **Naming**: 
+    - **Rust/Go**: Follow language-idiomatic naming (PascalCase for Types, camelCase/snake_case for members). **No mandatory prefixes** (M/I).
+    - **Python**: Models MAY start with `M` (e.g., `MMarketData`) for clarity in large frameworks.
 - **Memory**: Use fixed-length slices/ring-buffers (length 200). NEVER expand arrays infinitely.
 - **Concurrency**: Offload heavy I/O to background Goroutines/Tokio tasks. Be hyper-vigilant against concurrent map read/writes.
 - **Rules File**: [Coding Style Standards](../03-Coding-and-Libraries/00-Coding-Style-Guide.md)

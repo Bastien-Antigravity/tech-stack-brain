@@ -17,11 +17,14 @@ Our microservices communicate through four primary channels: gRPC for control, N
 - **Handling**: Use asynchronous subscribers to avoid blocking the network thread.
 - **Container**: Uses the `nats:2.12.6-alpine3.22` image with monitoring on port 8222.
 
-### 3. Cap'n Proto Transport (safe-socket)
+### 3. Cap'n Proto Transport (safe-socket) [HARDENED]
 - **Role**: Binary serialization for log messages between services and `log-server`.
+- **Hardening Rules**:
+    - **Framing**: ALL messages must use a 4-byte Big-Endian length prefix.
+    - **Identity**: ALL connections must perform a `HelloMsg` handshake immediately upon connection.
+- **Serialization**: Packed Cap'n Proto for data, Unpacked for handshakes.
 - **Library**: `github.com/Bastien-Antigravity/safe-socket` provides the transport layer.
-- **Schemas**: Defined in `capnp/` directories within relevant services.
-- **Server**: `log-server` (Rust) listens for Cap'n Proto messages on TCP.
+- **Server**: `log-server` (Rust) listens for Cap'n Proto messages on TCP (Port 15000).
 
 ### 4. Metric WebSockets (WSPublisher)
 - **Role**: Outbound metrics (performance, health status, real-time data) are streamed via non-blocking concurrent WebSocket publishers.
@@ -44,3 +47,8 @@ To prevent "Zombie Connections" (where a process thinks a socket is alive but it
 - **Standard**: Always implement `grpc_health_v1` for service health checks.
 - **Status Reporting**: Report serving status as `SERVING` only when all internal sub-processes are successfully initialized.
 - **Container Health**: Docker health checks use `pg_isready` (DB), HTTP monitoring (NATS), or gRPC health (application services).
+
+### 7. The Log Bridge Pattern
+- **Definition**: A gRPC gateway (Port 15001) used as a bridge for clients without raw TCP access (e.g., Web/JS).
+- **Semantics**: Must be called `LogBridge` to distinguish it from the `ProcessController` (Shadow Port) standard.
+- **Data Flow**: Logs received via the Bridge are mapped to the same internal ordered stream as TCP messages.
