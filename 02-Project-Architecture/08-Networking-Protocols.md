@@ -28,10 +28,17 @@ Our microservices communicate through four primary channels: gRPC for control, N
 - **Implementation**: `WSPublisher` is a standard component found in most Go microservices.
 - **Performance**: Metrics must be buffered and sent asynchronously to avoid performance hits on the main processing engine.
 
-### 5. Port Convention
-Services follow a convention where the gRPC port is `tcp_port + 1`:
-- Example: `log-server` listens on TCP `9020` and gRPC `9021`.
-- This fallback is implemented in `microservice-toolbox`'s `GetGRPCListenAddr()` method.
+### 5. The Shadow Port Protocol
+To avoid the complexity of a global port registry, all microservices MUST follow the **Shadow Port** convention:
+- **Rule**: The gRPC control port is always `Base TCP Port + 1`.
+- **Implementation**: This logic is hardcoded into the `microservice-toolbox` address resolution layer. 
+- **Auto-Discovery**: AI agents must assume `Port + 1` for gRPC traffic unless explicitly overridden in `distributed-config`.
+
+### 6. Heartbeat Safety Ratio (2.5x)
+To prevent "Zombie Connections" (where a process thinks a socket is alive but it's actually stuck), we enforce the **2.5x Safety Ratio**:
+- **Rule**: The Heartbeat interval MUST be at least 2.5x faster than the Idle Timeout (Deadline).
+- **Standard**: If `IdleTimeout = 500ms`, then `HeartbeatInterval = 200ms`.
+- **Goal**: Proactively prove the connection is "Dead" and trigger reconnection before the application hits a blocking timeout.
 
 ### 6. Health & Status
 - **Standard**: Always implement `grpc_health_v1` for service health checks.
