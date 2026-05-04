@@ -8,7 +8,7 @@ microservice: ecosystem-wide
 ## 📐 CI/CD and Lifecycle
 
 ### 🏛️ Definition Layer
-This document defines the high-level architectural requirements for CI/CD. For the **execution** protocols and stage-by-stage implementation details, see **[[fleet-operation-brain/05-Fleet-Strategy/02-CI-Protocols|📡 Fleet CI Protocols]]**.
+This document defines the high-level architectural requirements for CI/CD. For the **execution** protocols and stage-by-stage implementation details, see **[[05-Fleet-Operation/05-Fleet-Strategy/02-CI-Protocols|📡 Fleet CI Protocols]]**.
 
 ## Architectural Rule
 Container images are published to **GitHub Container Registry**. `Watchtower` is used to poll for new images and auto-update containers.

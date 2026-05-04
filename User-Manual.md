@@ -1,6 +1,6 @@
 # 📖 Tech Stack: User Manual
 
-This manual explains how to maintain and evolve the `tech-stack-brain` repository.
+This manual explains how to maintain and evolve the `03-Tech-Stack` repository.
 
 ## 1. The Purpose of the Tech Stack
 This repository is your ultimate "Standard Operating Procedure" for software engineering. If you decide that all future microservices should use `gRPC` instead of a custom `TCP` socket, you document that change **here**. 

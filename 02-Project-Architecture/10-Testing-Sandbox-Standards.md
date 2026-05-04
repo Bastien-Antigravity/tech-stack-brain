@@ -12,7 +12,7 @@ All testing sandboxes must follow this hierarchy:
 - **`implementations/`**: Polyglot code (Go, Python) that executes the steps.
     - Path format: `implementations/<lang>/<test_file>`.
 - **`infra/`**: Environment orchestration (Docker, NATS, etc.).
-- **`bin/`**: Standard execution scripts.
+- **`bin/`**: Standard execution 20-Scripts.
 
 ## 🚀 Orchestration Standard
 - Scenarios MUST be executable via the `scenario_orchestrator.py` tool.

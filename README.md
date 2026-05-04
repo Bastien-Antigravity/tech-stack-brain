@@ -9,7 +9,7 @@ This repository serves as the **Rulebook** for your specific technological stack
 - **`02-Project-Architecture/`**: Core architectural paradigms (e.g., Facade patterns, Interface decoupling) and Architecture Decision Records (ADRs).
 - **`03-Project-Coding/`**: The language-specific idioms (Go, Rust, Python) and documentation requirements.
 - **`04-Project-Deployment/`**: Infrastructure rules, Docker strategies, and CI/CD lifecycles.
-- **`05-Project-Scripts/`**: Universal automation scripts (e.g., modular build wrappers and repo validators).
+- **`05-Project-Scripts/`**: Universal automation 20-Scripts (e.g., modular build wrappers and repo validators).
 
 ## 🔗 How it connects to the Ecosystem
 
