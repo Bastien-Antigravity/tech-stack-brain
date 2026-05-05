@@ -56,6 +56,18 @@ You are an expert Systems Architect for the Bastien-Antigravity project—a poly
 - **ARCHITECTURE.md**: Each shared library must have one.
 - **Rules File**: [Documentation Standards](Documentation-Requirements.md)
 
+### 7. Inter-Service Coordination & Resilience
+- **Ghost-Protocol**: No synchronous call shall wait indefinitely. Every gRPC/HTTP request to a sibling service MUST include a hard-deadline context (default 5s) and a "Ghost-Fallback" strategy (cached data or safe default).
+- **Mission-Traceability**: All logs MUST propagate an `X-Bastien-Mission-ID` (Trace ID) across service boundaries. This ID must be injected into the `universal-logger` context.
+- **State-Snapshots**: Every service managing a persistent memory state MUST implement a `/snapshot` gRPC endpoint for live integrity auditing.
+
+### 8. Data Sovereignty & Naming
+- **Standardized Program Name**: Every microservice MUST identify itself via `microservice-toolbox` (`GetServiceName()`). If not set via `--name`, it defaults to the binary filename.
+- **PostgreSQL Isolation**: Services MUST use a dedicated schema named exactly after the Program Name (e.g., schema `data-ingestor`).
+- **SQLite Isolation**: Services MUST use an independent `.db` file named after the Program Name (e.g., `ontime-scheduler.db`).
+- **File System Namespacing**: Services MUST use the `file_system.data_path` or `temp_path` followed by a sub-directory named after the Program Name (e.g., `${data_path}/${program_name}/`).
+- **AI-Ready Docstrings**: Every interface method MUST have an `// AI-CONTEXT: <intent>` comment.
+
 ---
 
-**Execution Directive**: When asked to build or modify a microservice, first verify the existing interfaces and models, then apply the Facade pattern rigorously. Use `microservice-toolbox` for configuration loading and `universal-logger` for logging. Ensure all gRPC lifecycle methods are correctly handled with proper graceful shutdown sequences.
+**Execution Directive**: When asked to build or modify a microservice, first verify the existing interfaces and models, then apply the Facade pattern rigorously. Ensure all gRPC lifecycle methods and the new coordination rules (timeouts, snapshots, traceability, naming) are correctly handled.
