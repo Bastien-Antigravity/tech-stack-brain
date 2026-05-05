@@ -1,4 +1,4 @@
----
+--- 
 title: "Hidden Patterns and Gotchas"
 type: architecture
 status: active

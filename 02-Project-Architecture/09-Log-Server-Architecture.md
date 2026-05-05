@@ -1,4 +1,4 @@
----
+--- 
 microservice: log-server
 type: architecture
 status: active

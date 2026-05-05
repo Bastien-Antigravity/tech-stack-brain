@@ -1,3 +1,9 @@
+---
+microservice: obsidian-brain
+type: architecture
+status: active
+---
+
 # Configuration Standards: Profiles, Toolbox & Capabilities
 
 ## Configuration Philosophy

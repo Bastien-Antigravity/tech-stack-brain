@@ -1,3 +1,9 @@
+---
+microservice: obsidian-brain
+type: architecture
+status: active
+---
+
 # Documentation Standards: Diagrams, Schemas & Records
 
 ## Architectural Documentation

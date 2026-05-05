@@ -1,3 +1,9 @@
+---
+microservice: obsidian-brain
+type: architecture
+status: active
+---
+
 # 🏗️ Tech Stack Brain
 
 Welcome to the **Tech Stack Brain**. This repository is Tier 2 of the 3-Tier AI-KMS Architecture.

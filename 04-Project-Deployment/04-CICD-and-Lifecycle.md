@@ -1,4 +1,4 @@
----
+--- 
 title: "CI/CD and Lifecycle"
 type: architecture
 status: active

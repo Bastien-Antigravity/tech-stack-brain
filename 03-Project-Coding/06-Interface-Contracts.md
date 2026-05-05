@@ -1,4 +1,4 @@
----
+--- 
 title: "Interface Contracts"
 type: architecture
 status: active

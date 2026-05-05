@@ -1,3 +1,9 @@
+---
+microservice: obsidian-brain
+type: architecture
+status: active
+---
+
 # Networking & Communications: gRPC, NATS, Cap'n Proto, WebSockets
 
 ## Networking Stack

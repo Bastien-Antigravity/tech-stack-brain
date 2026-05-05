@@ -1,4 +1,7 @@
----
+--- 
+type: architecture
+microservice: obsidian-brain
+
 id: ADR-002
 title: "The Static Loading Law (Go-FFI Safety)"
 status: accepted

@@ -1,4 +1,4 @@
----
+--- 
 title: "Dependency Graph"
 type: architecture
 status: active

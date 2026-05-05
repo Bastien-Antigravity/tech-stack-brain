@@ -1,4 +1,4 @@
----
+--- 
 title: "Architecture Patterns"
 type: architecture
 status: active

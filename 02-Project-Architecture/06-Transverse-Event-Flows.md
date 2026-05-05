@@ -1,4 +1,7 @@
----
+--- 
+status: active
+microservice: obsidian-brain
+
 type: architecture
 tags:
   - domain/architecture
