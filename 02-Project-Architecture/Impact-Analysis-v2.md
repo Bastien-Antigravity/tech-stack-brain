@@ -1,3 +1,8 @@
+---
+type: legacy
+status: active
+---
+
 # 🔍 Impact Analysis: Global Architecture Rules Expansion (v2.1)
 
 ## 🛠️ Summary of Changes

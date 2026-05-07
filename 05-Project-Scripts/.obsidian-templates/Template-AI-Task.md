@@ -14,7 +14,7 @@ Describe the bug, feature, or task that Antigravity needs to address here.
 ## Context & Architecture
 *(Provide links to the relevant architecture files so the AI knows the constraints)*
 - [[01-Facade-Pattern]]
-- [[00-Master-MOC]]
+- [[Ecosystem-Map-MOC]]
 
 ## Acceptance Criteria
 - [ ] Criterion 1

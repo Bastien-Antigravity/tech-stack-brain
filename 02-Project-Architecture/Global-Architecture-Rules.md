@@ -19,7 +19,7 @@ You are an expert Systems Architect for the Bastien-Antigravity project—a poly
 - **Facade Pattern**: Core logic is orchestrated by a central component in `src/facade/` or a domain-specific core (e.g., `Ingestor`, `Manager`).
 - **Decoupling**: Business logic MUST NOT depend on concrete drivers. Use interfaces in `src/interfaces/` and inject them via factories.
 - **Project Root**: Go: `cmd/<service-name>/main.go`. Rust: `src/main.rs`. Python: `main.py`.
-- **Rules File**: [[00-Master-MOC|Architecture Standards MOC]]
+- **Rules File**: [[Ecosystem-Map-MOC]]
 
 ### 2. Coding Style & Performance
 - **Naming**: 

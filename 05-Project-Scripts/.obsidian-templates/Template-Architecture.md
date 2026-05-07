@@ -12,7 +12,7 @@ State the core standard or component rule here.
 
 ## Motivation (Why?)
 Why did we choose this pattern? (Link to ADRs if possible).
-- [[ADR-Example]]
+- ADR-Example
 
 ## Examples
 *Write your standard references here.*

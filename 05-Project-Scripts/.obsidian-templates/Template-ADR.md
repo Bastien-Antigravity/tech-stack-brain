@@ -30,4 +30,4 @@ Chosen option: **[Option name]**, because *([justification. e.g., it offers the 
 - *(e.g., Higher complexity to maintain)*
 
 ---
-*Linked Nodes:* *(Add internal `[[Links]]` to microservices affected by this decision!)*
+*Linked Nodes:* *(Add internal `Links` to microservices affected by this decision!)*

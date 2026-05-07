@@ -14,7 +14,7 @@ All testing sandboxes must follow this hierarchy:
 
 - **`00-Environment`**: Infrastructure as Code (Docker Compose, NATS, network topologies).
 - **`01-Specifications`**: BDD-style YAML files defining the "What" (Business Scenarios).
-    - MUST include a `Spec: [[...]]` link to the Business BDD brain.
+    - MUST include a `Spec: [...]` link to the Business BDD brain.
     - MUST use `FEAT-XXX` prefixes.
 - **`02-Scenarios`**: Technical implementations in Go, Rust, or Python defining the "How" (Validation Logic).
     - Path format: `02-Scenarios/<lang>/<test_file>`.
