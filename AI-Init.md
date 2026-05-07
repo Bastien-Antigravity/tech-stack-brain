@@ -1,3 +1,9 @@
+---
+microservice: tech-stack-brain
+type: governance
+status: active
+---
+
 # ⚡ AI Initialization: tech-stack-brain
 
 > [!IMPORTANT] MANDATORY INITIALIZATION
