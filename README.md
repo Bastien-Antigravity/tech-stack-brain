@@ -1,5 +1,5 @@
 ---
-microservice: obsidian-brain
+microservice: tech-stack-brain
 type: architecture
 status: active
 ---

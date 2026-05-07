@@ -2,11 +2,13 @@
 # coding:utf-8
 """
 ESSENTIAL PROCESS:
-Ecosystem orchestrator that discovers all microservice repositories and triggers their build or test cycles.
+Ecosystem orchestrator that discovers all microservice repositories and 
+triggers their build or test cycles.
 
 DATA FLOW:
 1. Scans the root directory for folders containing Go, Rust, or Python markers.
-2. For each discovered repository, executes the Build-Wrapper.py script with the requested action.
+2. For each discovered repository, executes the Build-Wrapper.py script 
+   with the requested action.
 3. Collects and summarizes results.
 
 KEY PARAMETERS:
@@ -14,22 +16,20 @@ KEY PARAMETERS:
 """
 
 from sys import argv as sysArgv, exit as sysExit, executable as sysExecutable
-from subprocess import (
-    run as subprocessRun,
-    CalledProcessError as subprocessCalledProcessError,
-)
-from pathlib import Path as pathlibPath
+from subprocess import run as subprocessRun, CalledProcessError as subprocessCalledProcessError
+from pathlib import Path
 from typing import List
 
 # -----------------------------------------------------------------------------------------------
 
-
-def get_repos(root_dir: str) -> List[pathlibPath]:
-    """Finds all root-level directories that look like they contain microservices."""
+def get_repos(root_dir: str) -> List[Path]:
+    """
+    Finds all root-level directories that look like they contain microservices.
+    """
     repos = []
-    for item in pathlibPath(root_dir).iterdir():
+    for item in Path(root_dir).iterdir():
         if item.is_dir() and not item.name.startswith(".") and item.name != "prompt":
-            # Just simple check: does it have a language folder or target config?
+            # Check for language markers
             if (
                 (item / "go.mod").exists()
                 or (item / "go").exists()
@@ -41,24 +41,24 @@ def get_repos(root_dir: str) -> List[pathlibPath]:
                 repos.append(item)
     return repos
 
-
 # -----------------------------------------------------------------------------------------------
 
-
 def run_all(action: str, root_dir: str) -> None:
-    """Orchestrates the build or test action across all discovered repositories."""
+    """
+    Orchestrates the build or test action across all discovered repositories.
+    """
     repos = get_repos(root_dir)
-    print(f"=== Bastien Orchestrator: Discovered {len(repos)} repositories ===")
+    print("=== Bastien Orchestrator: Discovered {0} repositories ===".format(len(repos)))
 
-    make_script = pathlibPath(__file__).parent / "Build-Wrapper.py"
+    make_script = Path(__file__).parent / "Build-Wrapper.py"
     if not make_script.exists():
-        print("Error: Build-Wrapper.py engine missing from .scripts/")
+        print("Error: Build-Wrapper.py engine missing from scripts/")
         sysExit(1)
 
     failures = []
 
     for repo in repos:
-        print(f"\n--- Processing {repo.name} ---")
+        print("\n--- Processing {0} ---".format(repo.name))
         try:
             # We call the Build-Wrapper script to handle the cross-platform stuff
             subprocessRun(
@@ -69,13 +69,12 @@ def run_all(action: str, root_dir: str) -> None:
 
     print("\n=== Orchestration Summary ===")
     if not failures:
-        print(f"SUCCESS: All {len(repos)} repositories passed '{action}' phase.")
+        print("SUCCESS: All {0} repositories passed '{1}' phase.".format(len(repos), action))
     else:
         print(
-            f"FAILURE: The following repos failed during '{action}': {', '.join(failures)}"
+            "FAILURE: The following repos failed during '{0}': {1}".format(action, ', '.join(failures))
         )
         sysExit(1)
-
 
 # -----------------------------------------------------------------------------------------------
 
@@ -84,8 +83,10 @@ if __name__ == "__main__":
         print("Usage: python Multi-Repo-Validator.py <build|test>")
         sysExit(1)
 
-    action = sysArgv[1]
+    action_param = sysArgv[1]
 
-    # Run from the root workspace directory
-    current_dir = pathlibPath(__file__).resolve().parent.parent
-    run_all(action, str(current_dir))
+    # Run from the root workspace directory (parent of tech-stack-brain)
+    script_dir = Path(__file__).resolve().parent
+    workspace_root = script_dir.parents[1]
+    
+    run_all(action_param, str(workspace_root))
