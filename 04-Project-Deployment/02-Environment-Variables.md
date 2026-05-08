@@ -1,8 +1,12 @@
---- 
-title: "Environment Variables"
+---
+title: Environment Variables
 type: architecture
 status: active
 microservice: ecosystem-wide
+tags:
+- '#state/active'
+- null
+- '#type/architecture'
 ---
 
 # 📐 Environment Variables

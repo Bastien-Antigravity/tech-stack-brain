@@ -2,6 +2,10 @@
 microservice: tech-stack-brain
 type: governance
 status: active
+tags:
+- '#type/governance'
+- null
+- '#state/active'
 ---
 
 # ⚡ AI Initialization: tech-stack-brain

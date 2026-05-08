@@ -1,6 +1,10 @@
 ---
 type: legacy
 status: active
+tags:
+- '#state/active'
+- null
+- '#type/legacy'
 ---
 
 # 🔍 Impact Analysis: Global Architecture Rules Expansion (v2.1)

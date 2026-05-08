@@ -1,8 +1,12 @@
---- 
-title: "Docker Infrastructure"
+---
+title: Docker Infrastructure
 type: architecture
 status: active
 microservice: ecosystem-wide
+tags:
+- '#state/active'
+- null
+- '#type/architecture'
 ---
 
 # 📐 Docker Infrastructure

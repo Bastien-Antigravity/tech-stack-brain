@@ -1,8 +1,12 @@
---- 
-title: "General Naming Conventions"
+---
+title: General Naming Conventions
 type: architecture
 status: active
 microservice: ecosystem-wide
+tags:
+- '#state/active'
+- null
+- '#type/architecture'
 ---
 
 # 📐 General Naming Conventions

@@ -2,6 +2,10 @@
 microservice: obsidian-brain
 type: architecture
 status: active
+tags:
+- '#state/active'
+- null
+- '#type/architecture'
 ---
 
 # 🧪 Testing Sandbox Standards (BDD)

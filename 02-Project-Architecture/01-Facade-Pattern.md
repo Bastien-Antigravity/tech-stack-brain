@@ -1,8 +1,12 @@
---- 
+---
 type: architecture
 status: active
 microservice: ecosystem-wide
-title: "The Facade Pattern"
+title: The Facade Pattern
+tags:
+- '#state/active'
+- null
+- '#type/architecture'
 ---
 
 # 01 - The Facade Pattern (SystemFacade)

@@ -3,6 +3,9 @@ microservice: {{title}}
 type: session-state
 status: active
 last-updated: {{date}}
+tags:
+  - #type/task
+  - #state/active
 ---
 
 # 🧠 {{title}} - AI Session & TODO State

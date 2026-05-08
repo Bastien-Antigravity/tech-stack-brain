@@ -1,8 +1,12 @@
---- 
-title: "Interface Contracts"
+---
+title: Interface Contracts
 type: architecture
 status: active
 microservice: ecosystem-wide
+tags:
+- '#state/active'
+- null
+- '#type/architecture'
 ---
 
 # 📐 Interface Contracts

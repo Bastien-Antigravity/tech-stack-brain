@@ -1,8 +1,12 @@
---- 
-title: "Go Memory and Concurrency"
+---
+title: Go Memory and Concurrency
 type: architecture
 status: active
 microservice: ecosystem-wide
+tags:
+- '#state/active'
+- null
+- '#type/architecture'
 ---
 
 # 📐 Go Memory and Concurrency

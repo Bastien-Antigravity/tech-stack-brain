@@ -1,11 +1,12 @@
---- 
+---
 status: active
 microservice: obsidian-brain
-
 type: architecture
 tags:
-  - domain/architecture
-  - domain/networking
+- '#state/active'
+- domain/networking
+- domain/architecture
+- '#type/architecture'
 ---
 
 # 🌀 Transverse Event Flow sequences

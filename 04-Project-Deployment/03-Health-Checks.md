@@ -1,8 +1,12 @@
---- 
-title: "Health Checks"
+---
+title: Health Checks
 type: architecture
 status: active
 microservice: ecosystem-wide
+tags:
+- '#state/active'
+- null
+- '#type/architecture'
 ---
 
 # 📐 Health Checks

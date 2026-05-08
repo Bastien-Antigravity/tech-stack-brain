@@ -1,8 +1,12 @@
---- 
+---
 type: reference
 status: active
 microservice: ecosystem-wide
-title: "Ecosystem Service Map"
+title: Ecosystem Service Map
+tags:
+- '#type/reference'
+- null
+- '#state/active'
 ---
 
 # 05 - Ecosystem Service Map

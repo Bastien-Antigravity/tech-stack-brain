@@ -1,8 +1,12 @@
---- 
-title: "Coding Style Guide (MOC)"
+---
+title: Coding Style Guide (MOC)
 type: moc
 status: active
 microservice: ecosystem-wide
+tags:
+- '#state/active'
+- null
+- '#type/moc'
 ---
 
 # 🎨 Coding Style Guide (MOC)

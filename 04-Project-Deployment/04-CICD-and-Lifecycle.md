@@ -1,8 +1,12 @@
---- 
-title: "CI/CD and Lifecycle"
+---
+title: CI/CD and Lifecycle
 type: architecture
 status: active
 microservice: ecosystem-wide
+tags:
+- '#state/active'
+- null
+- '#type/architecture'
 ---
 
 ## 📐 CI/CD and Lifecycle

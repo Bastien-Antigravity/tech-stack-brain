@@ -1,8 +1,12 @@
---- 
+---
 type: architecture
 status: active
 microservice: ecosystem-wide
-title: "Component Decoupling via Interfaces"
+title: Component Decoupling via Interfaces
+tags:
+- '#state/active'
+- null
+- '#type/architecture'
 ---
 
 # 02 - Component Decoupling via Interfaces

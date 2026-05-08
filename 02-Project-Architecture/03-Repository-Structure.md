@@ -1,8 +1,12 @@
---- 
+---
 type: architecture
 status: active
 microservice: ecosystem-wide
-title: "Repository Structure"
+title: Repository Structure
+tags:
+- '#state/active'
+- null
+- '#type/architecture'
 ---
 
 # 03 - Repository Structure

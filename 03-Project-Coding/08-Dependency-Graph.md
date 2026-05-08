@@ -1,8 +1,12 @@
---- 
-title: "Dependency Graph"
+---
+title: Dependency Graph
 type: architecture
 status: active
 microservice: ecosystem-wide
+tags:
+- '#state/active'
+- null
+- '#type/architecture'
 ---
 
 # 🔗 Dependency Graph

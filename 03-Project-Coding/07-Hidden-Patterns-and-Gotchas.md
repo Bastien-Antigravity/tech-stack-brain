@@ -1,8 +1,12 @@
---- 
-title: "Hidden Patterns and Gotchas"
+---
+title: Hidden Patterns and Gotchas
 type: architecture
 status: active
 microservice: ecosystem-wide
+tags:
+- '#state/active'
+- null
+- '#type/architecture'
 ---
 
 # ⚠️ Hidden Patterns and Gotchas

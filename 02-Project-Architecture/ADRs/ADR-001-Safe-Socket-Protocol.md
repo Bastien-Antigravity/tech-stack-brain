@@ -1,12 +1,13 @@
---- 
+---
 microservice: obsidian-brain
-
 type: adr
 status: accepted
 date: 2026-04-15
 tags:
-  - domain/networking
-  - domain/architecture
+- '#state/accepted'
+- '#type/adr'
+- domain/networking
+- domain/architecture
 ---
 
 # 📜 ADR-001: Safe-Socket Custom TCP Protocol

@@ -3,7 +3,9 @@ type: adr
 status: proposed
 date: {{date}}
 tags:
-  - domain/architecture
+  - #domain/architecture
+  - #type/architecture
+  - #state/draft
 ---
 
 # 📜 ADR-{{title}}: [Short Descriptive Title]

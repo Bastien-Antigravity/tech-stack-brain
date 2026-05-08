@@ -2,6 +2,10 @@
 microservice: tech-stack-brain
 type: architecture
 status: active
+tags:
+- '#state/active'
+- null
+- '#type/architecture'
 ---
 
 # 🏗️ Tech Stack Brain

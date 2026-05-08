@@ -1,8 +1,12 @@
---- 
-title: "Architecture Patterns"
+---
+title: Architecture Patterns
 type: architecture
 status: active
 microservice: ecosystem-wide
+tags:
+- '#state/active'
+- null
+- '#type/architecture'
 ---
 
 # 📐 Architecture Patterns

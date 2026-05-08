@@ -1,8 +1,12 @@
---- 
+---
 type: architecture
 status: active
 microservice: ecosystem-wide
-title: "Process Lifecycle"
+title: Process Lifecycle
+tags:
+- '#state/active'
+- null
+- '#type/architecture'
 ---
 
 # 04 - Process Lifecycle

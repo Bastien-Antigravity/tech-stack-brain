@@ -1,8 +1,11 @@
 ---
-title: "{{title}}"
-type: architecture
-status: active
 microservice: ecosystem-wide
+status: active
+tags:
+- '#type/task'
+- '#state/draft'
+title: '{{title}}'
+type: architecture
 ---
 
 # 📐 {{title}}

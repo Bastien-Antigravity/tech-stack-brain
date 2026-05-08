@@ -1,9 +1,12 @@
 ---
-title: "{{title}}"
-type: task
-status: active
-feature: 
+feature: null
 priority: medium
+status: active
+tags:
+- '#type/task'
+- '#state/draft'
+title: '{{title}}'
+type: task
 ---
 
 # 📝 AI Task: {{title}}

@@ -1,10 +1,12 @@
---- 
+---
 microservice: log-server
 type: architecture
 status: active
 tags:
-  - domain/observability
-  - domain/networking
+- domain/observability
+- '#state/active'
+- domain/networking
+- '#type/architecture'
 ---
 
 # Log Server Architecture
