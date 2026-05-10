@@ -49,7 +49,7 @@ tags:
 
 ## Go Workspace (`go.work`)
 ```
-go 1.25.4
+go 1.25
 use (
     ./config-server
     ./distributed-config
@@ -64,7 +64,7 @@ All 7 Go modules are bound into a single workspace. Local changes propagate inst
 
 ## Polyglot Component Map
 
-| Component | Go | Rust | Python |
+| Component | Go (1.25) | Rust (1.91) | Python (3.12) |
 |-----------|-----|------|--------|
 | Config Loader | `microservice-toolbox/go` | `microservice-toolbox/rust` | `microservice-toolbox/python` |
 | Log Engine | `flexible-logger` | N/A (uses CGO) | N/A (uses CGO) |

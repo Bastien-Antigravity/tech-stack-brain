@@ -14,6 +14,23 @@ tags:
 
 ---
 
+## 🏛️ Ecosystem Hardening Rules
+
+### Fixed Version Rule
+To ensure 100% reproducibility and prevent "it works on my machine" drift, all microservices MUST pin their language runtimes in CI/CD pipelines and Dockerfiles to the current **Ecosystem Baseline**:
+- **Go**: `1.25`
+- **Python**: `3.12`
+- **Rust**: `1.91`
+- **C/C++**: (System toolchain consistent with `alpine:3.20`)
+
+### Quality Gate Rule
+Every repository MUST implement a `CI/CD` workflow that enforces:
+- **Go**: `golangci-lint` with the project-standard `.golangci.yml`.
+- **Python**: `ruff` check and `pytest`.
+- **Rust**: `cargo clippy` and `cargo fmt`.
+
+---
+
 ## The AI Prompt
 
 **System Role & Philosophy:**
