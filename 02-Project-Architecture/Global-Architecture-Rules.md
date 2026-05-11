@@ -24,10 +24,11 @@ To ensure 100% reproducibility and prevent "it works on my machine" drift, all m
 - **C/C++**: (System toolchain consistent with `alpine:3.20`)
 
 ### Quality Gate Rule
-Every repository MUST implement a `CI/CD` workflow that enforces:
-- **Go**: `golangci-lint` with the project-standard `.golangci.yml`.
-- **Python**: `ruff` check and `pytest`.
-- **Rust**: `cargo clippy` and `cargo fmt`.
+Every repository MUST implement a `CI/CD` workflow that delegates to the **Centralized Reusable Workflows** in `fleet-operation-brain`:
+- **Go**: `workflow-go.yml` (enforces `golangci-lint` with the project-standard global `.golangci.yml` distributed by fleet-manager).
+- **Python**: `workflow-python.yml` (enforces testing with dynamic CGO bridge resolution).
+- **Rust**: `workflow-rust.yml`.
+- **C++**: `workflow-cpp.yml`.
 
 ---
 
