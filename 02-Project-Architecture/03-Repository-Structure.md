@@ -45,8 +45,10 @@ This governs the folder structure for all microservices in the ecosystem.
 Every microservice and library repository MUST include a `quick-overview/` folder at the root. This folder is **exclusively for human readers** and is excluded from AI agent context.
 
 - `quick-overview/Architecture-Overview.md`: Visual graphs and explanations of the repo's internal structure.
+- `quick-overview/Features-Behavior.md`: High-level overview of the service's features and core behaviors for human readers.
 - `quick-overview/Testing-Playbook.md`: How to test this specific service (unit, integration, sandbox).
 - `quick-overview/General-Misc.md`: Purpose, philosophy, and optimization tips for human operators.
+- `quick-overview/.geminiignore`, `quick-overview/.mcpignore`, `quick-overview/.aiignore`: Mandatory ignore files to ensure AI agents skip this folder.
 
 > [!IMPORTANT]
 > AI agents MUST ignore `quick-overview/`. The **DocMaintainer** is the only agent responsible for keeping these files up-to-date after major architectural changes, even though the content targets human readers.
