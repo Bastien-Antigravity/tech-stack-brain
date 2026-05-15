@@ -76,6 +76,7 @@ You are an expert Systems Architect for the Bastien-Antigravity project—a poly
 ### 6. Documentation
 - **ASCII Diagrams**: Maintain topological diagrams in `/doc` explaining Data Flow and models.
 - **ARCHITECTURE.md**: Each shared library must have one.
+- **Human Onboarding (`quick-overview/`)**: Every repo MUST contain a `quick-overview/` folder with `Architecture-Overview.md`, `Testing-Playbook.md`, and `General-Misc.md`. This folder is **excluded from AI agent context** — only the **DocMaintainer** may update it after major changes.
 - **Rules File**: [Documentation Standards](Documentation-Requirements.md)
 
 ### 7. Inter-Service Coordination & Resilience
