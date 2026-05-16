@@ -2,6 +2,7 @@
 microservice: ecosystem-wide
 status: active
 tags:
+- \'#service/ecosystem-wide\'
 - '#type/task'
 - '#state/draft'
 title: '{{title}}'

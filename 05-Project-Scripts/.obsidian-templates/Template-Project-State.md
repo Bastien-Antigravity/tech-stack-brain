@@ -4,6 +4,7 @@ type: session-state
 status: active
 last-updated: {{date}}
 tags:
+- \'#service/{{title}}\'
   - #type/task
   - #state/active
 ---
