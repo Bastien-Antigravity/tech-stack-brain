@@ -3,6 +3,7 @@ microservice: tech-stack-brain
 type: governance
 status: active
 tags:
+- \'#service/tech-stack-brain\'
 - '#type/governance'
 - null
 - '#state/active'

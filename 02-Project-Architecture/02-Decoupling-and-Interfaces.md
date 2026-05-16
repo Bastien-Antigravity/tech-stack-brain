@@ -4,6 +4,7 @@ status: active
 microservice: ecosystem-wide
 title: Component Decoupling via Interfaces
 tags:
+- \'#service/ecosystem-wide\'
 - '#state/active'
 - null
 - '#type/architecture'

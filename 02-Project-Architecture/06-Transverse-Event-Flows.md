@@ -3,9 +3,10 @@ status: active
 microservice: obsidian-brain
 type: architecture
 tags:
+- \'#service/obsidian-brain\'
 - '#state/active'
-- domain/networking
-- domain/architecture
+- '#domain/networking'
+- '#domain/architecture'
 - '#type/architecture'
 ---
 

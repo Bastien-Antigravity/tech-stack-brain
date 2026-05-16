@@ -3,6 +3,7 @@ microservice: obsidian-brain
 type: architecture
 status: active
 tags:
+- \'#service/obsidian-brain\'
 - '#state/active'
 - null
 - '#type/architecture'

@@ -3,6 +3,7 @@ microservice: tech-stack-brain
 type: architecture
 status: active
 tags:
+- \'#service/tech-stack-brain\'
 - '#state/active'
 - null
 - '#type/architecture'

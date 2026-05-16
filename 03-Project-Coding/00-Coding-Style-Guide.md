@@ -4,6 +4,7 @@ type: moc
 status: active
 microservice: ecosystem-wide
 tags:
+- \'#service/ecosystem-wide\'
 - '#state/active'
 - null
 - '#type/moc'

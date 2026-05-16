@@ -4,6 +4,7 @@ status: active
 microservice: ecosystem-wide
 title: The Facade Pattern
 tags:
+- \'#service/ecosystem-wide\'
 - '#state/active'
 - null
 - '#type/architecture'

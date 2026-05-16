@@ -4,6 +4,7 @@ status: active
 microservice: ecosystem-wide
 title: Ecosystem Service Map
 tags:
+- \'#service/ecosystem-wide\'
 - '#type/reference'
 - null
 - '#state/active'

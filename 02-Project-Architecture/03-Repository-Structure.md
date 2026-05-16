@@ -4,6 +4,7 @@ status: active
 microservice: ecosystem-wide
 title: Repository Structure
 tags:
+- \'#service/ecosystem-wide\'
 - '#state/active'
 - null
 - '#type/architecture'

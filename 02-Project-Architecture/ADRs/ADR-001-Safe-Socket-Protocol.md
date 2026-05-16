@@ -4,10 +4,11 @@ type: adr
 status: accepted
 date: 2026-04-15
 tags:
+- \'#service/obsidian-brain\'
 - '#state/accepted'
 - '#type/adr'
-- domain/networking
-- domain/architecture
+- '#domain/networking'
+- '#domain/architecture'
 ---
 
 # 📜 ADR-001: Safe-Socket Custom TCP Protocol
