@@ -6,6 +6,7 @@ title: The Static Loading Law (Go-FFI Safety)
 status: accepted
 date: 2026-05-03
 tags:
+- \'#zone/3-fleet\'
 - \'#service/ecosystem-wide\'
 - '#service/obsidian-brain'
 - polyglot

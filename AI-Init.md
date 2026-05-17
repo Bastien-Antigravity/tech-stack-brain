@@ -3,6 +3,7 @@ microservice: tech-stack-brain
 type: governance
 status: active
 tags:
+- \'#zone/3-fleet\'
 - '#service/tech-stack-brain'
 - '#type/governance'
 - '#state/active'

@@ -3,6 +3,7 @@ microservice: tech-stack-brain
 type: architecture
 status: active
 tags:
+- \'#zone/3-fleet\'
 - '#ai/ignore'
 - '#service/tech-stack-brain'
 - '#type/architecture'

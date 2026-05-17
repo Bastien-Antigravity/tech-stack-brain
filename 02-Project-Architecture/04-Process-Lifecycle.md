@@ -4,6 +4,7 @@ status: active
 microservice: ecosystem-wide
 title: Process Lifecycle
 tags:
+- \'#zone/3-fleet\'
 - '#service/ecosystem-wide'
 - '#state/active'
 - '#type/architecture'

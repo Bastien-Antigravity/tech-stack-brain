@@ -4,6 +4,7 @@ status: active
 microservice: ecosystem-wide
 title: Component Decoupling via Interfaces
 tags:
+- \'#zone/3-fleet\'
 - '#service/ecosystem-wide'
 - '#state/active'
 - '#type/architecture'

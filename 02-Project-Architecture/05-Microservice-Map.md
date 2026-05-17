@@ -4,6 +4,7 @@ status: active
 microservice: ecosystem-wide
 title: Ecosystem Service Map
 tags:
+- \'#zone/3-fleet\'
 - '#service/ecosystem-wide'
 - '#type/reference'
 - '#state/active'
