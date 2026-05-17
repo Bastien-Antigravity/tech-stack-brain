@@ -1,14 +1,14 @@
 ---
+
 microservice: tech-stack-brain
 type: architecture
 status: active
 tags:
-- \'#zone/3-fleet\'
+- '#zone/3-fleet'
 - '#ai/ignore'
 - '#service/tech-stack-brain'
 - '#type/architecture'
 ---
-
 # Testing Playbook
 
 Quality Assurance in the Tech Stack Brain focuses on ensuring our **standards** remain valid and our **automation** remains functional.

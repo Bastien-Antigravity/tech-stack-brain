@@ -1,14 +1,14 @@
 ---
+
 microservice: tech-stack-brain
 type: architecture
 status: active
 tags:
-- \'#zone/3-fleet\'
+- '#zone/3-fleet'
 - '#ai/ignore'
 - '#service/tech-stack-brain'
 - '#type/architecture'
 ---
-
 # Features & Behavior
 
 The Tech Stack Brain provides several key behavioral features that ensure consistency across the Bastien-Antigravity fleet.

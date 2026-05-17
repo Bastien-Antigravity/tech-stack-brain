@@ -1,10 +1,11 @@
 ---
+
 type: architecture
 status: active
 microservice: ecosystem-wide
 title: The Facade Pattern
 tags:
-- \'#zone/3-fleet\'
+- '#zone/3-fleet'
 - '#service/ecosystem-wide'
 - '#state/active'
 - '#type/architecture'

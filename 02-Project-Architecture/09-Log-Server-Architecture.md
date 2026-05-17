@@ -1,9 +1,10 @@
 ---
+
 microservice: log-server
 type: architecture
 status: active
 tags:
-- \'#zone/3-fleet\'
+- '#zone/3-fleet'
 - '#service/log-server'
 - '#domain/observability'
 - '#state/active'

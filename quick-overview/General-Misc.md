@@ -1,14 +1,14 @@
 ---
+
 microservice: tech-stack-brain
 type: architecture
 status: active
 tags:
-- \'#zone/3-fleet\'
+- '#zone/3-fleet'
 - '#ai/ignore'
 - '#service/tech-stack-brain'
 - '#type/architecture'
 ---
-
 # General & Misc
 
 Philosophy and general guidelines for the Bastien-Antigravity Tech Stack.

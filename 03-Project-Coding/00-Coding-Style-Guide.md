@@ -1,10 +1,11 @@
 ---
+
 title: Coding Style Guide (MOC)
 type: moc
 status: active
 microservice: ecosystem-wide
 tags:
-- \'#zone/3-fleet\'
+- '#zone/3-fleet'
 - '#service/ecosystem-wide'
 - '#state/active'
 - '#type/moc'

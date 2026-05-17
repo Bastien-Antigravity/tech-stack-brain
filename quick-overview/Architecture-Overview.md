@@ -1,14 +1,14 @@
 ---
+
 microservice: tech-stack-brain
 type: architecture
 status: active
 tags:
-- \'#zone/3-fleet\'
+- '#zone/3-fleet'
 - '#ai/ignore'
 - '#service/tech-stack-brain'
 - '#type/architecture'
 ---
-
 # Architecture Overview: Tech Stack Brain
 
 ## 🏛️ Role in the Ecosystem

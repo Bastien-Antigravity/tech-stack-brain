@@ -1,11 +1,12 @@
 ---
+
 microservice: ecosystem-wide
 type: adr
 status: accepted
 date: 2026-04-15
 tags:
-- \'#zone/3-fleet\'
-- \'#service/ecosystem-wide\'
+- '#zone/3-fleet'
+- '#service/ecosystem-wide'
 - '#service/obsidian-brain'
 - '#state/accepted'
 - '#type/adr'

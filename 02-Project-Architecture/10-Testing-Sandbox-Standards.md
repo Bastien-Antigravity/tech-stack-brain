@@ -1,10 +1,11 @@
 ---
+
 microservice: ecosystem-wide
 type: architecture
 status: active
 tags:
-- \'#zone/3-fleet\'
-- \'#service/ecosystem-wide\'
+- '#zone/3-fleet'
+- '#service/ecosystem-wide'
 - '#service/obsidian-brain'
 - '#state/active'
 - '#type/architecture'

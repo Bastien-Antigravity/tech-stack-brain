@@ -1,9 +1,10 @@
 ---
+
 type: legacy
 status: active
 tags:
-- \'#zone/3-fleet\'
-- \'#service/ecosystem-wide\'
+- '#zone/3-fleet'
+- '#service/ecosystem-wide'
 - '#service/tech-stack-brain'
 - '#state/active'
 - '#type/legacy'

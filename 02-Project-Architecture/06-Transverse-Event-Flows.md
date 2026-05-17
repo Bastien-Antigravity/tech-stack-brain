@@ -1,9 +1,10 @@
 ---
+
 status: active
 microservice: ecosystem-wide
 type: architecture
 tags:
-- \'#zone/3-fleet\'
+- '#zone/3-fleet'
 - '#service/ecosystem-wide'
 - '#state/active'
 - '#domain/networking'
