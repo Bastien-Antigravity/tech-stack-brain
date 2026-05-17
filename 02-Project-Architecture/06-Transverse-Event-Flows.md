@@ -1,15 +1,14 @@
 ---
 status: active
-microservice: obsidian-brain
+microservice: ecosystem-wide
 type: architecture
 tags:
-- \'#service/obsidian-brain\'
+- '#service/ecosystem-wide'
 - '#state/active'
 - '#domain/networking'
 - '#domain/architecture'
 - '#type/architecture'
 ---
-
 # 🌀 Transverse Event Flow sequences
 
 This document physically maps the boundaries and interactions between isolated microservices to provide a true transversal C4 view.

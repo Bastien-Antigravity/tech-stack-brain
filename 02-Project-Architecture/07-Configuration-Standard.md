@@ -1,14 +1,12 @@
 ---
-microservice: obsidian-brain
+microservice: ecosystem-wide
 type: architecture
 status: active
 tags:
-- \'#service/obsidian-brain\'
+- '#service/ecosystem-wide'
 - '#state/active'
-- null
 - '#type/architecture'
 ---
-
 # Configuration Standards: Profiles, Toolbox & Capabilities
 
 ## Configuration Philosophy

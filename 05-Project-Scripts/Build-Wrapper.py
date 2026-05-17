@@ -10,7 +10,7 @@ DATA FLOW:
 2. Executes build or test action via subprocess.
 
 KEY PARAMETERS:
-- target_action: build | test
+- target_action: build | test | lint
 - root_dir: Path to the repository root.
 """
 
@@ -51,6 +51,8 @@ def detect_and_run(target_action: str, root_dir: str) -> None:
             run_cmd(["cargo", "build"], str(rust_dir))
         elif target_action == "test":
             run_cmd(["cargo", "test"], str(rust_dir))
+        elif target_action == "lint":
+            run_cmd(["cargo", "clippy", "--", "-D", "warnings"], str(rust_dir))
 
     # 2. Go Detection
     if (root_path / "go.mod").exists() or (root_path / "go" / "go.mod").exists():
@@ -59,9 +61,12 @@ def detect_and_run(target_action: str, root_dir: str) -> None:
             run_cmd(["go", "build", "./..."], str(go_dir))
         elif target_action == "test":
             run_cmd(["go", "test", "./..."], str(go_dir))
+        elif target_action == "lint":
+            # Assumes golangci-lint is installed
+            run_cmd(["golangci-lint", "run"], str(go_dir))
 
     # 3. Python Detection
-    if (root_path / "requirements.txt").exists() or (root_path / "python").exists():
+    if (root_path / "requirements.txt").exists() or (root_path / "pyproject.toml").exists() or (root_path / "python").exists():
         py_dir = root_path / "python" if (root_path / "python").exists() else root_path
         if target_action == "build":
             # Just do a compile syntax check for Python "builds"
@@ -72,6 +77,12 @@ def detect_and_run(target_action: str, root_dir: str) -> None:
                 run_cmd([sysExecutable, "-m", "pytest"], str(py_dir))
             except Exception:
                 run_cmd([sysExecutable, "-m", "unittest", "discover"], str(py_dir))
+        elif target_action == "lint":
+            # Prefer ruff if available, else flake8
+            try:
+                run_cmd([sysExecutable, "-m", "ruff", "check", "."], str(py_dir))
+            except Exception:
+                run_cmd([sysExecutable, "-m", "flake8", "."], str(py_dir))
 
     print("=== {0} completed ===".format(target_action))
 
@@ -85,7 +96,7 @@ if __name__ == "__main__":
     action = sysArgv[1]
     target_param = sysArgv[2]
 
-    if action not in ["build", "test"]:
+    if action not in ["build", "test", "lint"]:
         print("Unsupported action. Use build or test.")
         sysExit(1)
 

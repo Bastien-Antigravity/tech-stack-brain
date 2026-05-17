@@ -1,14 +1,13 @@
 ---
-microservice: obsidian-brain
+microservice: ecosystem-wide
 type: architecture
 status: active
 tags:
-- \'#service/obsidian-brain\'
+- \'#service/ecosystem-wide\'
+- '#service/obsidian-brain'
 - '#state/active'
-- null
 - '#type/architecture'
 ---
-
 # Networking & Communications: gRPC, NATS, Cap'n Proto, WebSockets
 
 ## Networking Stack
@@ -54,12 +53,12 @@ To prevent "Zombie Connections" (where a process thinks a socket is alive but it
 - **Standard**: If `IdleTimeout = 500ms`, then `HeartbeatInterval = 200ms`.
 - **Goal**: Proactively prove the connection is "Dead" and trigger reconnection before the application hits a blocking timeout.
 
-### 6. Health & Status
+### 7. Health & Status
 - **Standard**: Always implement `grpc_health_v1` for service health checks.
 - **Status Reporting**: Report serving status as `SERVING` only when all internal sub-processes are successfully initialized.
 - **Container Health**: Docker health checks use `pg_isready` (DB), HTTP monitoring (NATS), or gRPC health (application services).
 
-### 7. The Log Bridge Pattern
+### 8. The Log Bridge Pattern
 - **Definition**: A gRPC gateway (Port 15001) used as a bridge for clients without raw TCP access (e.g., Web/JS).
 - **Semantics**: Must be called `LogBridge` to distinguish it from the `ProcessController` (Shadow Port) standard.
 - **Data Flow**: Logs received via the Bridge are mapped to the same internal ordered stream as TCP messages.

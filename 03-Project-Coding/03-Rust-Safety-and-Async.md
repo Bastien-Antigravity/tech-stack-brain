@@ -4,20 +4,20 @@ type: architecture
 status: active
 microservice: ecosystem-wide
 tags:
-- \'#service/ecosystem-wide\'
+- '#service/ecosystem-wide'
 - '#state/active'
-- null
 - '#type/architecture'
 ---
-
 # 📐 Rust Safety and Async
 
 ## Architectural Rule
 - **Polyglot Parity**: Rust implementations (especially in shared libraries) MUST maintain behavioral and API parity with the Go "Source of Truth".
+- **The Performance Exception**: `unsafe` code is permitted for performance-critical logic (e.g., FFI, zero-copy parsing) but must be encapsulated within safe abstractions and explicitly justified in comments.
+- **Atomic State Management**: Mirror the Go **Atomic Pointer Swap** pattern using `ArcSwap` or atomic primitives to manage shared state without locks in hotpaths.
 - **Async Runtime**: Use `tokio` with full features.
 - **Error Handling**: Use `Result<T, Box<dyn std::error::Error>>` and propagate with `?`. Use `.ok_or_else()` for descriptive error mapping.
 - **Ownership**: Prefer borrowing over cloning. Explicitly `.clone()` only when struct ownership is required.
-- **Polymorphism**: Use `Arc<dyn Trait>` for thread-safe shared ownership of polymorphic components (e.g., Loggers, Config Loaders).
+- **Polymorphism**: Use `Arc<dyn Trait>` for thread-safe shared ownership. Mirror the Go **Factory/Profile** pattern to enable deterministic dependency injection.
 - **Entry Point Errors**: Use `match` with `eprintln!` + `std::process::exit(1)`. Never `unwrap()` in production paths.
 - **Feature Flags**: Use `#[cfg(feature = "...")]` for optional integrations (e.g., `unilog`).
 

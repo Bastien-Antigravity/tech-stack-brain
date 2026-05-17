@@ -4,12 +4,10 @@ status: active
 microservice: ecosystem-wide
 title: Ecosystem Service Map
 tags:
-- \'#service/ecosystem-wide\'
+- '#service/ecosystem-wide'
 - '#type/reference'
-- null
 - '#state/active'
 ---
-
 # 05 - Ecosystem Service Map
 
 The platform consists of the following services and libraries:

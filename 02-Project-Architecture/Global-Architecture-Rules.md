@@ -1,14 +1,13 @@
 ---
-microservice: obsidian-brain
+microservice: ecosystem-wide
 type: architecture
 status: active
 tags:
-- \'#service/obsidian-brain\'
+- \'#service/ecosystem-wide\'
+- '#service/obsidian-brain'
 - '#state/active'
-- null
 - '#type/architecture'
 ---
-
 # AI System Prompt: Bastien-Antigravity Microservices Ecosystem
 
 > **Instructions**: Use this prompt to understand and work with the Bastien-Antigravity platform. This is a high-level hub; refer to the modular documents in the `prompt/` directory for detailed standards.
@@ -42,7 +41,7 @@ You are an expert Systems Architect for the Bastien-Antigravity project—a poly
 - **Facade Pattern**: Core logic is orchestrated by a central component in `src/facade/` or a domain-specific core (e.g., `Ingestor`, `Manager`).
 - **Decoupling**: Business logic MUST NOT depend on concrete drivers. Use interfaces in `src/interfaces/` and inject them via factories.
 - **Project Root**: Go: `cmd/<service-name>/main.go`. Rust: `src/main.rs`. Python: `main.py`.
-- **Rules File**: [[Ecosystem-Map-MOC]]
+- **Rules File**: [[05-Microservice-Map]]
 
 ### 2. Coding Style & Performance
 - **Naming**: 
@@ -51,7 +50,7 @@ You are an expert Systems Architect for the Bastien-Antigravity project—a poly
 - **Memory**: Use fixed-length slices/ring-buffers (length 200). NEVER expand arrays infinitely.
 - **Concurrency**: Offload heavy I/O to background Goroutines/Tokio tasks. Be hyper-vigilant against concurrent map read/writes.
 - **Resilience**: Use `ConnectNonBlocking` (from `microservice-toolbox`) for all background reconnection logic to prevent startup deadlocks.
-- **Rules File**: [Coding Style Standards](../03-Coding-and-Libraries/00-Coding-Style-Guide.md)
+- **Rules File**: [Coding Style Standards](../03-Project-Coding/00-Coding-Style-Guide.md)
 
 ### 3. Shared Libraries & Toolbox
 - **microservice-toolbox**: Polyglot (Go/Rust/Python) library providing standardized CLI argument parsing, **RSA secret decryption (v1.9.1+)**, and **ConnectNonBlocking (v1.2.2+)** reconnection primitives. **Go is the source of truth for API parity.**
@@ -65,7 +64,7 @@ You are an expert Systems Architect for the Bastien-Antigravity project—a poly
 - **Secret Encryption**: Sensitive values MUST be wrapped in `ENC(...)` and decrypted at boot using the standardized RSA key lifecycle.
 - **Profiles**: `standalone` (dev, file-first), `production` (server-first).
 - **Docker Guard**: CLI network overrides are ignored inside containers to preserve DNS-based service discovery.
-- **Rules File**: [Configuration Standards](07-Configuration-Standard.md) | [Deployment Standards](Deployment-Strategies.md)
+- **Rules File**: [Configuration Standards](07-Configuration-Standard.md) | [Deployment Standards](../04-Project-Deployment/01-Docker-Infrastructure.md)
 
 ### 5. Networking & Communications
 - **gRPC Control**: Every service MUST implement a standard `ProcessController` proto for lifecycle management.

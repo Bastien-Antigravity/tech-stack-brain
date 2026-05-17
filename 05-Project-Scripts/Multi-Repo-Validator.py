@@ -12,7 +12,7 @@ DATA FLOW:
 3. Collects and summarizes results.
 
 KEY PARAMETERS:
-- action: build | test
+- action: build | test | lint
 """
 
 from sys import argv as sysArgv, exit as sysExit, executable as sysExecutable
@@ -28,7 +28,7 @@ def get_repos(root_dir: str) -> List[Path]:
     """
     repos = []
     for item in Path(root_dir).iterdir():
-        if item.is_dir() and not item.name.startswith(".") and item.name != "prompt":
+        if item.is_dir() and not item.name.startswith(".") and item.name not in ["prompt", "obsidian-brain"]:
             # Check for language markers
             if (
                 (item / "go.mod").exists()
@@ -80,13 +80,13 @@ def run_all(action: str, root_dir: str) -> None:
 
 if __name__ == "__main__":
     if len(sysArgv) < 2:
-        print("Usage: python Multi-Repo-Validator.py <build|test>")
+        print("Usage: python Multi-Repo-Validator.py <build|test|lint>")
         sysExit(1)
 
     action_param = sysArgv[1]
 
-    # Run from the root workspace directory (parent of tech-stack-brain)
+    # Run from the fleet root (two levels up from scripts directory)
     script_dir = Path(__file__).resolve().parent
-    workspace_root = script_dir.parents[1]
+    workspace_root = script_dir.parents[2]
     
     run_all(action_param, str(workspace_root))

@@ -1,95 +1,72 @@
 ---
-microservice: obsidian-brain
+title: Documentation Requirements
 type: architecture
 status: active
+microservice: ecosystem-wide
 tags:
-- \'#service/obsidian-brain\'
+- '#service/ecosystem-wide'
 - '#state/active'
-- null
 - '#type/architecture'
 ---
+# 📚 Documentation Requirements
 
-# Documentation Standards: Diagrams, Schemas & Records
+Every component of the Bastien-Antigravity fleet MUST adhere to these documentation standards to ensure long-term maintainability and AI-assisted orchestration.
 
-## Architectural Documentation
-We maintain high-level topological records inside the `/doc` directory of every microservice.
+## 🏁 Code Documentation (The Ritual)
+All source code, regardless of language, MUST follow the **[[11-Unified-Comment-Standards|Unified Comment Standards]]**.
 
-### 1. ASCII Diagrams
-- **Role**: Every repository must contain an architectural overview in ASCII format within the `/doc` directory (e.g., `doc/architecture.txt` or `ARCHITECTURE.md`).
-- **Explanation**: This diagram must detail the Data Flow schemas and OHLCV Data Models whenever the architecture evolves.
-- **Tools**: Use `monodraw` or standard text-based diagram tools for consistent layout.
+### The Triple-Block Header
+Every file MUST start with:
+1.  **ESSENTIAL PROCESS**: The high-level "Why".
+2.  **DATA FLOW**: The logical path (Input -> Logic -> Output).
+3.  **KEY PARAMETERS**: Critical configurations.
 
-### 2. ARCHITECTURE.md
-- **Role**: Each shared library (`universal-logger`, `distributed-config`, `safe-socket`, `flexible-logger`, `microservice-toolbox`) MUST have an `ARCHITECTURE.md` at its root.
-- **Content**: Overview of internal package structure, key interfaces, dependency chain, and design decisions.
-
-### 3. Protocol Schemas
-- **Cap'n Proto**: Fast serialization schemas are stored in the `/capnp` directory at the root (used by `data-ingestor`, `log-server`, `safe-socket`).
-- **Protobuf**: gRPC protocol definitions are stored in `src/grpc_control/` (Go) or `proto/` (Rust/other).
-- **JSON**: Data models must always provide clear `json` tags (Go) or `serde` derive macros (Rust) for consistent REST/WebSocket serialization.
-
-### 4. README.md
-- **Every repository** should have a README.md explaining:
-  - What the service does
-  - How to build and run it
-  - Dependencies on other ecosystem services
-  - Environment variables required
-
-### 5. TESTING.md
-- Shared libraries should include a `TESTING.md` documenting:
-  - How to run unit tests
-  - Integration test setup requirements
-  - Known test fixtures or mocks
-
-### 6. Change Logs & TODOs
-- **File**: `todo/` directory or `README.md` must be maintained at the root to track in-progress features or issues.
-- **Status Reporting**: All major architectural changes MUST be documented in the repository's `ARCHITECTURE.md` file.
-
-### 7. Technical Walkthroughs
-- Use **Walkthrough** documents for any major features or integrations that require manual verification.
-- **Recordings**: Screenshots or recordings of the UI/Terminal behavior are encouraged for documentation.
-
-### 8. Prompt Directory
-- The `prompt/` repository contains modular AI system prompts for coding assistants.
-- These prompts document the ecosystem's architecture, coding conventions, and library APIs.
-- **Update Rule**: When a library API changes or a new service is added, update the relevant prompt files in `prompt/`.
+### Intent-First Docstrings
+- Use docstrings for all exported/public members.
+- Document the **Intent** (result), not the **Implementation** (process).
 
 ---
 
-## Standardized Repository File Structure
-Every repository in the ecosystem MUST contain:
+## 🏗 Repository Structure
+Every repository in the ecosystem MUST contain the following standardized files at its root:
 
-| File | Purpose |
-|------|---------|
-| `README.md` | User-facing documentation |
-| `ARCHITECTURE.md` | System design deep-dive |
-| `AI-Session-State.md` | AI context persistence (at root) |
-| `AI-Init.md` | AI onboarding beacon (at root) |
-| `.github/` | CI/CD workflows |
-| `.gitignore` | Git exclusions |
+| File | Requirement | Purpose |
+| :--- | :--- | :--- |
+| `README.md` | Mandatory | User-facing entry point and build instructions. |
+| `ARCHITECTURE.md` | Mandatory | Deep-dive into design decisions and package layout. |
+| `VERSION.txt` | Mandatory | Single source of truth for semantic versioning (vX.Y.Z). Referenced by all documentation. |
+| `AI-Project-DNA.md` | Mandatory | High-level behavioral summary for AI agents. |
+| `AI-Session-State.md` | Mandatory | Context persistence for AI coding assistants. |
+| `AI-Init.md` | Mandatory | Onboarding beacon for new agents. |
+| `TESTING.md` | Mandatory | Instructions for unit and integration testing. |
+| `TODO/` or `TODO.md` | Mandatory | Tracking of pending tasks and technical debt. |
 
-Optional but recommended:
-| File | Purpose |
-|------|---------|
-| `TESTING.md` | Test instructions |
-| `TODO.md` | Pending tasks |
-| `Makefile` | Build automation (Go repos) |
-| `Dockerfile` | Container build (server repos) |
-| `.dockerignore` | Docker build exclusions |
+### The `quick-overview/` Folder
+Repositories MUST provide a `quick-overview/` directory containing markdown files for:
+- `Architecture-Overview.md`
+- `Features-Behavior.md`
+- `Testing-Playbook.md`
 
-## Commit Conventions
-- **Format**: Conventional Commits: `feat:`, `fix:`, `refactor:`, `docs:`, `chore:`
-- **Scoping**: `feat(config-server): add gRPC support`
-- **Branch Strategy**: `develop` → `main` (merge, never rebase)
-- **Protected Branches**: Both `develop` and `main` are protected against force push and deletion.
-
-## Dataview YAML Frontmatter
-All Obsidian-visible docs must include standardized YAML:
-```yaml
 ---
-title: "Document Title"
-type: {architecture|repository|session-state}
-status: active
-microservice: {repo-name|ecosystem-wide}
+
+## 🏷 Metadata & Taxonomy
+All markdown documentation within the Obsidian Brain MUST include standardized YAML frontmatter.
+
+### Taxonomy Rules
+- **Service Tag**: Use `#service/[repo-name]` for repository-specific docs.
+- **Global Tag**: Use `#service/ecosystem-wide` for cross-cutting standards.
+- **Status**: Must be one of `active`, `skeleton`, `deprecated`, or `research`.
+- **Type**: Must be one of `architecture`, `repository`, `session-state`, `moc`, or `ritual`.
+
+### Sanitization Mandate
+- **No Null Tags**: Do not use `tags: null` or empty arrays. 
+- **Unique IDs**: Use `Sync-ID: [UUID]` for tracking document synchronization.
+
 ---
-```
+
+## 🔄 Governance Rituals
+- **Sign-off**: Every session MUST be concluded by running `python3 20-Scripts/close_mission.py`. This script verifies that `AI-Session-State.md` is updated and metadata is compliant.
+- **Audit**: The **Sentinel** role periodically runs `Multi-Repo-Validator.py lint` to identify technical debt and documentation drift across the fleet.
+
+---
+*Reference: [[00-Coding-Style-Guide]], [[11-Unified-Comment-Standards]]*

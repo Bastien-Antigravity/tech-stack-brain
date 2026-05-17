@@ -4,19 +4,19 @@ type: architecture
 status: active
 microservice: ecosystem-wide
 tags:
-- \'#service/ecosystem-wide\'
+- '#service/ecosystem-wide'
 - '#state/active'
-- null
 - '#type/architecture'
 ---
-
 # 📐 Go Memory and Concurrency
 
 ## Architectural Rule
 - **Interface-First Design**: Major components MUST define their behavior via interfaces in a dedicated `src/interfaces` package. This prevents circular dependencies and enables deterministic testing with mocks.
+- **Atomic Hotpaths**: For shared state management in performance-critical paths, MUST use the **Atomic Pointer Swap** pattern (using `atomic.Pointer` and CAS loops). This eliminates lock contention and ensures deterministic latency.
 - **Memory Efficiency**: Use fixed-length slices/ring-buffers (e.g., `200` length). NEVER expand arrays infinitely. Use `make` with capacity.
+- **Object Pooling**: For high-frequency allocations (e.g., log entries, network buffers), use `sync.Pool` to recycle memory and minimize GC pressure.
 - **Concurrency**: Use `context.Context` for cancellation. Always deep-copy shared resources before crossing Goroutine boundaries.
-- **Atomic State**: Use `atomic.Pointer` with CAS loops for lock-free reads (see `config-server/src/store/store.go`).
+- **Lock Usage**: Use `sync.RWMutex` ONLY for complex mutations or slow-path operations where atomic swaps are impractical.
 
 ## 🛠 Construction & Implementation
 - **Constructor Paradigm**: Use the `New{Type}` convention for instantiating components.
@@ -57,14 +57,11 @@ if err := proto.Unmarshal(data, req); err != nil {
 // Non-fatal errors log and continue
 ```
 
-## Comment Style
-Every Go file uses **horizontal rule comments** to separate logical sections:
-```go
-// -----------------------------------------------------------------------------
-// Section Name
-// -----------------------------------------------------------------------------
-```
-Applied between every exported function, interface method groups, and struct definitions.
+## 🎨 Comment Style & Documentation
+All Go code MUST adhere to the **[[11-Unified-Comment-Standards|Unified Comment Standards]]**. This includes:
+- The **Triple-Block Header** (Essential Process, Data Flow, Key Parameters).
+- **Horizontal Dividers** (`// ---`) between exported members.
+- **Intent-First Docstrings**.
 
 ## 📦 Go Import Structure
 Imports MUST be organized into four distinct blocks, separated by a single empty line, to ensure readability and maintain a clear hierarchy of dependencies:

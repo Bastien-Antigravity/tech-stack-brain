@@ -4,12 +4,10 @@ type: architecture
 status: active
 microservice: ecosystem-wide
 tags:
-- \'#service/ecosystem-wide\'
+- '#service/ecosystem-wide'
 - '#state/active'
-- null
 - '#type/architecture'
 ---
-
 # 📐 Architecture Patterns
 
 ## 1. Facade Pattern (Universal Entry Point)

@@ -4,12 +4,10 @@ type: architecture
 status: active
 microservice: ecosystem-wide
 tags:
-- \'#service/ecosystem-wide\'
+- '#service/ecosystem-wide'
 - '#state/active'
-- null
 - '#type/architecture'
 ---
-
 # ⚠️ Hidden Patterns and Gotchas
 
 ## 1. Safe Logger Guard (MANDATORY)
@@ -43,18 +41,16 @@ The FFI logic is decoupled into a "Smart Bridge" (`src/cgo_bridge` in `distribut
 *   **Why**: Ensures memory space unification. If both libraries are linked, they share the same handles and global state.
 *   **Rule**: Never put `//export` statements in the core logic package; keep them in the standalone `main` entry points.
 
-...
-
-## 11. Go Shared Library Unloading (`dlclose`)
+## 8. Go Shared Library Unloading (`dlclose`)
 **CRITICAL**: Never unload a Go-based shared library (`dlclose` in C, `drop` of `Library` in Rust) once loaded.
 *   **Why**: The Go runtime starts background threads (GC/Scheduler) that do not support shutdown. Unloading the library while these threads are active causes an indefinite hang or crash.
 *   **Solution**: Use "load-once" patterns (e.g., leaked static references in Rust).
 
-## 8. Domain-Specific Log Levels
+## 9. Domain-Specific Log Levels
 Custom levels beyond standard: `Stream`, `Logon`, `Logout`, `Trade`, `Schedule`, `Report`. These are **financial services / market data** domain levels.
 
-## 9. Config File Naming Inconsistency
+## 10. Config File Naming Inconsistency
 Some config files use prefix (`config_preprod.yaml`) and others don't (`standalone.yaml`). Be aware when switching profiles.
 
-## 10. Duplicate GoDoc in Socket Factory
+## 11. Duplicate GoDoc in Socket Factory
 `safe-socket/src/factory/socket_factory.go` has the `Create` function documented twice (copy-paste artifact). The function body is correct.

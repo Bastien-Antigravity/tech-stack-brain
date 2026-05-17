@@ -23,9 +23,8 @@ from typing import List
 # ### CONFIGURATIONS ###
 
 SCRIPT_DIR = Path(__file__).resolve().parent
-# tech-stack-brain/05-Project-Scripts -> parent is tech-stack-brain -> parent is root
-WORKSPACE_ROOT = SCRIPT_DIR.parents[1]
-VAULT_ROOT = WORKSPACE_ROOT / "obsidian-brain"
+# tech-stack-brain/05-Project-Scripts -> parent is tech-stack-brain -> parent is obsidian-brain (VAULT_ROOT)
+VAULT_ROOT = SCRIPT_DIR.parents[1]
 
 OBSIDIAN_DIR = VAULT_ROOT / ".obsidian"
 SNIPPETS_DIR = OBSIDIAN_DIR / "snippets"

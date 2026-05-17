@@ -1,14 +1,13 @@
 ---
-microservice: obsidian-brain
+microservice: ecosystem-wide
 type: architecture
 status: active
 tags:
-- \'#service/obsidian-brain\'
+- \'#service/ecosystem-wide\'
+- '#service/obsidian-brain'
 - '#state/active'
-- null
 - '#type/architecture'
 ---
-
 # 🧪 Testing Sandbox Standards (BDD)
 
 ## 🎯 Architecture Intent

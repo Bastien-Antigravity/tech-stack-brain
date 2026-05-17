@@ -2,13 +2,12 @@
 type: legacy
 status: active
 tags:
-- \'#service/tech-stack-brain\'
+- \'#service/ecosystem-wide\'
+- '#service/tech-stack-brain'
 - '#state/active'
-- null
 - '#type/legacy'
-microservice: tech-stack-brain
+microservice: ecosystem-wide
 ---
-
 # 🔍 Impact Analysis: Global Architecture Rules Expansion (v2.1)
 
 ## 🛠️ Summary of Changes

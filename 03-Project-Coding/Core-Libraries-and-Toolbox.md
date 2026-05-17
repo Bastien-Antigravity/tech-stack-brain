@@ -1,97 +1,114 @@
 ---
-microservice: obsidian-brain
+title: Core Libraries and Toolbox
 type: architecture
 status: active
+microservice: ecosystem-wide
 tags:
-- \'#service/obsidian-brain\'
+- '#service/ecosystem-wide'
 - '#state/active'
-- null
 - '#type/architecture'
 ---
-
-# Shared Libraries Reference
+# 📦 Core Libraries and Toolbox
 
 ## Library Hierarchy
-The Bastien-Antigravity platform uses a layered library architecture. Understanding the dependency chain is critical for any modifications.
+The Bastien-Antigravity platform uses a layered library architecture. Versions are managed per-repository; always refer to the `VERSION.txt` file at each repository root for the current production baseline.
 
-```
-microservice-toolbox  (config, CLI, networking primitives)
-    └── distributed-config  (YAML loading, env expansion, config-server sync)
-        └── safe-socket  (Cap'n Proto transport)
+```mermaid
+graph TD
+    subgraph Toolbox_Layer [Microservice Toolbox]
+        MT[Toolbox Core]
+        BM[Business Models: MarketEvent, Signal]
+    end
 
-universal-logger  (logging facade + bootstrap)
-    └── flexible-logger  (underlying log routing engine)
-    └── distributed-config  (for config-based log level)
+    subgraph Config_Layer [Distributed Config]
+        DC[Config Engine]
+        RSA[RSA Decryption: ENC Pattern]
+    end
+
+    subgraph Transport_Layer [Safe-Socket]
+        SS[Universal Transport]
+        ID[Idle Zombie Detection]
+    end
+
+    subgraph Telemetry_Layer [Universal Logger]
+        UL[Logger Facade]
+        FL[Flexible Logger Engine]
+        VBA[VBA Message Pump]
+    end
+
+    MT --> DC
+    DC --> SS
+    UL --> FL
+    UL --> DC
 ```
 
 ---
 ## 1. microservice-toolbox
-**Module**: `github.com/Bastien-Antigravity/microservice-toolbox/go` (v1.2.2)
+**Module**: `github.com/Bastien-Antigravity/microservice-toolbox/go`
 **Languages**: Go, Rust, Python, C++, VBA
 **Role**: The standardized entry point for all microservice configuration, resilience, and networking.
 
-### Packages
-| Package | Purpose |
-|---|---|
-| `config` | `LoadConfig(profile)`, CLI argument parsing, Docker Guard |
-| `conn_manager` | **ConnectNonBlocking**, background reconnection, strategy-based connection pools |
-| `connectivity` | Network resolver, Docker detection |
-| `lifecycle` | Graceful shutdown helpers |
-| `network` | gRPC server builder |
-| `serializers` | Cap'n Proto / Protobuf message serialization |
-
-### Usage Pattern
-```go
-// Go - Non-blocking reconnection
-nm := conn_manager.NewNetworkManager()
-conn := nm.ConnectNonBlocking(&ip, &port, nil, "tcp-hello")
-```
-
-### API Parity Rule
-**Go is the source of truth.** When adding features to the toolbox, implement in Go first, then port to all supported languages with identical behavior and matching method signatures.
+### Key Features
+- **Smart Loader**: Implements the "Hierarchy of Truth" (CLI > ENV > YAML > Config-Server).
+- **Business Data Standards**: Unified models defined in `schemas/business`:
+    - `MarketEvent`: Low-latency L1/L2 data envelope.
+    - `OHLCV`: Standardized time-series bars.
+    - `Signal`: Unified strategy signals (Buy/Sell/Exit).
+- **The Mirroring Mandate**: Go is the source of truth. Features MUST be ported to Python, Rust, and C++ in the same development cycle to maintain parity.
 
 ---
 
 ## 2. universal-logger
-**Module**: `github.com/Bastien-Antigravity/universal-logger` (v1.2.0)
+**Module**: `github.com/Bastien-Antigravity/universal-logger`
 **Languages**: Go, C++, Python, Rust, VBA (via CGO bridge)
-**Role**: Standardized logging facade. Ensures microservices are decoupled from the underlying logging engine.
+**Role**: Standardized logging facade. Decouples services from the underlying `flexible-logger` engine.
 
-### Key Interfaces
-- `interfaces.Logger` — The main logging interface with methods: `Debug`, `Info`, `Warning`, `Error`, `Critical`, `Stream`, `Logon`, `Logout`, `Trade`, `Schedule`, `Report`.
-- `bootstrap.Init(Name, ConfigProfile, LoggerProfile, LogLevel, useLocalNotifier, existingConfig)` → Returns `(*config.DistConfig, interfaces.Logger)`.
-- `bootstrap.InitWithOptions(BootstrapOptions{})` → **Preferred** advanced entry point with dependency injection and metadata support.
-
-### Log Levels
-`NotSet`, `Debug`, `Stream`, `Info`, `Logon`, `Logout`, `Trade`, `Schedule`, `Report`, `Warning`, `Error`, `Critical`
-
-### Usage Pattern
-```go
-import "github.com/Bastien-Antigravity/universal-logger/src/bootstrap"
-
-// Modern Init using Options
-distConfig, logger := bootstrap.InitWithOptions(bootstrap.BootstrapOptions{
-    Name:          "my-service",
-    ConfigProfile: "standalone",
-    LoggerProfile: "standard",
-    Metadata:      map[string]string{"env": "prod"},
-})
-defer logger.Close()
-```
+### Advanced Capabilities
+- **Shared Dynamic Library**: The Go core is compiled to a shared library (`.dll`, `.so`) used by all language facades.
+- **Defensive Marshaling**: Prevents runtime panics by using `yaml:"-"` on internal state fields.
+- **VBA Message Pump**: Uses a hidden `HWND_MESSAGE` window to safely bridge multi-threaded Go callbacks into Excel's single-threaded environment.
+- **Handle Memory Store**: Tracks sessions via integer handles to minimize FFI overhead.
 
 ---
 
 ## 3. distributed-config
-**Module**: `github.com/Bastien-Antigravity/distributed-config` (v1.6.0)
-**Language**: Go
-**Role**: YAML-based configuration with environment variable expansion, capability mapping, and config-server synchronization. Supports native RSA decryption via `ENC(...)`.
+**Module**: `github.com/Bastien-Antigravity/distributed-config`
+**Language**: Go (Reference)
+**Role**: YAML-based configuration with environment variable expansion and native RSA decryption.
+
+### Key Features
+- **ENC(...) Pattern**: Secrets remain encrypted in memory. Decrypted on-demand via the `DecryptSecret()` API.
+- **Error Transparency**: Native support for `GetLastError()` to surface engine-level failures to the language facade.
+- **In-Memory Mirroring**: High-performance mirroring ensures sub-millisecond config lookups.
 
 ---
 
 ## 4. safe-socket
-**Module**: `github.com/Bastien-Antigravity/safe-socket` (v1.9.0)
+**Module**: `github.com/Bastien-Antigravity/safe-socket`
 **Languages**: Go, Python, C API
-**Role**: Universal high-performance transport (TCP/UDP/SHM) with profile-based protocols and **Infinite Wait** resilience.
+**Role**: Universal high-performance transport (TCP/UDP/SHM) with **Infinite Wait** resilience.
 
 ### Architecture
-Uses the Facade pattern with transport profiles. **v1.9.0+** introduces `SetIdleTimeout(0)` for persistent background streams, allowing for zero-timeout blocking reads while maintaining active **Zombie Detection** through adaptive heartbeats.
+- **Zombie Detection**: Utilizes adaptive heartbeats to detect dead connections in background streams.
+- **Zero-Timeout Reads**: Supports persistent blocking reads while maintaining active health monitoring.
+
+---
+
+## 🔄 Polyglot Development Workflow
+Developing across library (parent) and microservice (child) boundaries requires a coordinated ritual.
+
+### 1. Local Override (Simultaneous Dev)
+To work on a library and a microservice at the same time without pushing intermediate versions:
+- **Go**: Use `go.mod` `replace` directives to point to your local library clone.
+- **Python**: Use `pip install -e /path/to/local/lib`.
+- **Rust**: Use `[patch.crates-io]` in `Cargo.toml`.
+
+### 2. The Atomic Update Ritual
+When a core API change occurs:
+1. **Parent Update**: Implement the change in the Go reference library.
+2. **Facade Porting**: Immediately port the change to Python, Rust, and C++ facades (Mirroring Mandate).
+3. **Integration Test**: Run the `integration/run_tests.sh` suite in the toolbox.
+4. **Child Update**: Update the microservice to consume the new library version only after all facades are validated.
+
+---
+*Reference: [[01-General-Naming-Conventions]], [[11-Unified-Comment-Standards]]*

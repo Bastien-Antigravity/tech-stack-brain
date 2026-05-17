@@ -4,12 +4,10 @@ status: active
 microservice: ecosystem-wide
 title: The Facade Pattern
 tags:
-- \'#service/ecosystem-wide\'
+- '#service/ecosystem-wide'
 - '#state/active'
-- null
 - '#type/architecture'
 ---
-
 # 01 - The Facade Pattern (SystemFacade)
 
 ## Architectural Philosophy

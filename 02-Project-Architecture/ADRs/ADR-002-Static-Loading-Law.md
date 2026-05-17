@@ -1,19 +1,19 @@
 ---
 type: architecture
-microservice: obsidian-brain
+microservice: ecosystem-wide
 id: ADR-002
 title: The Static Loading Law (Go-FFI Safety)
 status: accepted
 date: 2026-05-03
 tags:
-- \'#service/obsidian-brain\'
+- \'#service/ecosystem-wide\'
+- '#service/obsidian-brain'
 - polyglot
 - '#type/architecture'
 - ffi
 - '#state/accepted'
 - safety
 ---
-
 # ADR-002: The Static Loading Law (Go-FFI Safety)
 
 ## Context

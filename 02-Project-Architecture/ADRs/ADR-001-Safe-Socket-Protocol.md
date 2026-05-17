@@ -1,16 +1,16 @@
 ---
-microservice: obsidian-brain
+microservice: ecosystem-wide
 type: adr
 status: accepted
 date: 2026-04-15
 tags:
-- \'#service/obsidian-brain\'
+- \'#service/ecosystem-wide\'
+- '#service/obsidian-brain'
 - '#state/accepted'
 - '#type/adr'
 - '#domain/networking'
 - '#domain/architecture'
 ---
-
 # 📜 ADR-001: Safe-Socket Custom TCP Protocol
 
 ## 1. Context and Problem Statement

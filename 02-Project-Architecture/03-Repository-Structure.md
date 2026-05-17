@@ -4,12 +4,10 @@ status: active
 microservice: ecosystem-wide
 title: Repository Structure
 tags:
-- \'#service/ecosystem-wide\'
+- '#service/ecosystem-wide'
 - '#state/active'
-- null
 - '#type/architecture'
 ---
-
 # 03 - Repository Structure
 
 This governs the folder structure for all microservices in the ecosystem.

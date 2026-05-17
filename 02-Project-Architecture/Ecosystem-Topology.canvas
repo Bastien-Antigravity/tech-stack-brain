@@ -1,14 +1,38 @@
 {
 	"nodes":[
+		{"id":"node_global_rules","type":"file","file":"03-Tech-Stack/02-Project-Architecture/Global-Architecture-Rules.md","x":-200,"y":-1800,"width":900,"height":1000},
 		{"id":"node_facade","type":"file","file":"03-Tech-Stack/02-Project-Architecture/01-Facade-Pattern.md","x":-640,"y":-700,"width":840,"height":950},
 		{"id":"node_decouple","type":"file","file":"03-Tech-Stack/02-Project-Architecture/02-Decoupling-and-Interfaces.md","x":300,"y":-700,"width":560,"height":900},
 		{"id":"node_repo","type":"file","file":"03-Tech-Stack/02-Project-Architecture/03-Repository-Structure.md","x":-580,"y":340,"width":780,"height":580},
 		{"id":"node_map","type":"file","file":"03-Tech-Stack/02-Project-Architecture/05-Microservice-Map.md","x":300,"y":340,"width":720,"height":1020},
-		{"id":"node_global_rules","type":"file","file":"03-Tech-Stack/02-Project-Architecture/Global-Architecture-Rules.md","x":-200,"y":-1800,"width":900,"height":1000}
+		{"id":"node_lifecycle","type":"file","file":"03-Tech-Stack/02-Project-Architecture/04-Process-Lifecycle.md","x":1100,"y":340,"width":600,"height":600},
+		{"id":"node_config","type":"file","file":"03-Tech-Stack/02-Project-Architecture/07-Configuration-Standard.md","x":-580,"y":1000,"width":800,"height":1000},
+		{"id":"node_network","type":"file","file":"03-Tech-Stack/02-Project-Architecture/08-Networking-Protocols.md","x":300,"y":1400,"width":800,"height":1000},
+		{"id":"node_log_arch","type":"file","file":"03-Tech-Stack/02-Project-Architecture/09-Log-Server-Architecture.md","x":1200,"y":1400,"width":800,"height":1000},
+		{"id":"node_testing","type":"file","file":"03-Tech-Stack/02-Project-Architecture/10-Testing-Sandbox-Standards.md","x":2100,"y":1400,"width":800,"height":1000},
+		{"id":"node_style_moc","type":"file","file":"03-Tech-Stack/03-Project-Coding/00-Coding-Style-Guide.md","x":-1500,"y":340,"width":800,"height":1000},
+		{"id":"node_go","type":"file","file":"03-Tech-Stack/03-Project-Coding/02-Go-Memory-and-Concurrency.md","x":-2500,"y":1400,"width":800,"height":1000},
+		{"id":"node_rust","type":"file","file":"03-Tech-Stack/03-Project-Coding/03-Rust-Safety-and-Async.md","x":-1600,"y":1400,"width":800,"height":1000},
+		{"id":"node_python","type":"file","file":"03-Tech-Stack/03-Project-Coding/04-Python-Types-and-Structure.md","x":-700,"y":2100,"width":800,"height":1000},
+		{"id":"node_cpp","type":"file","file":"03-Tech-Stack/03-Project-Coding/09-CPP-Performance-and-FFI.md","x":-1600,"y":2500,"width":800,"height":1000},
+		{"id":"node_vba","type":"file","file":"03-Tech-Stack/03-Project-Coding/10-VBA-Excel-Integration.md","x":-2500,"y":2500,"width":800,"height":1000},
+		{"id":"node_impact","type":"file","file":"03-Tech-Stack/02-Project-Architecture/Impact-Analysis-v2.md","x":800,"y":-1800,"width":600,"height":800}
 	],
 	"edges":[
+		{"id":"edge_global_facade","fromNode":"node_global_rules","fromSide":"bottom","toNode":"node_facade","toSide":"top"},
 		{"id":"edge_facade_decouple","fromNode":"node_facade","fromSide":"right","toNode":"node_decouple","toSide":"left"},
 		{"id":"edge_facade_repo","fromNode":"node_facade","fromSide":"bottom","toNode":"node_repo","toSide":"top"},
-		{"id":"edge_global_facade","fromNode":"node_global_rules","fromSide":"bottom","toNode":"node_facade","toSide":"top"}
+		{"id":"edge_repo_map","fromNode":"node_repo","fromSide":"right","toNode":"node_map","toSide":"left"},
+		{"id":"edge_map_lifecycle","fromNode":"node_map","fromSide":"right","toNode":"node_lifecycle","toSide":"left"},
+		{"id":"edge_global_impact","fromNode":"node_global_rules","fromSide":"right","toNode":"node_impact","toSide":"left"},
+		{"id":"edge_repo_config","fromNode":"node_repo","fromSide":"bottom","toNode":"node_config","toSide":"top"},
+		{"id":"edge_config_network","fromNode":"node_config","fromSide":"right","toNode":"node_network","toSide":"left"},
+		{"id":"edge_network_log","fromNode":"node_network","fromSide":"right","toNode":"node_log_arch","toSide":"left"},
+		{"id":"edge_log_testing","fromNode":"node_log_arch","fromSide":"right","toNode":"node_testing","toSide":"left"},
+		{"id":"edge_style_go","fromNode":"node_style_moc","fromSide":"bottom","toNode":"node_go","toSide":"top"},
+		{"id":"edge_style_rust","fromNode":"node_style_moc","fromSide":"bottom","toNode":"node_rust","toSide":"top"},
+		{"id":"edge_style_python","fromNode":"node_style_moc","fromSide":"bottom","toNode":"node_python","toSide":"top"},
+		{"id":"edge_style_cpp","fromNode":"node_style_moc","fromSide":"bottom","toNode":"node_cpp","toSide":"top"},
+		{"id":"edge_style_vba","fromNode":"node_style_moc","fromSide":"bottom","toNode":"node_vba","toSide":"top"}
 	]
 }

@@ -3,18 +3,16 @@ microservice: tech-stack-brain
 type: governance
 status: active
 tags:
-- \'#service/tech-stack-brain\'
+- '#service/tech-stack-brain'
 - '#type/governance'
-- null
 - '#state/active'
 ---
-
 # ⚡ AI Initialization: tech-stack-brain
 
 > [!IMPORTANT] MANDATORY INITIALIZATION
 > Copy and paste this prompt when starting a new session in this repository:
 > 
-> "1. Read the ecosystem map in **[[Ecosystem-Map-MOC]]**."
+> "1. Read the ecosystem map in **[[05-Microservice-Map]]**."
 > "2. Load project constraints from **[[AI-Project-DNA]]**."
 > "3. Restore session state from **[[AI-Session-State]]**."
 > "4. **Sentinel Audit**: Run `python core-kms-brain/Scripts/Brain-Health-Audit.py` and resolve any drift."

@@ -4,12 +4,10 @@ status: active
 microservice: ecosystem-wide
 title: Process Lifecycle
 tags:
-- \'#service/ecosystem-wide\'
+- '#service/ecosystem-wide'
 - '#state/active'
-- null
 - '#type/architecture'
 ---
-
 # 04 - Process Lifecycle
 
 This document defines how services govern their own execution loops.

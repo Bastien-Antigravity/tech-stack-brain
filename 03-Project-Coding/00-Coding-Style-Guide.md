@@ -4,12 +4,10 @@ type: moc
 status: active
 microservice: ecosystem-wide
 tags:
-- \'#service/ecosystem-wide\'
+- '#service/ecosystem-wide'
 - '#state/active'
-- null
 - '#type/moc'
 ---
-
 # 🎨 Coding Style Guide (MOC)
 
 This hub centralizes all coding standards, naming conventions, and language-specific idioms for the Bastien-Antigravity ecosystem. All microservices, regardless of language, must adhere to these structural and stylistic pillars.
@@ -28,6 +26,7 @@ This hub centralizes all coding standards, naming conventions, and language-spec
 - [[07-Hidden-Patterns-and-Gotchas|Architectural Gotchas & Anti-Patterns]]
 - [[08-Dependency-Graph|Dependency Management & Graph]]
 - [[Documentation-Requirements|Documentation Standards]]
+- [[11-Unified-Comment-Standards|Unified Comment Standards (Triple-Block)]]
 
 ---
 

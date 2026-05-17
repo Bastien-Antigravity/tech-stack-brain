@@ -3,12 +3,10 @@ microservice: tech-stack-brain
 type: architecture
 status: active
 tags:
-- \'#service/tech-stack-brain\'
+- '#service/tech-stack-brain'
 - '#state/active'
-- null
 - '#type/architecture'
 ---
-
 # 🏗️ Tech Stack Brain
 
 Welcome to the **Tech Stack Brain**. This repository is Tier 2 of the 3-Tier AI-KMS Architecture.
@@ -18,7 +16,7 @@ This repository serves as the **Rulebook** for your specific technological stack
 ## 📦 What's Inside?
 
 - **`02-Project-Architecture/`**: Core architectural paradigms (e.g., Facade patterns, Interface decoupling) and Architecture Decision Records (ADRs).
-- **`03-Project-Coding/`**: The language-specific idioms (Go, Rust, Python) and documentation requirements.
+- **`03-Project-Coding/`**: The language-specific idioms (Go, Rust, Python, C++, VBA) and documentation requirements.
 - **`04-Project-Deployment/`**: Infrastructure rules, Docker strategies, and CI/CD lifecycles.
 - **`05-Project-Scripts/`**: Universal automation 20-Scripts (e.g., modular build wrappers and repo validators).
 

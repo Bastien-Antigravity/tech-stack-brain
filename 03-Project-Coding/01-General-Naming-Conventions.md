@@ -4,53 +4,66 @@ type: architecture
 status: active
 microservice: ecosystem-wide
 tags:
-- \'#service/ecosystem-wide\'
+- '#service/ecosystem-wide'
 - '#state/active'
-- null
 - '#type/architecture'
 ---
-
 # 📐 General Naming Conventions
 
 ## Architectural Rule
-- **Interfaces (Python)**: MUST start with `I` (e.g., `ILogger`, `IDataProcessor`).
-- **Interfaces (Go)**: Follow idiomatic Go — NO `I`-prefix. Use descriptive nouns (e.g., `Logger`, `Socket`, `ConfigStrategy`).
-- **Interfaces (Rust)**: Use traits with descriptive names (e.g., `Logger`).
-- **Models**: prefix with `M` (e.g., `MMarketData`, `MOrderBook`).
-- **Functions/Methods**: Go: `PascalCase` (exported) / `camelCase` (unexported). Rust: `snake_case`. Python: `snake_case` with `_underscore_prefix` for private.
+
+### Interfaces
+- **Python/Go/Rust**: MUST NOT use an `I`-prefix. Use descriptive nouns (e.g., `Logger`, `DataProcessor`, `Socket`).
+- **C++**: Abstract base classes follow `PascalCase` without prefix.
+- **VBA**: Interface-like Class Modules use `PascalCase` nouns.
+
+### Functions & Methods
+| Language | Exported/Public | Private/Unexported |
+| :--- | :--- | :--- |
+| **Go** | `PascalCase` | `camelCase` |
+| **Rust** | `snake_case` | `snake_case` |
+| **Python** | `snake_case` | `_snake_case` |
+| **C++** | `PascalCase` (Parity Rule) | `snake_case_` (member) |
+| **VBA** | `PascalCase` (Parity Rule) | `Private m_camelCase` |
+
+> [!NOTE]
+> **C++ & VBA: Parity Rule** — All public methods MUST use `PascalCase` to maintain semantic identity with the Go reference implementation (e.g., `GetListenAddr` in Go → `GetListenAddr()` in C++ → `GetListenAddr` in VBA).
 
 ## 🛠 Constructor Conventions
 
 | Language | Pattern | Example |
-|----------|---------|---------|
-| **Go** | `New{Type}` | `NewStandardLogger()`, `NewResolver()` |
+|----------|---------|---------| 
+| **Go** | `New{Type}` / `New{Type}With{Dep}` | `NewStandardLogger()`, `NewResolver()` |
 | **Rust** | `pub fn new()` | `AppConfig::new()`, `LogServer::new()` |
-| **Python** | `ClassName()` | `FinvizScraper()`, `AAACalculator()` |
+| **Python** | `ClassName()` | `FinvizScraper()`, `AppConfig()` |
+| **C++** | Free function `LoadConfig(...)` | `LoadConfig("standalone")` |
+| **VBA** | `Class_Initialize` / `LoadConfig` Sub | `ac.LoadConfig "standalone"` |
 
 > [!NOTE]
-> In **Go**, use `New{Type}With{Dependency}` for more specific factory methods (e.g., `LoadConfigWithLogger`).
-
+> In **Go**, use `New{Type}With{Dependency}` for factory methods requiring explicit dependencies (e.g., `LoadConfigWithLogger`).
 
 ## File Naming
 
 | Language | Convention | Example |
-|----------|-----------|---------|
+|----------|-----------|---------| 
 | Go | `snake_case.go` | `request_handler.go`, `socket_factory.go` |
 | Rust | `snake_case.rs` | `loader.rs`, `args.rs`, `mod.rs` |
 | Python | `snake_case.py` | `loader.py`, `args.py`, `test_logger.py` |
+| C++ | `PascalCase.hpp` / `.cpp` | `AppConfig.hpp`, `NetworkManager.cpp` |
+| VBA | `PascalCase.cls` / `.bas` | `AppConfig.cls`, `DistConf.bas` |
 | Scripts | `PascalCase-Hyphenated.py` | `Build-Wrapper.py`, `Hide-Empty-Folders.py` |
 
 ## 🔗 Ecosystem Import Aliasing
-To ensure parity across our polyglot environment, all `Bastien-Antigravity` repositories MUST be aliased using a standardized set of short, descriptive names.
+All `Bastien-Antigravity` repositories MUST be aliased using standardized descriptive names across all languages to ensure polyglot readability.
 
 ### Go
 ```go
-safe_socket          "github.com/Bastien-Antigravity/safe-socket"
-safe_socket_ifaces   "github.com/Bastien-Antigravity/safe-socket/src/interfaces"
-distributed_config   "github.com/Bastien-Antigravity/distributed-config/src/schemas"
-toolbox_config       "github.com/Bastien-Antigravity/microservice-toolbox/go/pkg/config"
-flexible_logger      "github.com/Bastien-Antigravity/flexible-logger/src/interfaces"
-unilog               "github.com/Bastien-Antigravity/universal-logger/src/bootstrap"
+safe_socket        "github.com/Bastien-Antigravity/safe-socket"
+safe_socket_ifaces "github.com/Bastien-Antigravity/safe-socket/src/interfaces"
+distributed_config "github.com/Bastien-Antigravity/distributed-config/src/schemas"
+toolbox_config     "github.com/Bastien-Antigravity/microservice-toolbox/go/pkg/config"
+flexible_logger    "github.com/Bastien-Antigravity/flexible-logger/src/interfaces"
+unilog             "github.com/Bastien-Antigravity/universal-logger/src/bootstrap"
 ```
 
 ### Rust
@@ -70,7 +83,7 @@ import universal_logger as unilog
 ```
 
 ### VBA
-Class Modules and Global Objects MUST use the PascalCase version of the repository name:
+Class Modules and Global Objects MUST use the `PascalCase` version of the repository name:
 - `Safe_Socket` (from safe-socket)
 - `Microservice_Toolbox` (from microservice-toolbox)
 - `Distributed_Config` (from distributed-config)
@@ -82,7 +95,7 @@ Dim socketManager As New Safe_Socket.SocketManager
 ```
 
 ## Python Stdlib Aliasing
-Use `moduleAction` or `moduleLocation` aliasing to distinguish standard actions from local variables:
+Use `moduleAction` or `moduleLocation` aliasing to distinguish standard imports from local variables:
 ```python
 from os.path import join as osPathJoin
 from os.path import exists as osPathExists
@@ -93,20 +106,22 @@ from argparse import ArgumentParser as argparseArgumentParser
 
 ## Variable Naming Conventions
 
-| Pattern | Convention | Example |
-|---------|-----------|---------|
-| Configuration objects | `ac` or `dConf` | `ac := &AppConfig{}` |
-| Loggers | `logger`, `flexLogger`, `unilog` | `flexLogger = profiles.NewStandardLogger()` |
-| Sockets | `sock`, `serverSock`, `conn` | `serverSock, err := factory.Create(...)` |
-| Error handling | Always `err` | `if err != nil { return nil, err }` |
+| Variable Type | Language | Convention | Example |
+| :--- | :--- | :--- | :--- |
+| Configuration | ALL | `ac` or `dConf` | `ac := &AppConfig{}`, `auto ac = LoadConfig(...)` |
+| Loggers | ALL | `logger`, `unilog` | `logger = profiles.NewStandardLogger()` |
+| Sockets | Go/Python | `sock`, `conn` | `serverSock, err := factory.Create(...)` |
+| Private Member | VBA | `m_camelCase` | `Private m_handle As LongPtr` |
+| Private Member | C++ | `snake_case_` | `std::string profile_;` |
+| Local Variables | Rust/Python | `snake_case` | `retry_count = 5`, `let buffer_size = 1024` |
+| Error handling | Go | Always `err` | `if err != nil { return nil, err }` |
 
 ## Motivation (Why?)
 - Unified readability across polyglot microservices.
-- Instant recognition of types and abstractions when switching between Go, Rust, and Python.
+- Instant recognition of types and abstractions when switching between Go, Rust, Python, C++, and VBA.
 
 ## Examples
-- `Logger` (Go Interface)
-- `ILogger` (Python Interface)
-- `MMarketData` (Model)
-- `app_logger` (Variable)
+- `Logger` (Interface — all languages)
+- `app_logger` (Variable — Python/Rust)
 - `NewServer()` (Go Constructor)
+- `LoadConfig("standalone")` (C++ / VBA factory)
