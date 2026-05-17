@@ -1,5 +1,4 @@
 ---
-
 title: Python Types and Structure
 type: architecture
 status: active

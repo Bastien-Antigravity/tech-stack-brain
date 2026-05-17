@@ -1,5 +1,4 @@
 ---
-
 title: Documentation Requirements
 type: architecture
 status: active

@@ -1,5 +1,4 @@
 ---
-
 microservice: ecosystem-wide
 type: adr
 status: accepted

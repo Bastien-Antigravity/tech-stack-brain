@@ -1,5 +1,4 @@
 ---
-
 title: Health Checks
 type: architecture
 status: active

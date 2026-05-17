@@ -1,5 +1,4 @@
 ---
-
 title: Environment Variables
 type: architecture
 status: active

@@ -1,5 +1,4 @@
 ---
-
 title: Core Libraries and Toolbox
 type: architecture
 status: active

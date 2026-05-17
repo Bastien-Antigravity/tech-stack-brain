@@ -1,5 +1,4 @@
 ---
-
 status: active
 microservice: ecosystem-wide
 type: architecture

@@ -1,5 +1,4 @@
 ---
-
 type: legacy
 status: active
 tags:

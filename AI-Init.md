@@ -1,5 +1,4 @@
 ---
-
 microservice: tech-stack-brain
 type: governance
 status: active

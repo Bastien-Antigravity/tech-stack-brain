@@ -1,5 +1,4 @@
 ---
-
 type: reference
 status: active
 microservice: ecosystem-wide

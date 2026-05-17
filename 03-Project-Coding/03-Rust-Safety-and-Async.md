@@ -1,5 +1,4 @@
 ---
-
 title: Rust Safety and Async
 type: architecture
 status: active

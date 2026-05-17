@@ -1,5 +1,4 @@
 ---
-
 title: Go Memory and Concurrency
 type: architecture
 status: active

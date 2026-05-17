@@ -1,5 +1,4 @@
 ---
-
 title: Docker Infrastructure
 type: architecture
 status: active

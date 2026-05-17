@@ -1,5 +1,4 @@
 ---
-
 type: architecture
 microservice: ecosystem-wide
 id: ADR-002

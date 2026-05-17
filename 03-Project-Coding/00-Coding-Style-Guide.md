@@ -1,5 +1,4 @@
 ---
-
 title: Coding Style Guide (MOC)
 type: moc
 status: active

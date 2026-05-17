@@ -1,5 +1,4 @@
 ---
-
 title: General Naming Conventions
 type: architecture
 status: active
