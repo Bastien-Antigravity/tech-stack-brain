@@ -27,10 +27,9 @@ To ensure 100% reproducibility and prevent "it works on my machine" drift, all m
 
 ### Quality Gate Rule
 Every repository MUST implement a `CI/CD` workflow that delegates to the **Centralized Reusable Workflows** in `fleet-operation-brain`:
-- **Go**: `workflow-go.yml` (enforces `golangci-lint` with the project-standard global `.golangci.yml` distributed by fleet-manager).
-- **Python**: `workflow-python.yml` (enforces testing with dynamic CGO bridge resolution).
-- **Rust**: `workflow-rust.yml`.
-- **C++**: `workflow-cpp.yml`.
+- **Universal CI**: All repositories (regardless of language) MUST delegate exclusively to `master-ci.yml`.
+- `master-ci.yml` will automatically perform ecosystem discovery and dynamically spawn parallel matrix jobs for **Go**, **Python**, **Rust**, and **C++** as detected in the repository tree.
+- *Legacy Templates*: `workflow-go.yml`, `workflow-python.yml`, etc., are retained for backward compatibility but should not be used for new microservices.
 
 ---
 
