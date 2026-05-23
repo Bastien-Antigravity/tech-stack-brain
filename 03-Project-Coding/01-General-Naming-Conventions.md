@@ -26,6 +26,7 @@ tags:
 | **Python** | `snake_case` | `_snake_case` |
 | **C++** | `PascalCase` (Parity Rule) | `snake_case_` (member) |
 | **VBA** | `PascalCase` (Parity Rule) | `Private m_camelCase` |
+| **JavaScript** | `camelCase` | `camelCase` |
 
 > [!NOTE]
 > **C++ & VBA: Parity Rule** — All public methods MUST use `PascalCase` to maintain semantic identity with the Go reference implementation (e.g., `GetListenAddr` in Go → `GetListenAddr()` in C++ → `GetListenAddr` in VBA).
@@ -39,6 +40,7 @@ tags:
 | **Python** | `ClassName()` | `FinvizScraper()`, `AppConfig()` |
 | **C++** | Free function `LoadConfig(...)` | `LoadConfig("standalone")` |
 | **VBA** | `Class_Initialize` / `LoadConfig` Sub | `ac.LoadConfig "standalone"` |
+| **JavaScript** | `new ClassName()` | `new ConnectionManager()` |
 
 > [!NOTE]
 > In **Go**, use `New{Type}With{Dependency}` for factory methods requiring explicit dependencies (e.g., `LoadConfigWithLogger`).
@@ -53,6 +55,10 @@ tags:
 | C++ | `PascalCase.hpp` / `.cpp` | `AppConfig.hpp`, `NetworkManager.cpp` |
 | VBA | `PascalCase.cls` / `.bas` | `AppConfig.cls`, `DistConf.bas` |
 | Scripts | `PascalCase-Hyphenated.py` | `Build-Wrapper.py`, `Hide-Empty-Folders.py` |
+| HTML (Views) | `PascalCase.html` | `PostgresBrowser.html` |
+| HTML (Layouts) | `snake_case.html` | `base_layout.html` |
+| JS / TS | `kebab-case.js` | `database-explorer.js` |
+| CSS | `kebab-case.css` | `market-observer.css` |
 
 ## 🔗 Ecosystem Import Aliasing
 All `Bastien-Antigravity` repositories MUST be aliased using standardized descriptive names across all languages to ensure polyglot readability.
@@ -115,6 +121,8 @@ from argparse import ArgumentParser as argparseArgumentParser
 | Private Member | VBA | `m_camelCase` | `Private m_handle As LongPtr` |
 | Private Member | C++ | `snake_case_` | `std::string profile_;` |
 | Local Variables | Rust/Python | `snake_case` | `retry_count = 5`, `let buffer_size = 1024` |
+| Local Variables | JavaScript | `camelCase` | `let retryCount = 5` |
+| DOM Elements | JavaScript | `$camelCase` | `this.dom.$tableContainer` |
 | Error handling | Go | Always `err` | `if err != nil { return nil, err }` |
 
 ## Motivation (Why?)
