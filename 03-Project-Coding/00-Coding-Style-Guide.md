@@ -28,8 +28,10 @@ This hub centralizes all coding standards, naming conventions, and language-spec
 - [[08-Dependency-Graph|Dependency Management & Graph]]
 - [[Documentation-Requirements|Documentation Standards]]
 - [[11-Unified-Comment-Standards|Unified Comment Standards (Triple-Block)]]
+- [[12-Cross-Language-FFI|Cross-Language FFI & Shared Libraries]]
 
 ---
+
 
 > [!TIP]
 > Use the specialized language guides when building new drivers or refactoring core logic to ensure parity with the **Go source of truth**.
