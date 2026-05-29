@@ -74,7 +74,7 @@ Each capability level belongs to a specific architectural classification, defini
 Click on each level below to explore its specific **Magnitude of Abstraction**, Classification Type, Git submodule mounting rules, progressive dependencies, and colocated scripts:
 
 ### ⚡ Base Layer
-*   **[[03-Tech-Stack/01-Obsidian-Brain/Obsidian-Brain-Organization|📐 Level 00: AI Orchestration]]** — *Type: Mutable Active Local State*. Magnitude: Single-Session Scope. Governs boot settings and mode switches.
+*   **[[03-Tech-Stack/01-Obsidian-Brain/00-AI-Orchestration|📐 Level 00: AI Orchestration]]** — *Type: Mutable Active Local State*. Magnitude: Single-Session Scope. Governs boot settings and mode switches.
 
 ### 🌌 Reflective Governance
 *   **[[03-Tech-Stack/01-Obsidian-Brain/01-Strategic-Nexus|📐 Level 01: Strategic Nexus]]** — *Type: Contextual Override*. Magnitude: Project Lifespan Scope. Governs anti-backlogs, audits, and Oracle agent.
@@ -96,6 +96,9 @@ Click on each level below to explore its specific **Magnitude of Abstraction**, 
 
 ### 🧠 Organizational Memory
 *   **[[03-Tech-Stack/01-Obsidian-Brain/07-Core-KMS|📐 Level 07: Core KMS]]** — *Type: Default Immutable*. Magnitude: Global Ontology Scope. Governs default agent templates and the Sovereignty engine.
+
+### 🛠️ Active Utilities
+*   **[[03-Tech-Stack/01-Obsidian-Brain/08-Base-Scripts|📐 Level 08: Base Scripts]]** — *Type: Active Utility / Executable Scaffolding*. Magnitude: System-Wide Control. Governs workspace automation, environment setup, and CLI integrations.
 
 ### 🔍 Cognitive Retrieval
 *   **[[03-Tech-Stack/01-Obsidian-Brain/09-RAG-Engine|📐 Level 09: RAG Engine]]** — *Type: Cognitive Retrieval Memory*. Magnitude: Vector Memory Scope. Governs ChromaDB indexing and watchers.

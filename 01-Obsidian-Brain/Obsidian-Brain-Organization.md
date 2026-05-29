@@ -28,7 +28,8 @@ obsidian-brain (Workspace Root)
 ├── 05-Fleet-Operation/       # L05: Ops, git control, & deployments
 ├── 06-Microservices/         # L06: Architecture Hub notes mapping repos
 ├── 07-Core-KMS/              # L07: Playbooks & Tag Taxonomies
-└── 08-RAG-Engine/            # L08: Local vector database & code search
+├── 08-Base-Scripts/          # Core execution, launchers, & validation scripts
+└── 09-RAG-Engine/            # L09: Local vector database & code search
 ```
 
 ### 🧱 Key Principles
@@ -40,7 +41,7 @@ obsidian-brain (Workspace Root)
 
 ## 📦 2. Mandatory Files in Every Submodule Module
 
-To ensure that each Git submodule can be developed and audited in isolation, every capability folder (L00 through L08) **MUST** contain the following structural files:
+To ensure that each Git submodule can be developed and audited in isolation, every capability folder (L00 through L09) **MUST** contain the following structural files:
 
 ### 1. `README.md`
 *   **Purpose:** Describes the role of the submodule within the ecosystem, the repository URL, and the active branch.

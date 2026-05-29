@@ -9,11 +9,11 @@ tags:
 - '#zone/3-fleet'
 - '#service/ecosystem-wide'
 - '#service/obsidian-brain'
-- '#polyglot'
+- '#tech/polyglot'
 - '#type/architecture'
-- '#ffi'
+- '#tech/ffi'
 - '#state/accepted'
-- '#safety'
+- '#tech/safety'
 ---
 # ADR-002: The Static Loading Law (Go-FFI Safety)
 

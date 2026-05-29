@@ -7,8 +7,8 @@ tags:
 - '#service/ecosystem-wide'
 - '#state/active'
 - '#type/architecture'
-- '#polyglot'
-- '#ffi'
+- '#tech/polyglot'
+- '#tech/ffi'
 - '#zone/3-fleet'
 ---
 # 🔌 Cross-Language FFI & Shared Libraries
