@@ -32,9 +32,12 @@ Level 01 governs the **strategic integrity and long-term memories** of the ecosy
     ```
     obsidian-brain (Workspace Root)
     └── 01-Strategic-Nexus/       # Merged repository mount
-        ├── Strategy-Audit-MOC.md # Index of all strategic reports
-        ├── Anti-Backlog.md       # Rejected ideas database
-        └── STRAT-XXX/            # Transverse strategic audits
+        ├── strategic/            # Strategic memory documents
+        │   ├── Strategy-Audit-MOC.md # Index of all strategic reports
+        │   ├── Strategic-Vision.md   # Long-term ecosystem roadmap
+        │   └── Strategic-Patterns.md # Recurring architectural truths
+        ├── archive/              # Archived STRAT-XXX audits
+        └── Anti-Backlog.md       # Rejected ideas database
     ```
 *   **Colocation Rule**: All templates and agent prompts specific to strategy (such as the Chronos-Oracle prompt) are physically attached (stored) inside the L01 repository, ensuring they check out together.
 *   **Stateless Portability**: All links use relative paths (e.g., `[[../02-Business-BDD/01-Domain-Glossary/00-Glossary]]`) to support running L01 in isolation without absolute workspace paths.
