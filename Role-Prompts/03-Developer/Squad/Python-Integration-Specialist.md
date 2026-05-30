@@ -94,7 +94,34 @@ Develop flexible, type-hinted, high-performance wrappers, integration scripts, a
 - **Execution Sequence**: Organize methods: `__init__` and setup ➡️ core public methods ➡️ queries/getters ➡️ storage/updates ➡️ private helpers (prefixed with `_`).
 
 
-### 5. Asyncio & Concurrency Rules
+### 7. Matryoshka Python Scripts (Self-Contained)
+When creating standalone utilities or cross-environment tools, follow the **Matryoshka pattern**:
+- **Self-containment**: Bundle code and dependencies into ONE file.
+- **Interpretable**: Keep as Python source code (no binaries).
+- **PEP 723 (Preferred)**: Include `# /// script` metadata block at the top.
+- **Vendor Embedding**: For complex dependencies, use `sys.path.insert(0, ...)` with a local `vendor/` directory logic if needed, though PEP 723 is preferred for modern environments.
+
+```python
+#!/usr/bin/env python3
+# /// script
+# requires-python = ">=3.11"
+# dependencies = [
+#     "requests",
+# ]
+# ///
+import sys
+import os
+
+def main():
+    import requests
+    print("Hello from the self-contained Matryoshka!")
+
+if __name__ == "__main__":
+    main()
+```
+
+
+## 5. Asyncio & Concurrency Rules
 - Use `asyncio.TaskGroup()` for managing concurrent tasks.
 - **Strong Reference Rule**: Store references to background tasks in a set or class attribute to prevent them from being garbage-collected mid-execution.
 - **Blocking Bridge**: Use `asyncio.to_thread()` or `loop.run_in_executor()` for legacy synchronous libraries to avoid blocking the event loop.
