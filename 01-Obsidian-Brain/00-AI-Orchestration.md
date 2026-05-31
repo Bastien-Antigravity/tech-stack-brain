@@ -62,5 +62,5 @@ Level 00 boot and lifecycle are driven and verified by the base orchestration sc
 *   **Operation**: Reads `MODE-MANUAL.md` to switch protocols, configures MCP filesystem permissions based on active zone isolation rules, and launches the AI client (Gemini, Claude, or Deepseek API).
 
 ### ⚙️ Workspace Variable Sync
-*   **Target**: [Project-Variables.md](../../00-AI-Orchestration/Project-Variables.md)
+*   **Target**: [Project-Variables.md](../../00-AI-Orchestration/Config/Project-Variables.md)
 *   **Operation**: Standard keys such as `ecosystem_name` and repo mappings are updated during initial scaffolding, ensuring downstream scripts can read paths dynamically.
