@@ -27,6 +27,7 @@ Our microservices communicate through four primary channels: gRPC for control, N
 - **Pattern**: Pub/Sub for market data, order books, and events.
 - **Handling**: Use asynchronous subscribers to avoid blocking the network thread.
 - **Container**: Uses the `nats:2.12.6-alpine3.22` image with monitoring on port 8222.
+- **Connection Standard**: All services connecting to the NATS bus MUST use the standardized connection builders from `microservice-toolbox` (`Connect` for Go, `connect` for Python and Rust). This unifies event logging (using connection ClientID prefixes), reconnect timeouts, and liveness check options across the fleet.
 
 ### 3. Cap'n Proto Transport (safe-socket) [HARDENED]
 - **Role**: Binary serialization for log messages between services and `log-server`.
@@ -43,12 +44,28 @@ Our microservices communicate through four primary channels: gRPC for control, N
 - **Performance**: Metrics must be buffered and sent asynchronously to avoid performance hits on the main processing engine.
 
 ### 5. The Shadow Port Protocol
-To avoid the complexity of a global port registry, all microservices MUST follow the **Shadow Port** convention:
-- **Rule**: The gRPC control port is always `Base TCP Port + 1`.
-- **Implementation**: This logic is hardcoded into the `microservice-toolbox` address resolution layer. 
-- **Auto-Discovery**: AI agents must assume `Port + 1` for gRPC traffic unless explicitly overridden in `distributed-config`.
+To avoid the complexity of a global port registry, all microservices MUST follow the **Shadow Port** convention. This allows for predictable port discovery without a central registry.
 
-### 6. Heartbeat Safety Ratio (2.5x)
+| Interface | Port Mapping | Purpose |
+| :--- | :--- | :--- |
+| **Main Protocol** | `Base Port` | Primary logic (TCP, Cap'n Proto, WebSockets) |
+| **gRPC Protocol** | `Base + 1` | Standard ingestion/synchronization protocol |
+| **gRPC Management** | `Base + 2` | Control and monitoring via `grpc_control` |
+| **REST Management** | `Base + 3` | Control and monitoring via HTTP/JSON |
+
+**Auto-Discovery Rule**: AI agents and peer services must assume this sequential mapping unless explicitly overridden in the `distributed-config` capability block.
+
+### 6. Unified Management Interface
+Every core microservice (e.g., `config-server`, `notif-server`, `data-ingestor`) exposes a dual-protocol management interface:
+
+- **gRPC Control**: Implements a standardized `ControlService` proto.
+    - **Location**: `src/grpc_control/`
+    - **Methods**: `GetStatus`, `ReloadConfig`, and service-specific actions (e.g., `ListNotifiers`, `SetConfig`).
+- **REST Control**: A lightweight HTTP gateway mapping to the same backend logic.
+    - **Endpoints**: `/api/v1/status`, `/api/v1/config/list`, etc.
+    - **Port**: Always `Base + 3` (Shadow Port Protocol).
+
+### 7. Heartbeat Safety Ratio (2.5x)
 To prevent "Zombie Connections" (where a process thinks a socket is alive but it's actually stuck), we enforce the **2.5x Safety Ratio**:
 - **Rule**: The Heartbeat interval MUST be at least 2.5x faster than the Idle Timeout (Deadline).
 - **Standard**: If `IdleTimeout = 500ms`, then `HeartbeatInterval = 200ms`.

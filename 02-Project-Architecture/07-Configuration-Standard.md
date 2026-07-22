@@ -23,9 +23,20 @@ Our microservices avoid hardcoded parameters. All settings are sourced from a la
 - **Profiles**:
   - `standalone` / `test` → **Dev Mode**: Local YAML file is the hard override.
   - Any other profile → **Production Mode**: Config Server is authoritative; local file fills gaps (e.g., local overrides).
-- **Search Paths**: All loaders must search for YAML files in the **current directory** and the **`config/` sub-directory** sequentially.
+- **Search Paths (Locality Rule)**: To ensure predictability, configuration loaders MUST prioritize the **Binary's Home Directory** over the Current Working Directory (CWD).
+  - **Auto-Skeleton (Zero-Config)**: If the target config file (e.g., `standalone.yaml`) is missing, the library automatically generates a complete, platform-standard skeleton in the binary's folder.
+  - **'go run' Support**: For development, the system robustly detects the source file directory (`cmd/<service>/`) and treats it as the home folder for configs and logs.
 
-### 2. Unified Shared Engine Architecture (v1.9.92+)
+### 2. Harmonized Configuration System (v2.0+)
+The fleet utilizes a **Universal Configuration Template** located in `shared-config/standalone.yaml`.
+- **Single Source of Truth**: All repositories symlink their local `standalone.yaml` to this shared file.
+- **Environment Driven**: The YAML uses `${VAR:-default}` templates for all IP addresses and ports, allowing a single file to support Local, Docker, and isolated macOS (`127.0.0.2`) deployments simultaneously.
+- **The "Chain of Truth" (Priority)**:
+  1. **Environment Variables**: Highest priority (forced overrides).
+  2. **Config File**: Canonical source for static settings.
+  3. **Hardcoded Fallbacks**: Safe defaults (`127.0.0.1`) used for skeleton generation.
+
+### 3. Unified Shared Engine Architecture (v1.9.92+)
 - To ensure absolute behavioral parity and memory-space unification, all non-Go languages (Python, Rust, C++, VBA) utilize the **Unified Shared Engine** (`libdistconf` / `libunilog`).
 - **Single Memory State**: The shared engine ensures that multiple configuration sessions (e.g., one in the Logger and one in the Toolbox) share the same handle store and runtime environment.
 - **Shared Logic**: By converging on the `src/cgo_bridge` core in `distributed-config`, all languages benefit from the exact same environment expansion, path discovery, and network sync logic.

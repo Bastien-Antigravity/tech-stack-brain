@@ -1,4 +1,6 @@
----
+--- 
+microservice: obsidian-brain
+
 type: adr
 status: proposed
 date: {{date}}

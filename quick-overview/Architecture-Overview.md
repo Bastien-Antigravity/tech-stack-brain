@@ -1,4 +1,4 @@
----
+--- 
 microservice: tech-stack-brain
 type: architecture
 status: active
@@ -7,6 +7,7 @@ tags:
 - '#ai/ignore'
 - '#service/tech-stack-brain'
 - '#type/architecture'
+- '#state/active'
 ---
 # Architecture Overview: Tech Stack Brain
 
