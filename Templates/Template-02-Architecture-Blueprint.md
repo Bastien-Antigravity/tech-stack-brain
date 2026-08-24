@@ -1,15 +1,12 @@
---- 
-microservice: {{microservice}}
-type: architecture-blueprint
-status: draft
-role: architect
+---
+microservice: 08-Base-Scripts
+type: note
+status: active
 tags:
-- "#tech/TO-DO"
-- "#tier/TO-DO"
-- "#zone/TO-DO"
-- "#service/{{microservice}}"
-- '#state/draft'
-- '#type/architecture-blueprint'
+- '#service/08-Base-Scripts'
+- '#type/note'
+- '#state/active'
+- '#zone/3-fleet'
 ---
 # Architecture Blueprint: [Feature/Bug Name]
 

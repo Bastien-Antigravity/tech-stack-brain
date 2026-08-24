@@ -16,6 +16,7 @@ This repository serves as the **Rulebook** for your specific technological stack
 
 ## 📦 What's Inside?
 
+- **`quick-overview/Ecosystem-Taxonomy-Guide.md`**: [Ecosystem Taxonomy & Classification Guide](quick-overview/Ecosystem-Taxonomy-Guide.md) (Shared Libraries vs Level 1 Microservices vs Orchestration).
 - **`02-Project-Architecture/`**: Core architectural paradigms (e.g., Facade patterns, Interface decoupling) and Architecture Decision Records (ADRs).
 - **`03-Project-Coding/`**: The language-specific idioms (Go, Rust, Python, C++, VBA) and documentation requirements.
 - **`04-Project-Deployment/`**: Infrastructure rules, Docker strategies, and CI/CD lifecycles.

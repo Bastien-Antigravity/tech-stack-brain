@@ -1,16 +1,12 @@
---- 
-microservice: obsidian-brain
-
-type: adr
-status: proposed
-date: {{date}}
+---
+microservice: 08-Base-Scripts
+type: note
+status: active
 tags:
-- "#tech/TO-DO"
-- "#tier/TO-DO"
-- "#zone/TO-DO"
-  - #domain/architecture
-  - #type/architecture
-  - #state/draft
+- '#service/08-Base-Scripts'
+- '#type/note'
+- '#state/active'
+- '#zone/3-fleet'
 ---
 
 # 📜 ADR-{{title}}: [Short Descriptive Title]
