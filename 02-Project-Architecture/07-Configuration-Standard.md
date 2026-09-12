@@ -91,24 +91,40 @@ capabilities:
 ### 7. Environment Variable Expansion
 YAML files support environment variable templates using `${VAR_NAME:-default}` syntax. These are expanded at load time by `distributed-config`.
 
-### 8. Local Configuration (Service-Specific)
-For settings that do not fit the `ip/port` capability pattern (e.g., custom service-specific flags, internal paths), use the `local:` block. This section is **Toolbox-Specific** and is strictly **Local-Only**:
-- **Non-Synchronized**: Unlike `capabilities`, the `local:` block is **never** synchronized with the Config Server. It remains local to the service instance.
-- **Access Pattern (Go/C++)**: Access via `ac.GetLocal("key")` or unmarshal the entire section into a struct using `UnmarshalLocal(target)`.
-- **Access Pattern (Python/Rust)**: Access via `ac.get_local("key")` or use `unmarshal_local::<T>()`.
-- **Decryption**: Local values are eligible for on-demand `ENC(...)` decryption using toolbox helpers.
-- **In-Memory Mirroring**: C++ and VBA implement full in-memory mirroring for high-performance access without repeated disk I/O.
+### 8. Non-Shared & Local Configuration
+When configuration settings must remain private to a single microservice rather than shared ecosystem-wide, three distinct mechanisms are supported:
 
-### 9. Secret Encryption (v1.9.1+)
-`distributed-config` supports native RSA encryption for sensitive fields in YAML files.
-- **Pattern**: Wrap encrypted values in `ENC(...)`. Example: `password: "ENC(base64_blob)"`.
-- **On-Demand Decryption**: By default, the library **stores secrets in their encrypted form**. The service must explicitly decrypt them when needed using the toolbox helpers.
-- **Public Key Discovery**: At boot, the system searches for `public.pem` (following the standard discovery chain) and, if found, embeds its content into the `common.public_key` config field. This allows the service to share its public identity without manual configuration.
-- **Key Locations**:
-  - **Public Key (`public.pem`)**: Non-Sensitive. Used by developers to encrypt secrets.
-  - **Private Key (`private.pem`)**: Critical Secret. **MUST NOT** be committed to Git. loaded from `BASTIEN_PRIVATE_KEY_PATH` or `/etc/bastien/`.
-- **Volatility Rule**: Decrypted values must never be written to disk, logs, or databases. Services should keep decrypted secrets in volatile variables for the shortest time possible.
-- **Utilities**: All repositories must include or reference the standard **`config-tool`** found in the `distributed-config/cmd` directory for managing these secrets.
+1. **The `local:` YAML Block**:
+   - For settings that do not fit the shared `capabilities` pattern (e.g., service-internal directories, operational flags).
+   - **Strictly Non-Synchronized**: The `local:` block is **never** synchronized with or broadcast by the `config-server`. It lives exclusively in the local service YAML file.
+   - **Access Pattern (Go/C++)**: Access via `ac.GetLocal("key")` or unmarshal the entire block into a struct using `UnmarshalLocal(&target)`.
+   - **Access Pattern (Python/Rust)**: Access via `ac.get_local("key")` or `unmarshal_local::<T>()`.
+   - **Secret Protection**: Values inside `local:` can also use `ENC(...)` and are decrypted on-demand via `DecryptSecret()`.
+
+2. **Dedicated Service Config Files**:
+   - Each service can specify a standalone configuration file via `--conf /path/to/service.yaml` or through its binary-local `<service-name>.yaml`.
+   - In `standalone` or `test` profiles, this local file is authoritative and acts as a complete, unshared override.
+
+3. **Scoped Environment Variables**:
+   - `${VAR_NAME:-default}` template placeholders in YAML resolve from the process environment.
+   - Variables set exclusively inside a service's Docker container or systemd unit remain completely isolated from other services.
+
+### 9. Secret Encryption & Per-Service Key Architecture (v1.9.1+)
+`distributed-config` provides native RSA encryption for sensitive fields in YAML configurations:
+- **Format**: Wrap base64-encoded ciphertext in `ENC(...)`. Example: `token: "ENC(base64_blob)"`.
+- **Zero-Knowledge Core**: `config-server` and `web-interface` do NOT decrypt secrets. Configuration loaders (`distributed-config` / `microservice-toolbox`) preserve `ENC(...)` values untouched in the configuration AST and in-memory snapshots.
+- **On-Demand Decryption**: Consuming microservices explicitly decrypt secrets at point-of-use using `appConfig.DecryptSecret(ciphertext)` (or `secret.Decrypt(ciphertext)`).
+- **Per-Service Private Key Isolation**:
+  - Each microservice can possess its own unique RSA key pair (e.g. `tele-remote-public.pem` / `tele-remote-private.pem`).
+  - Secrets encrypted with a specific service's public key can **only** be decrypted by that specific service.
+  - A compromise of one service's private key does not compromise secrets encrypted for other services.
+- **Key Resolution Hierarchy**:
+  1. `BASTIEN_PRIVATE_KEY` (inline PEM string in environment)
+  2. `BASTIEN_PRIVATE_KEY_PATH` (or `--key` CLI argument)
+  3. `/etc/bastien/private.pem` (Production default / Docker secret mount)
+  4. `./private.pem` (Local development fallback)
+- **Volatility Rule**: Decrypted values must never be written to disk, logs, or distributed back to `config-server`. Services must retain decrypted secrets only in volatile memory for the duration of the connection or operation.
+- **Unified Tooling**: All key generation and encryption tasks are performed using `config-tool` (`distributed-config/cmd/config-tool`).
 
 ### 10. Polyglot Feature Parity Matrix
 
