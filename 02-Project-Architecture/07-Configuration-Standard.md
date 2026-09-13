@@ -28,8 +28,8 @@ Our microservices avoid hardcoded parameters. All settings are sourced from a la
   - **'go run' Support**: For development, the system robustly detects the source file directory (`cmd/<service>/`) and treats it as the home folder for configs and logs.
 
 ### 2. Harmonized Configuration System (v2.0+)
-The fleet utilizes a **Universal Configuration Template** located in `shared-config/standalone.yaml`.
-- **Single Source of Truth**: All repositories symlink their local `standalone.yaml` to this shared file.
+The fleet utilizes a **Universal Configuration Template** located in `docker-deployment/modes/local/config/native.yaml`.
+- **Single Source of Truth**: All repositories symlink their local `standalone.yaml` directly to this authoritative profile.
 - **Environment Driven**: The YAML uses `${VAR:-default}` templates for all IP addresses and ports, allowing a single file to support Local, Docker, and isolated macOS (`127.0.0.2`) deployments simultaneously.
 - **The "Chain of Truth" (Priority)**:
   1. **Environment Variables**: Highest priority (forced overrides).
