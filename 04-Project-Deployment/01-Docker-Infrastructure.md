@@ -61,8 +61,17 @@ The platform follows a **Sovereign Decryption** pattern to ensure end-to-end sec
 > If `BASTIEN_PRIVATE_KEY` (content) is not provided, the system falls back to the following locations in order:
 > 1.  Path specified in **`BASTIEN_PRIVATE_KEY_PATH`** environment variable (or `--key` flag).
 > 2.  **`/etc/bastien/private.pem`** (Standard Production host path).
-> 3.  **`docker-deployment/config/keys/private.pem`** (Self-contained repository fallback for zero-configuration multi-machine portability).
+> 3.  **`~/.bastien/keys/private.pem`** (Standard User Home path, strictly isolated outside all git repositories).
 > 4.  **`./private.pem`** (Local/Sandbox development fallback).
 
+## 🚀 Deployment Modes Architecture
+The platform provides three strictly isolated execution modes managed via `scripts/fleet.py` (`./fleet.sh` / `fleet.cmd`):
+
+| Mode | Location | Backing Target | Description |
+|---|---|---|---|
+| **Local Native** | `modes/local/` | Host Loopback (`127.0.0.1`) | Native binary execution supervised by `watchdog-agent`. TimescaleDB/NATS can run natively or via compose. |
+| **Docker Loopback** | `modes/docker/` | Loopback Alias (`127.0.0.2`) | Containerized fleet isolated to `127.0.0.2` to avoid host port conflicts. |
+| **Production VPS** | `modes/production/` | Public Interface (`0.0.0.0`) | Full container stack with automated Watchtower GHCR updates. |
+
 ## 🚦 Operational Readiness
-- **Health Checks**: Every service must be monitored for readiness to ensure correct dependency sequencing. See **[[03-Health-Checks|📐 Health Checks]]** for implementation details.
+- **Health Checks**: Every service must be monitored for readiness to ensure correct dependency sequencing. See **[[03-Health-Checks|📐 Health Checks]]** and **[[05-Fleet-Orchestration|📐 Fleet Orchestration]]** for implementation details.

@@ -60,3 +60,17 @@ services:
       nats-server:
         condition: service_healthy
 ```
+
+## ⚡ Host-Side Ecosystem Readiness Engine (`modes/local/health.py`)
+In addition to container-level Docker health checks, the native execution orchestrator implements a **Multi-Tier Host Readiness Probing Engine**:
+
+1. **TCP Socket Verification**: Probes all microservice listening ports (`is_port_listening`) using non-blocking socket handshakes.
+2. **HTTP Endpoint Probing**: Dynamically probes HTTP services (`/health`, `/api/v1/status`, `/`) via standard library HTTP requests. Any response `< 500` confirms the web server process is actively responding.
+3. **Supervisor REST Status Polling**: Queries the `watchdog-agent` REST API (`http://127.0.0.1:9095/api/v1/status`) to ensure all child processes are in the `running: true` state and healthy.
+4. **Mandatory Readiness Gate**: Startup sequences block until all services pass health verification or a timeout is reached. Bypassing readiness verification is strictly prohibited.
+5. **Actionable Failure Diagnostics**: If startup times out, the engine prints a comprehensive diagnosis:
+   - Unopened ports
+   - Unresponsive HTTP endpoints
+   - Terminated/crashed child processes
+   - The last 15 lines of `watchdog.log`
+
