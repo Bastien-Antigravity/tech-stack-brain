@@ -24,14 +24,14 @@ To maintain fleet-wide consistency, the following prefixes and variables are man
 ### 1. Connectivity Overrides (`*_IP`, `*_PORT`)
 Used to manage the transition between internal container DNS and host-side loopback mappings.
 
-| Service | Host/IP Variable | Main Port | gRPC Sync | gRPC Mgmt | REST Mgmt |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| **Log Server** | `LS_IP` | `LS_PORT` | `LS_GRPC_PORT` | - | - |
-| **Config Server** | `CF_IP` | `CF_PORT` | `CF_GRPC_PORT` | - | `CF_REST_PORT` |
-| **Notif Server** | `NT_IP` | `NT_PORT` | `NT_GRPC_PORT` | `NT_GRPC_MGMT_PORT` | `NT_REST_PORT` |
-| **Tele-Remote** | `TR_IP` | `TR_PORT` | - | - | - |
-| **TimescaleDB** | `DB_IP` | `DB_PORT` | - | - | - |
-| **Scheduler** | `SC_IP` | `SC_PORT` | `SC_GRPC_PORT` | - | - |
+| Service | Host/IP Variable | Main Port | gRPC Sync | REST Mgmt |
+| :--- | :--- | :--- | :--- | :--- |
+| **Log Server** | `LS_IP` | `LS_PORT` | `LS_GRPC_PORT` | - |
+| **Config Server** | `CF_IP` | `CF_PORT` | `CF_GRPC_PORT` | `CF_REST_PORT` |
+| **Notif Server** | `NT_IP` | `NT_PORT` | `NT_GRPC_PORT` | `NT_REST_PORT` |
+| **Tele-Remote** | `TR_IP` | `TR_PORT` | - | - |
+| **TimescaleDB** | `DB_IP` | `DB_PORT` | - | - |
+| **Scheduler** | `SC_IP` | `SC_PORT` | `SC_GRPC_PORT` | - |
 
 ### 2. Deployment Control
 - `TAG`: Defines the Docker image version (e.g., `develop`, `latest`, or `v1.2.3`).
