@@ -20,7 +20,7 @@ tags:
 *Define the Go interfaces, Rust traits, or Python protocols here. Do NOT write business logic. If this is a cross-repo boundary, it MUST be registered.*
 ```go
 // Example
-type IFeature interface {
+type Feature interface {
     DoThing() error
 }
 ```

@@ -36,7 +36,7 @@ Our microservices communicate through four primary channels: gRPC for control, N
     - **Identity**: ALL connections must perform a `HelloMsg` handshake immediately upon connection.
 - **Serialization**: Packed Cap'n Proto for data, Unpacked for handshakes.
 - **Library**: `github.com/Bastien-Antigravity/safe-socket` provides the transport layer.
-- **Server**: `log-server` (Rust) listens for Cap'n Proto messages on TCP (Port 15000).
+- **Server**: `log-server` (Rust) listens for Cap'n Proto messages on TCP (Port 9020).
 
 ### 4. Metric WebSockets (WSPublisher)
 - **Role**: Outbound metrics (performance, health status, real-time data) are streamed via non-blocking concurrent WebSocket publishers.
@@ -77,6 +77,6 @@ To prevent "Zombie Connections" (where a process thinks a socket is alive but it
 - **Container Health**: Docker health checks use `pg_isready` (DB), HTTP monitoring (NATS), or gRPC health (application services).
 
 ### 8. The Log Bridge Pattern
-- **Definition**: A gRPC gateway (Port 15001) used as a bridge for clients without raw TCP access (e.g., Web/JS).
+- **Definition**: A gRPC gateway (Port 9021) used as a bridge for clients without raw TCP access (e.g., Web/JS).
 - **Semantics**: Must be called `LogBridge` to distinguish it from the `ProcessController` (Shadow Port) standard.
 - **Data Flow**: Logs received via the Bridge are mapped to the same internal ordered stream as TCP messages.

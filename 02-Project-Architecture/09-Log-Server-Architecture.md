@@ -17,7 +17,7 @@ This document describes the data flow and component hierarchy of the Log Server.
 ## Data Flow Overview
 
 - **TCP Entry [HARDENED]**: High-performance Cap'n Proto stream requiring a 4-byte BE length prefix and a mandatory Identity Handshake.
-- **gRPC Log Bridge**: Interoperability gateway for HTTP/JS clients (Port 15001).
+- **gRPC Log Bridge**: Interoperability gateway for HTTP/JS clients (Port 9021).
 - **Unified Processing**: Both ingestion paths converge into a shared asynchronous pipeline for sequencing and persistent storage.
 
 ## Bootstrapping State Machine

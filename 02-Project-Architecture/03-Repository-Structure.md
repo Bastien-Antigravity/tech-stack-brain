@@ -9,32 +9,54 @@ tags:
 - '#state/active'
 - '#type/architecture'
 ---
-# 03 - Repository Structure & Microservice Creation Standard
 
-This document governs the mandatory folder architecture, root files, and ecosystem integration standards for all microservices across the Bastien-Antigravity fleet.
+# 🏛️ 03 - Repository Structure & Microservice Creation Standard
+
+This document establishes the authoritative, mandatory standard for repository naming, folder architecture, root files, Makefile automation, coding standards, and ecosystem integration touchpoints for all microservices across the Bastien-Antigravity fleet.
+
+It serves as the definitive reference for both human engineers and AI coding agents (IDE Pair-Programmers, FleetCommander, Orchestrator, Developer, Architect, Sentinel).
 
 ---
 
-## 1. The 10 Mandatory Root Files Checklist
+## 🏷️ 1. Repository Naming Conventions
 
-Every microservice repository in the workspace **MUST** contain the following 10 root files:
+All repositories in the `Bastien-Antigravity` ecosystem MUST follow strict naming patterns based on their architectural role:
 
-| # | File Name | Purpose & Canonical Requirement |
+| Category | Naming Pattern | Canonical Examples | Description |
+| :--- | :--- | :--- | :--- |
+| **Microservices** | `<domain>-server` | `config-server`, `log-server`, `notif-server` | Standalone backend daemons exposing network ports |
+| **Agents & Supervisors** | `<domain>-agent` | `watchdog-agent` | Background supervisory, monitoring, or healing agents |
+| **Gateways & Adaptors** | `<domain>-gateway` | `mt5-gateway` | Edge protocol adapters and hardware bridges |
+| **User Interfaces** | `<domain>-interface` | `web-interface` | Web frontend / dashboard applications |
+| **Domain Processing** | `<domain>-<worker>` | `market-observer`, `fundamental-analysis` | Event-driven processing engines |
+| **Shared Libraries** | `<feature>-<type>` | `microservice-toolbox`, `universal-logger`, `distributed-config`, `safe-socket`, `flexible-logger` | Polyglot cross-service core libraries |
+| **Testing / Sandboxes** | `<domain>-testing` | `sandbox-testing` | E2E integration test harnesses and mock providers |
+| **Knowledge Vaults** | `<number>-<Name>` | `obsidian-brain` | Architecture blueprints, BDD specs, and RAG knowledge |
+
+---
+
+## 📋 2. The 12 Mandatory Root Files & Folders Checklist
+
+Every newly created microservice repository in the workspace **MUST** contain the following 12 root elements:
+
+| # | File / Directory | Mandatory Standard & Purpose |
 | :-: | :--- | :--- |
-| **1** | `standalone.yaml` | **Mandatory Symlink**: Points to `../docker-deployment/modes/local/config/native.yaml`. Registered in `watchdog-agent` self-healing engine. |
-| **2** | `AGENTS.md` | **Autonomous Agent Operating Guide**: Documents mission, exposed capabilities, ports, build/test commands, and forbidden anti-patterns. |
-| **3** | `AI-Session-State.md` | **Agent Session Context Tracker**: Contains standard YAML frontmatter tracking active tasks, mission IDs, and known issues. |
-| **4** | `Dockerfile` | **Standalone Multi-Stage Build**: Conforms to `12-Docker-Deployment-Standards.md`. Clones shared library replace directives in builder stage. |
-| **5** | `docker-compose.yml` | **Local Fragment Compose**: Configured with `context: .`, port mappings using `${ENV_VAR:-fallback}`, and `teleremote-network`. |
-| **6** | `VERSION.txt` | **Canonical Version Identifier**: Single-line plain text file (e.g. `0.0.1`) read dynamically by `Makefile`, CI/CD pipelines, and release workflows. |
-| **7** | `.golangci.yml` | **Static Analysis Rules** *(Go services)*: Configures `govet`, `staticcheck`, `ineffassign`, and suppression rules. |
-| **8** | `go.mod` / `requirements.txt` / `Cargo.toml` | **Language Dependency Manifest**: Uses approved internal ecosystem SDKs (`microservice-toolbox`, `universal-logger`, `safe-socket`). |
-| **9** | `Makefile` | **Standardized CLI Automation** *(Go, Rust, C++, CGO bridges)*: Uses dynamic versioning (`VERSION := $(shell cat VERSION.txt 2>/dev/null || echo "0.0.1")`) with targets `version`, `build`, `test`, `run`, and `clean`. Pure Python services rely natively on `requirements.txt`, `pytest`, and `python main.py`. |
-| **10** | `README.md` | **Project Compass**: High-level repository mission and link to `AGENTS.md`. |
+| **1** | `standalone.yaml` | **Mandatory Symlink**: Points to `../docker-deployment/modes/local/config/native.yaml`. Registered in `watchdog-agent` self-healing engine (`heal.go`). |
+| **2** | `AGENTS.md` | **AI Technical Rulebook**: Mission, exposed capabilities, ports, build/test commands, and forbidden anti-patterns. Ingested automatically into AI system instructions. |
+| **3** | `AI-Init.md` / `AI-Project-DNA.md` / `AI-Session-State.md` | **AI Workflow & Context Suite**: `AI-Init.md` (interactive kickoff prompt), `AI-Project-DNA.md` (domain intent & classification), `AI-Session-State.md` (session memory), and `TODO.md` (roadmap checklist). |
+| **4** | `Dockerfile` | **Multi-Stage Build**: Complies with `12-Docker-Deployment-Standards.md`. Clones shared library replace directives in builder stage; minimal runtime container. |
+| **5** | `docker-compose.yml` | **Local Compose Fragment**: Uses `context: .`, `${HOST_IP:-127.0.0.1}:${PORT}:${PORT}`, and external `teleremote-network`. |
+| **6** | `VERSION.txt` | **Canonical Semver SSoT**: Single-line plain text (e.g. `0.0.1`) read dynamically by `Makefile`, CI/CD pipelines, and release workflows. |
+| **7** | `.golangci.yml` | **Static Analysis** *(Go services)*: Configures `govet`, `staticcheck`, `ineffassign`, and project exclusion rules. |
+| **8** | Language Manifest | **Dependency Manifest**: `go.mod` (Go) / `requirements.txt` (Python) / `Cargo.toml` (Rust) using ecosystem SDKs. |
+| **9** | `Makefile` | **Standardized CLI Automation** *(Compiled languages)*: Implements `all`, `build`, `test`, `race`, `vet`, `version`, `clean` with dynamic versioning. Strictly prohibits `\|\| true` and `2>/dev/null`. |
+| **10** | `README.md` | **Project Compass**: High-level mission and direct markdown link to `AGENTS.md`. |
+| **11** | `.gitignore` | **Standard Protections**: OS caches (`.DS_Store`), python caches (`__pycache__`), binaries (`bin/`, `target/`), and logs (`*.log`). |
+| **12** | `quick-overview/` | **Human Onboarding Zone**: Contains human documentation and `.geminiignore`, `.mcpignore`, `.aiignore` so AI agents do not waste context. |
 
 ---
 
-## 2. Directory Anatomy by Language
+## 📁 3. Standard Directory Anatomy by Language
 
 ### Go Services (Primary Language)
 ```text
@@ -45,22 +67,39 @@ Every microservice repository in the workspace **MUST** contain the following 10
 │       └── standalone.yaml       # (Symlink if executing directly from cmd/)
 ├── src/
 │   ├── core/                     # Central domain logic & worker controllers
+│   │   ├── controller.go         # Domain worker controller
+│   │   └── controller_test.go    # Starter unit test with mock logger
 │   ├── interfaces/               # Abstract interfaces (zero direct cyclic imports)
 │   ├── models/                   # Shared typed structs & telemetry payloads
 │   ├── config/                   # Typed capability schemas
-│   ├── rest/                     # REST HTTP handlers & OpenMFE asset host
-│   └── server/                   # SafeSocket TCP or gRPC network servers
-├── quick-overview/               # Mandatory human onboarding documentation (see Sec. 3)
+│   ├── rest/                     # REST HTTP handlers & OpenMFE asset host (if applicable)
+│   └── server/                   # SafeSocket TCP or gRPC network servers (if applicable)
+├── quick-overview/               # Human onboarding documentation (isolated from AI)
+│   ├── Architecture-Overview.md
+│   ├── Features-Behavior.md
+│   ├── Testing-Playbook.md
+│   ├── General-Misc.md
+│   ├── .geminiignore
+│   ├── .mcpignore
+│   └── .aiignore
+├── .github/                      # CI/CD workflows and dependabot
+│   ├── workflows/ci.yml
+│   ├── dependabot.yml
+│   └── CODEOWNERS
 ├── standalone.yaml               # Symlink -> ../docker-deployment/modes/local/config/native.yaml
-├── Dockerfile                    # Multi-stage standalone build
-├── docker-compose.yml            # Local fragment compose
-├── AGENTS.md                     # AI agent operational prompt
+├── Dockerfile                    # Multi-stage builder & minimal Alpine runtime
+├── docker-compose.yml            # Local fragment compose (teleremote-network)
+├── AGENTS.md                     # AI agent operational prompt & rules (machine-ingested)
+├── AI-Init.md                    # Interactive session kickoff prompt
+├── AI-Project-DNA.md             # Business intent & classification metadata
 ├── AI-Session-State.md           # AI session memory tracker
+├── TODO.md                       # Task checklist & roadmap
 ├── .golangci.yml                 # Static analysis config
+├── .gitignore                    # OS and build artifact protections
 ├── VERSION.txt                   # Version identifier (e.g. 0.0.1)
-├── Makefile                      # version, build, test, run, clean targets
+├── Makefile                      # Standard build, test, race, vet, version, clean
 ├── go.mod / go.sum               # Go modules with replace directives
-└── README.md                     # High-level overview
+└── README.md                     # Project compass
 ```
 
 ### Python Services (e.g., enhanced-backtesting, fundamental-analysis, 09-RAG-Engine)
@@ -70,16 +109,32 @@ Every microservice repository in the workspace **MUST** contain the following 10
 ├── src/
 │   ├── core/                     # Domain controllers and worker execution logic
 │   ├── interfaces/               # Abstract base classes (ABCs) & typing.Protocol
-│   ├── models/                   # Dataclasses and M-prefixed schemas (e.g. MStatusPayload)
+│   ├── models/                   # Domain models and dataclasses (e.g. StatusPayload)
 │   └── lib/                      # Shared helper utilities
-├── tests/                        # Pytest suite (e.g. test_basic.py)
-├── quick-overview/               # Mandatory human onboarding
+├── tests/
+│   ├── conftest.py               # Shared pytest fixtures
+│   └── test_basic.py             # Starter unit test verifying environment
+├── quick-overview/               # Human onboarding (isolated from AI)
+│   ├── Architecture-Overview.md
+│   ├── Features-Behavior.md
+│   ├── Testing-Playbook.md
+│   ├── General-Misc.md
+│   ├── .geminiignore
+│   ├── .mcpignore
+│   └── .aiignore
+├── .github/
+│   ├── workflows/ci.yml
+│   └── dependabot.yml
 ├── standalone.yaml               # Symlink to native.yaml
-├── Dockerfile                    # Containerization manifest (Python 3.12-alpine)
+├── Dockerfile                    # Containerization manifest (Python 3.12-alpine + libunilog.so)
 ├── docker-compose.yml            # Local fragment compose
-├── AGENTS.md                     # AI agent operational prompt
+├── AGENTS.md                     # AI agent operational prompt & rules (machine-ingested)
+├── AI-Init.md                    # Interactive session kickoff prompt
+├── AI-Project-DNA.md             # Business intent & classification metadata
 ├── AI-Session-State.md           # AI session memory tracker
-├── requirements.txt              # Python dependencies (microservice-toolbox, universal-logger, pytest)
+├── TODO.md                       # Task checklist & roadmap
+├── requirements.txt              # Dependencies (microservice-toolbox, universal-logger, pytest)
+├── .gitignore                    # Python cache and venv protections
 ├── VERSION.txt                   # Version identifier (e.g. 0.0.1)
 └── README.md
 ```
@@ -93,84 +148,199 @@ Every microservice repository in the workspace **MUST** contain the following 10
 │   ├── servers/                  # Tokio SafeSocket TCP listener & gRPC handlers
 │   ├── models/                   # Typed structs
 │   └── protocols/                # Length-prefixed framing and Cap'n Proto schemas
-├── quick-overview/               # Mandatory human onboarding
+├── tests/
+│   ├── test_basic.rs             # Unit and integration test suite
+├── quick-overview/               # Human onboarding (isolated from AI)
+│   ├── Architecture-Overview.md
+│   ├── Features-Behavior.md
+│   ├── Testing-Playbook.md
+│   ├── General-Misc.md
+│   ├── .geminiignore
+│   ├── .mcpignore
+│   └── .aiignore
+├── .github/
+│   ├── workflows/ci.yml
+│   └── dependabot.yml
 ├── standalone.yaml               # Symlink to native.yaml
 ├── Dockerfile                    # Rust multi-stage builder (protoc + capnproto)
 ├── docker-compose.yml            # Local fragment compose
-├── AGENTS.md                     # AI agent operational prompt
+├── AGENTS.md                     # AI agent operational prompt & rules (machine-ingested)
+├── AI-Init.md                    # Interactive session kickoff prompt
+├── AI-Project-DNA.md             # Business intent & classification metadata
 ├── AI-Session-State.md           # AI session memory tracker
-├── VERSION.txt                   # Version identifier (e.g. 0.0.1)
+├── TODO.md                       # Task checklist & roadmap
 ├── Cargo.toml / Cargo.lock       # Cargo dependencies
+├── .gitignore                    # Rust target/ and OS protections
+├── VERSION.txt                   # Version identifier (e.g. 0.0.1)
 ├── Makefile                      # Standard CLI automation with dynamic versioning
 └── README.md
 ```
 
 ---
 
-## 3. Human Onboarding (`quick-overview/` — Mandatory)
+## 🛠️ 4. Standardized Makefile Automation
 
-Every microservice repository MUST include a `quick-overview/` folder at the root. This folder is **exclusively for human readers** and is excluded from AI agent context:
-
-- `quick-overview/Architecture-Overview.md`: Visual graphs and explanations of internal modules.
-- `quick-overview/Features-Behavior.md`: High-level summary of features and domain behaviors.
-- `quick-overview/Testing-Playbook.md`: How to test this specific service (unit, integration, sandbox).
-- `quick-overview/General-Misc.md`: Philosophy, operational caveats, and optimization tips.
-- `quick-overview/.geminiignore`, `quick-overview/.mcpignore`, `quick-overview/.aiignore`: Mandatory ignore files ensuring AI agents do not waste context on human onboarding notes.
+Compiled language repositories (Go, Rust, C++) MUST provide a root `Makefile` implementing the standardized targets.
 
 > [!IMPORTANT]
-> AI agents MUST ignore `quick-overview/`. The **DocMaintainer** is the only agent persona responsible for updating these files after major architectural updates.
+> **Python Tooling Purity**: Pure Python repositories **DO NOT** use a `Makefile`. They rely natively on `pytest`, `requirements.txt`, and virtual environments.
+
+### Canonical Go Makefile Template:
+```makefile
+VERSION ?= $(shell cat VERSION.txt 2>/dev/null || echo "0.0.1")
+LDFLAGS := -s -w -X 'github.com/Bastien-Antigravity/$(NAME)/src/core.ServerVersion=$(VERSION)'
+
+.PHONY: all build test race vet version clean
+
+all: build
+
+version:
+	@echo $(VERSION)
+
+build:
+	@echo "Building $(NAME) (version $(VERSION))..."
+	@mkdir -p bin
+	go build -ldflags="$(LDFLAGS)" -o bin/$(NAME) ./cmd/$(NAME)
+
+test:
+	@echo "Running tests (version $(VERSION))..."
+	go test -v ./...
+
+race:
+	@echo "Running race detector (version $(VERSION))..."
+	go test -race -v ./...
+
+vet:
+	@echo "Running go vet..."
+	go vet ./...
+
+clean:
+	@echo "Cleaning build artifacts..."
+	@rm -rf bin/ dist/ build/
+```
+
+### Critical Rules for Makefiles:
+1. **Dynamic Versioning**: Always extract version via `$(shell cat VERSION.txt 2>/dev/null || echo "0.0.1")`.
+2. **Never Mask Errors**: Strict prohibition of `|| true` or `2>/dev/null` on `go build`, `go test`, or `cargo test`. Failures must bubble up to CI/CD and terminal output immediately.
+3. **Deterministic Output**: Compiled binaries must be placed in `./bin/<service-name>`.
 
 ---
 
-## 4. The 6 Ecosystem Integration Touchpoints (The Golden Fleet Standard)
+## 🤖 5. Code Standards for AI-Assisted Programming
 
-When introducing or modifying a microservice, the following 6 integration touchpoints are required:
+To ensure flawless code generation by AI agents, every file and package must follow these architectural rules:
 
-1. **`obsidian-brain/05-Fleet-Operation/00-Repo-Control/service-registry.json`**:
-   Register the service name, Docker image, canonical default port, protocol, and classification in the fleet registry.
-2. **`obsidian-brain/05-Fleet-Operation/00-Repo-Control/inventory.json` (Single Source of Truth)**:
-   Register the repository path, git remote URL, default branch (`develop`), repository archetype (`level1-microservice`), `is_core` boolean, and `modes` array (e.g. `["local", "docker", "production"]`).
-   - `docker-deployment/modes/local/inventory.json`, `modes/docker/inventory.json`, and `modes/production/inventory.json` are **authoritative symlinks** pointing directly to this file.
-   - `docker-deployment`'s orchestrator automatically filters repositories by `mode in r.get("modes", [mode])` and `WORKSPACE_REPOSITORIES`.
-   - Run `python3 obsidian-brain/05-Fleet-Operation/00-Repo-Control/build-inventory.py` to auto-discover and preserve overrides.
-3. **`docker-deployment/modes/local/config/native.yaml`**:
-   Register the service capability block:
-   ```yaml
-   capabilities:
-     my_service:
-       ip: ${MS_IP:-127.0.0.1}
-       port: "${MS_PORT:-8090}"
-   ```
-4. **`docker-deployment/docker-compose.yaml`**:
-   Register the service container for fleet orchestration and healthchecks.
-5. **`watchdog-agent/src/config/heal.go`**:
-   Register the relative `standalone.yaml` path in the `targets` slice so the supervisor heals missing symlinks automatically.
-6. **`web-interface` & `tele-remote` Dynamic Integration** *(if UI or remote alerts exist)*:
-   - Web UI: Service exposes `/static/js/mfe-loader.js` and auto-registers at `http://127.0.0.1:5000/api/v1/register` on boot.
-   - Remote C2: Service connects over gRPC on port `1863` to publish telemetry and register Telegram interactive menu trees.
+### 1. The Triple-Block Header
+Every source file (Go, Python, Rust, C++) MUST begin with the standardized Triple-Block header:
+```text
+ESSENTIAL PROCESS:
+High-level statement of what this file does, why it exists, and its domain boundary.
+
+DATA FLOW:
+1. Input: Source of triggers, events, requests, or injected configs.
+2. Logic: Core domain algorithms and state transitions.
+3. Output: Destinations of output, emitted events, telemetry, or structured logs.
+
+KEY PARAMETERS:
+List of primary configuration keys, ports, or environment variables controlling behavior.
+```
+
+### 2. Section Dividers
+Use 80-character dividers between major functions, interfaces, and exported types:
+```go
+// -----------------------------------------------------------------------------
+```
+
+### 3. Universal Bootstrap Ritual
+Never manually parse YAML files or read raw environment variables without fallback chains. All services MUST initialize via `microservice-toolbox`:
+- **Go**: `appConfig, appLogger := toolbox_bootstrap.BootstrapService("<name>")`
+- **Python**: `config = load_config("standalone"); logger = UniLog(app_name="<name>")`
+- **Rust**: `let app_config = load_config("standalone")?;`
+
+### 4. Dynamic Port & Address Resolution
+Never hardcode host IP addresses or port numbers in code. Ports must be dynamically resolved via configuration capabilities:
+```go
+addr, err := appConfig.GetListenAddr("<capability_name>")
+```
+
+### 5. Encrypted Secrets Standard
+Sensitive tokens (passwords, bot tokens, API keys) must be stored in configuration files as `ENC(...)` tokens and decrypted sovereignly at runtime via:
+```go
+decryptedValue, err := appConfig.DecryptSecret(encryptedToken)
+```
+Plaintext credentials in committed code or configuration files are strictly forbidden.
+
+### 6. Process Lifecycle & Graceful Termination
+All workers, listeners, and background routines must register shutdown hooks with `toolbox_lifecycle.Manager`. Services must cleanly exit on `SIGINT` / `SIGTERM` with status code 0.
 
 ---
 
-## 5. Automated Scaffolding Tooling
+## 🌐 6. The 8 Ecosystem Integration Touchpoints
 
-Instead of manually assembling folders and boilerplate, agents and engineers **MUST** use the automated scaffolding CLI provided in `08-Base-Scripts`:
+Introducing a new microservice requires registering it across **all 8 ecosystem touchpoints**:
+
+```mermaid
+flowchart TD
+    MS["New Microservice"] --> T1["1. Local Capability<br/>(modes/local/config/native.yaml)"]
+    MS --> T2["2. Container Slice<br/>(modes/docker/config/services/<name>.yaml)"]
+    MS --> T3["3. Fleet Compose<br/>(docker-deployment/docker-compose.yaml)"]
+    MS --> T4["4. Symlink Healer<br/>(watchdog-agent/src/config/heal.go)"]
+    MS --> T5["5. Fleet Orchestrator<br/>(docker-deployment/scripts/common.py)"]
+    MS --> T6["6. Service Registry<br/>(obsidian-brain/.../service-registry.json)"]
+    MS --> T7["7. Repo Inventory<br/>(obsidian-brain/.../inventory.json)"]
+    MS --> T8["8. UI & Remote C2<br/>(web-interface OpenMFE & tele-remote)"]
+```
+
+| # | Touchpoint File | Required Registration Entry |
+| :-: | :--- | :--- |
+| **1** | `docker-deployment/modes/local/config/native.yaml` | Add service capability block under `capabilities:` with default `ip` and `${ENV:-port}`. |
+| **2** | `docker-deployment/modes/docker/config/services/{name}.yaml` | Create isolated container capability configuration slice for Docker bridge execution. |
+| **3** | `docker-deployment/docker-compose.yaml` | Add container service definition with `context: ../{name}`, volume mount for standalone.yaml, and `teleremote-network`. |
+| **4** | `watchdog-agent/src/config/heal.go` | Register `filepath.Join(rootDir, "{name}", "standalone.yaml")` in `targets` slice so symlinks heal automatically. |
+| **5** | `docker-deployment/scripts/common.py` | Add entry in `SERVICES_SPEC` list for `fleet.sh` compilation (`./fleet.sh compile`) and lifecycle tracking. |
+| **6** | `obsidian-brain/05-Fleet-Operation/00-Repo-Control/service-registry.json` | Register service name, Docker image, default port, protocol, archetype, and classification. |
+| **7** | `obsidian-brain/05-Fleet-Operation/00-Repo-Control/inventory.json` | Register repository path, remote URL, branch (`develop`), and archetype (`level1-microservice`). |
+| **8** | Dynamic UI & Remote C2 *(if applicable)* | - **OpenMFE**: Auto-registers with `web-interface` via `POST /api/v1/register`.<br/>- **Tele-Remote**: Binds to port `1863` via gRPC for Telegram alerts and interactive menus. |
+
+---
+
+## 🚀 7. Automated Scaffolding Tooling (`08-Base-Scripts`)
+
+To eliminate manual boilerplate creation and guarantee compliance with all 12 root files, developers and AI agents **MUST** use the automated scaffolding CLI:
 
 ```bash
 # Scaffold a new Go microservice
 python3 08-Base-Scripts/main.py scaffold-microservice --name market-observer --lang go --port 8092 --desc "Real-time ticker stream ingestor"
 
-# Scaffold a new Python microservice (generates controller, models, requirements.txt, VERSION.txt, Makefile)
+# Scaffold a new Python microservice
 python3 08-Base-Scripts/main.py scaffold-microservice --name fundamental-analysis --lang python --port 8093 --desc "Financial metrics and SEC filing parser"
+
+# Scaffold a new Rust microservice
+python3 08-Base-Scripts/main.py scaffold-microservice --name log-aggregator --lang rust --port 9030 --desc "High-throughput log buffer"
 
 # Preview fabrication without writing to disk
 python3 08-Base-Scripts/main.py scaffold-microservice --name orderbook-aggregator --lang go --dry-run
 ```
 
-This automated generator:
-1. Fabricates the language directory skeleton (including `src/core/controller.*`, `src/interfaces/`, `src/models/`).
-2. Creates all mandatory root files (`VERSION.txt`, `requirements.txt` / `go.mod`, `Makefile`, `Dockerfile`, `docker-compose.yml`, `AGENTS.md`, `AI-Session-State.md`, `README.md`).
-3. Sets up standardized dynamic versioning in `Makefile` (`VERSION := $(shell cat VERSION.txt 2>/dev/null || echo "0.0.1")`).
-4. Symlinks `standalone.yaml` to `../docker-deployment/modes/local/config/native.yaml`.
-5. Creates `quick-overview/` with ignore files.
-6. Generates the initial BDD specification note in `02-Business-BDD/02-Behavior-Specs/<name>/FEAT-001-Initialization.md`.
-7. Prints the exact copy-paste registration snippets for the 6 Ecosystem Integration Touchpoints.
+### What the Scaffolding Engine Automates:
+1. Generates the language directory skeleton (`cmd/`, `src/core`, `src/interfaces`, `src/models`, `tests/`).
+2. Creates all 12 mandatory root files (`standalone.yaml` symlink, `Dockerfile`, `docker-compose.yml`, `AGENTS.md`, `AI-Session-State.md`, `.golangci.yml`, `Makefile`, `README.md`, `VERSION.txt`, `go.mod`/`requirements.txt`/`Cargo.toml`, `.gitignore`, `.github/`).
+3. Generates working starter unit tests (`controller_test.go` with mock logger for Go, `test_basic.py` for Python, `test_basic.rs` for Rust) ensuring `make test` or `pytest` immediately succeeds.
+4. Creates human onboarding zone `quick-overview/` with `.geminiignore`, `.mcpignore`, and `.aiignore`.
+5. Establishes the initial BDD behavior specification in `02-Business-BDD/02-Behavior-Specs/<name>/FEAT-001-Initialization.md`.
+6. Prints the exact copy-paste configuration snippets for all 8 Ecosystem Integration Touchpoints.
+
+---
+
+## 🚫 8. Prohibited Anti-Patterns Checklist
+
+❌ **NEVER hardcode machine paths** (`/Users/imac/...`, `/home/...`, `~/.local/bin`) in code, scripts, or documentation links.  
+❌ **NEVER hardcode ports or IPs** in application source files. Always resolve dynamically via `appConfig.GetListenAddr()`.  
+❌ **NEVER commit plaintext credentials**, API tokens, or private keys. Always use encrypted `ENC(...)` tokens.  
+❌ **NEVER mask build or test failures** with `|| true` or `2>/dev/null` in Makefiles or CI scripts.  
+❌ **NEVER call `os.Exit()`** inside libraries or internal worker methods. Return errors to `main()` or trigger lifecycle shutdown.  
+❌ **NEVER break symlink relative depth**. Root `standalone.yaml` must point to `../docker-deployment/modes/local/config/native.yaml`.  
+❌ **NEVER duplicate HTML boilerplate** (`<!DOCTYPE html>`, `<html>`, `<head>`) in sub-templates served by `web-interface`.  
+
+---
+*Back-links: [[11-Microservice-Integration-Standard]], [[12-Docker-Deployment-Standards]], [[Microservice-Logging-Standard]], [[Web-Interface-Hub]]*

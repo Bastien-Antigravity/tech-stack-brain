@@ -35,7 +35,7 @@ To keep images lean (avoiding `EXPOSE` and extra probe tools), we prioritize sim
 If the service is a TCP server (e.g., SafeSocket, gRPC, or custom TCP), check if the port is bound and accepting connections.
 ```yaml
 healthcheck:
-  test: ["CMD", "nc", "-z", "localhost", "1862"]
+  test: ["CMD", "nc", "-z", "localhost", "3306"]
   interval: 10s
   timeout: 5s
   retries: 3

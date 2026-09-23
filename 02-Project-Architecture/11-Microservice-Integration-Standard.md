@@ -182,19 +182,22 @@ flowchart TD
   python3 08-Base-Scripts/main.py scaffold-microservice --name <name> --lang <go|python|rust> --port <port>
   ```
 - This automatically generates:
-  - Language skeleton (`cmd/`, `src/core`, `src/interfaces`, etc.)
-  - The 9 mandatory root files (`standalone.yaml` symlink, `Dockerfile`, `docker-compose.yml`, `AGENTS.md`, `AI-Session-State.md`, `.golangci.yml`, `Makefile`, `README.md`, `go.mod`/`requirements.txt`/`Cargo.toml`)
+  - Language skeleton (`cmd/`, `src/core`, `src/interfaces`, `src/models`, `tests/`)
+  - The 12 mandatory root files/folders adhering to [[03-Repository-Structure|Repository Structure Standard]]
+  - Starter unit tests (`controller_test.go` / `test_basic.py` / `test_basic.rs`) ensuring immediate test passing
   - The human onboarding folder (`quick-overview/`) with ignore files
   - Initial BDD specification note in `02-Business-BDD/02-Behavior-Specs/<name>/FEAT-001-Initialization.md`.
 
-### 4. Fleet Registration (The 6 Touchpoints)
-Every microservice must complete all 6 registration touchpoints before being declared operational:
-1. **Service Registry**: `obsidian-brain/05-Fleet-Operation/00-Repo-Control/service-registry.json`
-2. **Repository Inventory**: `obsidian-brain/05-Fleet-Operation/00-Repo-Control/inventory.json`
-3. **Capability Profile**: `docker-deployment/modes/local/config/native.yaml`
-4. **Container Orchestration**: `docker-deployment/docker-compose.yaml`
-5. **Symlink Auto-Healer**: `watchdog-agent/src/config/heal.go`
-6. **Dynamic UI / C2 Bridge**: `web-interface` (OpenMFE) and `tele-remote` (gRPC menu)
+### 4. Fleet Registration (The 8 Touchpoints)
+Every microservice must complete all 8 registration touchpoints before being declared operational:
+1. **Local Capability Profile**: `docker-deployment/modes/local/config/native.yaml`
+2. **Container Configuration Slice**: `docker-deployment/modes/docker/config/services/{name}.yaml`
+3. **Container Orchestration**: `docker-deployment/docker-compose.yaml`
+4. **Symlink Auto-Healer**: `watchdog-agent/src/config/heal.go`
+5. **Fleet Orchestration & Compilation**: `docker-deployment/scripts/common.py` (`SERVICES_SPEC`)
+6. **Service Registry**: `obsidian-brain/05-Fleet-Operation/00-Repo-Control/service-registry.json`
+7. **Repository Inventory**: `obsidian-brain/05-Fleet-Operation/00-Repo-Control/inventory.json`
+8. **Dynamic UI / C2 Bridge**: `web-interface` (OpenMFE) and `tele-remote` (gRPC menu)
 
 ---
 

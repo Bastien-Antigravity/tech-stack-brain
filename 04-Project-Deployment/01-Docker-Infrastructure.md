@@ -31,7 +31,7 @@ The platform runs as a set of Docker containers orchestrated by `docker-compose`
 
 | Service | Source of Truth | Key Ports |
 |---|---|---|
-| **Core Fleet** | `service-registry.json` | 1862 (Config), 9021 (gRPC Log), 1863 (Tele) |
+| **Core Fleet** | `service-registry.json` | 3306 (Config TCP), 9020 (Log TCP), 1863 (Tele gRPC) |
 | **Data Pipeline** | `service-registry.json` | 5432 (DB), 4222 (NATS) |
 
 AI Agents should use the following logic:

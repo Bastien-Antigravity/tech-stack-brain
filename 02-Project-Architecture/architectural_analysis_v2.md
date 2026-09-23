@@ -321,7 +321,7 @@ Separating the code (the Orchestrator) from the content (the Knowledge Vault) de
 
 ## 🗺️ Complete Directory & Script Migration Blueprint
 
-To facilitate a clean separation of execution code from knowledge, this section details a folder-by-folder and script-by-script map of `/Users/imac/Desktop/Bastien-Antigravity/obsidian-brain/`.
+To facilitate a clean separation of execution code from knowledge, this section details a folder-by-folder and script-by-script map of `obsidian-brain/`.
 
 ### 1. Directory Modularity Strategy (The Folders)
 

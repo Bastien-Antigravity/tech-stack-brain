@@ -21,7 +21,7 @@ This document defines the authoritative architecture, build guidelines, and oper
 All multi-service compositions, production releases, and container networking topology are centrally managed within:
 `docker-deployment/docker-compose.yaml`
 
-- **Authoritative Orchestrator**: The Python-driven fleet manager ([`fleet.py`](file:///Users/imac/Desktop/Bastien-Antigravity/docker-deployment/scripts/fleet.py) via `./fleet.sh` / `fleet.cmd`) is the single canonical entry point for container operations (`./fleet.sh docker`, `./fleet.sh production`, `./fleet.sh compile --docker`).
+- **Authoritative Orchestrator**: The Python-driven fleet manager (`docker-deployment/scripts/fleet.py` via `./fleet.sh` / `fleet.cmd`) is the single canonical entry point for container operations (`./fleet.sh docker`, `./fleet.sh production`, `./fleet.sh compile --docker`).
 - **No Divergent Fleet Manifests**: Microservices must not create competing top-level multi-container compositions. Fragment compose files in individual repositories (if kept for isolated module development) must strictly conform to canonical ports and syntax.
 
 ---
@@ -88,16 +88,16 @@ To prevent port collision across native host execution and Docker containers:
    All services communicate over the named bridge network `teleremote-network` using service aliases (e.g. `http://config-server:3306`, `nats://nats-server:4222`, `postgresql://timescale-db:5432`).
 
 ### Canonical Port Registry:
-| Service | Container Internal Port | Protocol | Default Host Port |
+| Service | Container Internal Ports | Protocol | Docker Host Port (`docker-compose`) |
 | :--- | :--- | :--- | :--- |
 | `web-interface` | `5000` | HTTP | `5000` |
 | `tele-remote` | `1863` | gRPC | `1863` |
-| `config-server` | `3306` (TCP), `3307` (gRPC), `3308` (REST) | Multi | `3306`, `3307`, `3308` |
-| `notif-server` | `1026` (TCP), `1027` (gRPC), `1029` (REST) | Multi | `1026`, `1027`, `1029` |
-| `log-server` | `9020` (TCP), `9021` (gRPC) | SafeSocket / Tonic | `9020`, `9021` |
+| `config-server` | `3306` (TCP), `3307` (gRPC), `3308` (REST) | SafeSocket / gRPC / REST | `3306` (TCP sync) |
+| `notif-server` | `1026` (TCP), `1027` (gRPC), `1029` (REST) | SafeSocket / gRPC / REST | `1026`, `1027`, `1029` |
+| `log-server` | `9020` (TCP), `9021` (gRPC) | SafeSocket / Tonic | `9020` (TCP log sink) |
 | `nats-server` | `4222` (TCP), `8222` (HTTP) | NATS | `4222`, `8222` |
 | `timescale-db` | `5432` | PostgreSQL | `5432` |
-| `rag-engine` | `8080` (REST), `8090` (MCP), `8091` (gRPC), `8082` (Dash) | HTTP / gRPC | `8080`, `8090`, `8091`, `8082` |
+| `rag-engine` | `8090` (MCP), `8082` (Dash), `8091` (gRPC) | SSE / HTTP / gRPC | `8090`, `8082`, `8091` |
 
 ---
 
