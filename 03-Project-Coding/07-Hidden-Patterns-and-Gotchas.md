@@ -11,14 +11,17 @@ tags:
 ---
 # ⚠️ Hidden Patterns and Gotchas
 
-## 1. Safe Logger Guard (MANDATORY)
-Every toolbox entry point wraps the logger in a nil-safe wrapper:
+## 1. Safe Logger Guard (Two-Tier Invariant)
+Every reusable library and SDK constructor wraps injected loggers in a nil-safe wrapper:
 ```
-Go:     safeLogger := utils.EnsureSafeLogger(logger)
-Rust:   let final_logger = ensure_safe_logger(logger)
+Go:     safeLogger := logger.EnsureSafeLogger(l)
+Rust:   let final_logger = ensure_safe_logger(logger);
 Python: self.logger = ensure_safe_logger(logger)
+C++:    logger = EnsureSafeLogger(logger);
 ```
-**Why**: Prevents nil-pointer panics when no logger is provided.
+- **Tier 1 (Libraries & Reusable SDKs)**: Prevents nil-pointer panics (`SIGSEGV`) when components are used in unit tests or CLI scripts without a full logger setup. Eliminates boilerplate `if logger != nil` checks.
+- **Tier 2 (Production Microservices)**: Microservices MUST initialize via `BootstrapService` which guarantees a real `ILogger`. Using `EnsureSafeLogger` in non-test microservice production code is strictly prohibited (`PRODUCTION_MOCK_POLLUTION`).
+- **Strict Mode**: Setting `STRICT_LOGGER=true` forces `EnsureSafeLogger` to panic / raise `RuntimeError` immediately if passed `nil`, preventing silent no-op log leaks in production.
 
 ## 2. gRPC Port Convention: `base_port + 1`
 When no explicit gRPC config exists, ALL three languages fall back to `port + 1`. If you set port `9020`, gRPC will bind to `9021`.

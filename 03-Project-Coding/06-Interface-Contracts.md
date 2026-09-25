@@ -91,12 +91,13 @@ LoadNotifSender(notifiersConf) -> map[string][]string
 
 ## Cross-Language Parity
 
-| Method | Go | Rust | Python |
-|--------|-----|------|--------|
-| Load config | `LoadConfig(profile, flags)` | `load_config(profile)` | `load_config(profile, flags)` |
-| Listen addr | `GetListenAddr(cap)` | `get_listen_addr(cap)` | `get_listen_addr(cap)` |
-| gRPC addr | `GetGRPCListenAddr(cap)` | `get_grpc_listen_addr(cap)` | `get_grpc_listen_addr(cap)` |
-| Deep merge | `DeepMerge(dst, src)` | `deep_merge(dst, src)` | `deep_merge(dst, src)` |
-| Safe logger | `EnsureSafeLogger(l)` | `ensure_safe_logger(l)` | `ensure_safe_logger(l)` |
+| Method | Go | Rust | Python | C++ |
+|--------|-----|------|--------|-----|
+| Load config | `LoadConfig(profile, flags)` | `load_config(profile)` | `load_config(profile, flags)` | `LoadConfig(profile, flags)` |
+| Listen addr | `GetListenAddr(cap)` | `get_listen_addr(cap)` | `get_listen_addr(cap)` | `GetListenAddr(cap)` |
+| gRPC addr | `GetGRPCListenAddr(cap)` | `get_grpc_listen_addr(cap)` | `get_grpc_listen_addr(cap)` | `GetGRPCListenAddr(cap)` |
+| Deep merge | `DeepMerge(dst, src)` | `deep_merge(dst, src)` | `deep_merge(dst, src)` | `DeepMerge(dst, src)` |
+| Safe logger | `EnsureSafeLogger(l)` | `ensure_safe_logger(l)` | `ensure_safe_logger(l)` | `EnsureSafeLogger(l)` |
 
-> **Rule**: Go is the source of truth. Rust and Python implement identical semantics.
+> **Rule**: Go is the source of truth. Rust, Python, and C++ implement identical semantics. `EnsureSafeLogger` panics/throws in strict mode (`STRICT_LOGGER=true`).
+
