@@ -57,6 +57,25 @@ Use standard markers to signal intent to AI agents and audit tools:
 - `NOTE`: Contextual nuance that isn't obvious from the code.
 - `PERF`: Optimization notes for high-frequency hotpaths.
 
+## 🧠 Obsidian Architecture Alignment Tags (`@obsidian [[...]]`)
+To bind physical source code directly to the Obsidian knowledge vault and activate automated documentation drift detection, engineers and AI assistants MUST tag critical interfaces, entry points, and domain components with the `@obsidian` directive.
+
+### Tag Syntax
+Place the `@obsidian` tag in a line comment immediately preceding the struct, class, interface, function, or file-level header:
+- **Go / Rust / C++**: `// @obsidian [[Note-Title]]`
+- **Python / Shell**: `# @obsidian [[Note-Title]]`
+- **VBA**: `' @obsidian [[Note-Title]]`
+
+### When to Tag:
+1. **Core Service Interfaces & Handlers**: Link exported interfaces to their architectural blueprint (e.g. `// @obsidian [[Architecture-Blueprint-DocSync]]`).
+2. **Feature Implementations**: Link BDD feature entry points to their specification note (e.g. `// @obsidian [[FEAT-010-Doc-Sync]]`).
+3. **Domain Entities**: Link domain models to the domain glossary (e.g. `// @obsidian [[00-Glossary]]`).
+
+### Synchronization & Drift Detection Lifecycle
+1. The **CodeDocSynchronizer** (`09-RAG-Engine`) scans `@obsidian [[...]]` tags on file save and registers `(code_id, doc_id, SHA-256)` in the PostgreSQL `alignment_links` registry.
+2. When the implementation changes, the RAG engine detects hash disparity and flags the document as **drifted**.
+3. Squad agents run `suggest_doc_rewrite` or `resolve_documentation_drift` to keep architecture documentation in lock-step with code.
+
 ---
 *Reference: [[01-General-Naming-Conventions]], [[07-Hidden-Patterns-and-Gotchas]]*
 
