@@ -82,9 +82,9 @@ Monolithic scripts are strictly prohibited. Each module is assigned a single, cl
 
 ### Lifecycle & Maintenance
 - `./fleet.sh compile [native|docker|all]`: Incremental binary compilation & virtual environment setup (supports `--force`).
-- `./fleet.sh rebuild`: Force clean rebuild of all native binaries and Docker container images.
+- `./fleet.sh rebuild [all|local|docker]`: Force clean rebuild of binaries and/or Docker images (supports `--local`, `--docker`, `--all`).
 - `./fleet.sh status`: Display real-time status of Docker containers, native PIDs, and listening ports (`--host-ip` optional).
-- `./fleet.sh stop`: Terminate running services (`--scope {all,native,docker}`).
+- `./fleet.sh stop [all|local|docker]`: Terminate running services (supports `--local`, `--docker`, `--all`, or `--scope`).
 - `./fleet.sh doctor`: Pre-flight diagnostic check for required toolchains (Go, Rust, Python 3, Docker, Git).
 - `./fleet.sh guide`: Interactive manual installation guide for TimescaleDB and NATS.
 - `./fleet.sh secrets [action]`: Manage keys and secrets (`encrypt --token <TOKEN>`, `rotate-db`, `set-db-password`, `check-keys`).
