@@ -37,7 +37,7 @@ The fleet utilizes a **Universal Configuration Template** located in `docker-dep
   3. **Hardcoded Fallbacks**: Safe defaults (`127.0.0.1`) used for skeleton generation.
 
 ### 3. Unified Shared Engine Architecture (v1.9.92+)
-- To ensure absolute behavioral parity and memory-space unification, all non-Go languages (Python, Rust, C++, VBA) utilize the **Unified Shared Engine** (`libdistconf` / `libunilog`).
+- To ensure absolute behavioral parity and memory-space unification, all non-Go languages (Python, Rust, C++, VBA) utilize the **Unified Shared Engine** (`libdistconf` / `libunilog` / `libnotif`).
 - **Single Memory State**: The shared engine ensures that multiple configuration sessions (e.g., one in the Logger and one in the Toolbox) share the same handle store and runtime environment.
 - **Shared Logic**: By converging on the `src/cgo_bridge` core in `distributed-config`, all languages benefit from the exact same environment expansion, path discovery, and network sync logic.
 - **Critical Rule (FFI Stability)**: When wrapping the shared engine, the library MUST NOT be unloaded (`dlclose`). See [Hidden Patterns and Gotchas](../../03-Project-Coding/07-Hidden-Patterns-and-Gotchas.md) for details.

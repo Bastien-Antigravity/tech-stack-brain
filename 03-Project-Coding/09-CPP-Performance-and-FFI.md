@@ -17,7 +17,7 @@ tags:
 - **Atomic Hotpaths**: For shared state in performance-critical paths, MUST use the **Atomic Pointer Swap** pattern (using `std::atomic<T*>`). This eliminates lock contention in hot-reloading scenarios.
 - **Memory Management (RAII)**: Raw `new` and `delete` are strictly forbidden. Use `std::unique_ptr` for ownership and `std::shared_ptr` only when multiple ownership is required.
 - **Error Transparency**: Surfaces all engine-level errors from the underlying C-bridge via `GetLastError()` wrappers.
-- **FFI Stability (Static Loading Law)**: When wrapping `libdistconf` or `libunilog`, the library MUST NOT be unloaded via `dlclose`. This ensures memory safety across the Go-C bridge.
+- **FFI Stability (Static Loading Law)**: When wrapping `libdistconf`, `libunilog`, or `libnotif`, the library MUST NOT be unloaded via `dlclose`. This ensures memory safety across the Go-C bridge.
 
 ## 🛠 Construction & Implementation
 - **Constructor Pattern**: Use factory functions returning `std::unique_ptr<T>` for component instantiation.

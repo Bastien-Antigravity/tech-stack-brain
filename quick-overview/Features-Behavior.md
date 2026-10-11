@@ -18,7 +18,7 @@ The Tech Stack Brain provides several key behavioral features that ensure consis
 - **Pattern Standardization**: Enforces the Facade pattern to ensure all microservices have a predictable entry point (`src/facade/`).
 
 ## 2. Polyglot Parity
-- **Unified Logic**: Uses CGO-based shared libraries (`libdistconf`, `libunilog`) to ensure that Python, Rust, and C++ services behave identically to Go services regarding configuration and logging.
+- **Unified Logic**: Uses CGO-based shared libraries (`libdistconf`, `libunilog`, `libnotif`) to ensure that Python, Rust, and C++ services behave identically to Go services regarding configuration, logging, and notifications.
 - **Contract Enforcement**: Defines the superset/subset relationships between core library interfaces (e.g., `universal-logger` wrapping `flexible-logger`).
 
 ## 3. Configuration & Secrets

@@ -13,7 +13,7 @@ tags:
 
 ## Architectural Rule
 - **Paradigm**: Event-driven automation for Excel-based reporting and fleet monitoring.
-- **FFI Integration**: Use `Declare PtrSafe Sub/Function` to bind to the standard `libdistconf.dll` and `libunilog.dll` bridges.
+- **FFI Integration**: Use `Declare PtrSafe Sub/Function` to bind to the standard `libdistconf.dll`, `libunilog.dll`, and `libnotif.dll` bridges.
 - **Error Handling**: Every public Sub/Function MUST use the `On Error GoTo ErrorHandler` pattern to ensure FFI resources are handled gracefully.
 - **State Management**: Use **Global Singleton Objects** in a dedicated `MTB_Core` module for accessing the Configuration Store and the Universal Logger.
 - **Static Discovery**: The VBA toolbox must search for the `private.pem` key in the standard system locations (`/etc/bastien/` or `%APPDATA%\Bastien\`) to enable RSA decryption.
