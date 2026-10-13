@@ -1,13 +1,15 @@
 ---
-microservice: 08-Base-Scripts
-type: note
+microservice: tech-stack-brain
+type: architecture
 status: active
 tags:
-- '#service/08-Base-Scripts'
-- '#type/note'
+- '#service/tech-stack-brain'
+- '#type/architecture'
 - '#state/active'
-- '#zone/3-fleet'
----# 🚀 SDK & Agent Guide
+- '#zone/1-frozen'
+---
+
+# 🚀 SDK & Agent Guide
 
 ## 🤖 Role-Prompt Personas
 The system dynamically loads agent personalities from `07-Core-KMS/Role-Prompts`. 

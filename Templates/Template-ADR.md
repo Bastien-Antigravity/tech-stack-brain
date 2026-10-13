@@ -1,12 +1,12 @@
 ---
-microservice: 08-Base-Scripts
+microservice: tech-stack-brain
 type: note
 status: active
 tags:
-- '#service/08-Base-Scripts'
+- '#service/tech-stack-brain'
 - '#type/note'
 - '#state/active'
-- '#zone/3-fleet'
+- '#zone/1-frozen'
 ---
 
 # 📜 ADR-{{title}}: [Short Descriptive Title]

@@ -1,13 +1,15 @@
 ---
-microservice: 08-Base-Scripts
-type: note
+microservice: tech-stack-brain
+type: architecture
 status: active
 tags:
-- '#service/08-Base-Scripts'
-- '#type/note'
+- '#service/tech-stack-brain'
+- '#type/architecture'
 - '#state/active'
-- '#zone/3-fleet'
----# 🏛️ Architecture V2: OOP & SDK Squad Core
+- '#zone/1-frozen'
+---
+
+# 🏛️ Architecture V2: OOP & SDK Squad Core
 
 ## 🌟 Overview
 The Bastien-Antigravity Squad has been refactored from a collection of procedural scripts into a robust, Object-Oriented engine. This migration ensures reliability, formalized workflows, and industry-standard security boundaries.

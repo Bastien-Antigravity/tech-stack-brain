@@ -193,7 +193,7 @@ The numbering sequence is designed as a functional dependency hierarchy:
 | **`05`** | `05-Fleet-Operation` | Repositories inventory (`inventory.json`) | None (Pure configuration) |
 | **`06`** | `06-Microservices` | Sibling repository linking and hubs | None (Pure metadata) |
 | **`07`** | `07-Core-KMS` | Core persona definitions and role prompts | None (Immutable base) |
-| **`08`** | `08-Base-Scripts` | Local vault maintenance and utility scripts | None (Local automation) |
+| **`08`** | `08-Squad-Agent` | Local vault maintenance and utility scripts | None (Local automation) |
 | **`09`** | `09-RAG-Engine` | Offline database and search service | None (Stand-alone service) |
 | **`99`** | `99-Humans` | Manuals and operator onboarding | None (Documentation) |
 
@@ -286,7 +286,7 @@ To achieve complete decoupling, a detailed audit of code files reveals several *
 - **Decoupling Fix**: If `06-Microservices` is missing, skip hub linking in the fixer without raising errors.
 
 ### 5. Upstream Structural Path Matching in Sovereignty Check
-- **Vulnerability**: The metadata auditor [sovereignty.py](../../08-Base-Scripts/src/lib/sovereignty.py) relies on hardcoded folder structures to determine frontmatter validation rules:
+- **Vulnerability**: The metadata auditor [sovereignty.py](../../08-Squad-Agent/src/lib/sovereignty.py) relies on hardcoded folder structures to determine frontmatter validation rules:
   ```python
   # sovereignty.py (Lines 372-376)
   if zone == "06-Microservices" and len(parts) > 1:
@@ -313,7 +313,7 @@ The numeric prefixes serve as a clean, standardized, and human-navigable **names
 
 ### 2. Benefits of Moving Code Out of the Vault
 Separating the code (the Orchestrator) from the content (the Knowledge Vault) delivers direct structural improvements:
-- **Pure Markdown Vault**: Removing execution scripts (like `08-Base-Scripts/` and `09-RAG-Engine/`) cleans up the vault, converting it into a **100% pure knowledge graph** containing only Markdown, YAML, and configuration files. This prevents merge conflicts between code changes and documentation changes.
+- **Pure Markdown Vault**: Removing execution scripts (like `08-Squad-Agent/` and `09-RAG-Engine/`) cleans up the vault, converting it into a **100% pure knowledge graph** containing only Markdown, YAML, and configuration files. This prevents merge conflicts between code changes and documentation changes.
 - **Eliminating Path Contamination**: It prevents python compilation files (`__pycache__/`, `.venv/`) from cluttering the documentation search boundaries, making RAG indexing faster and context mapping clean.
 - **Absolute Path Resolution**: The orchestrator's scripts will execute with a clear `vault_root` context argument, resolving all path names explicitly (e.g. `vault_root + "02-Business-BDD"`). This guarantees that folder prefixes remain completely static and robust namespaces.
 
@@ -335,7 +335,7 @@ To facilitate a clean separation of execution code from knowledge, this section 
 | **`05-Fleet-Operation`** | **YES** | `tools/fleet/` (move execution scripts) | Keep logs & configurations (`inventory.json`). Move commander scripts to the codebase. |
 | **`06-Microservices`** | **YES** | None (Pure metadata) | Keep integration hubs exactly as is. |
 | **`07-Core-KMS`** | **YES** | `tools/auditors/` & `src/defaults/` (move scripts) | Keep `Role-Prompts/`. Move checking and dispatcher scripts under `07-Core-KMS/Scripts/` to codebase. |
-| **`08-Base-Scripts`** | **YES (Renamed)** | `tools/` (Code remains in orchestrator) | **Rename `20-Scripts` to `08-Base-Scripts`** to maintain the single-digit prefix standard for local scripts. |
+| **`08-Squad-Agent`** | **YES (Renamed)** | `tools/` (Code remains in orchestrator) | **Renamed to `08-Squad-Agent`** to maintain single-digit prefix and reflect squad agent capability. |
 | **`09-RAG-Engine`** | **YES (Submodule)**| `squad-rag-engine/` (New Repository) | Treat this embedded submodule strictly as a self-contained service repo rather than vault content. |
 | **`99-Humans`** | **YES** | None (Pure documentation) | Keep onboarding manuals and dashboards exactly as is. |
 
@@ -351,7 +351,7 @@ Below is the mapping for every Python script currently in `obsidian-brain`.
 - **`ui.py`** -> Move to **Codebase Root (`/ui.py`)**
   - *Modifications*: Delete duplicate Completion block logic. Replace non-existent `get_messages` calls with `get_session_history`.
 
-#### B. Local Vault-Level Scripts (`20-Scripts/` renamed to `08-Base-Scripts/`)
+#### B. Local Vault-Level Scripts (`08-Squad-Agent/`)
 - **`convert_agents.py`** -> Move to **`tools/scaffolding/convert_agents.py`** (Codebase) and reference in **`09-Vault-Scripts/`**
   - *Modifications*: Implement fallback to copy default prompts to client config folders if `07-Core-KMS` is missing.
 - **`close_mission.py`** -> Move to **`tools/fleet/close_mission.py`** (Codebase) and reference in **`09-Vault-Scripts/`**

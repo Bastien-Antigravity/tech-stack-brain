@@ -78,7 +78,7 @@ To ensure that each Git submodule can be developed and audited in isolation, eve
 
 ---
 
-## 💻 4. Coding Rules for Orchestration & Base Scripts
+## 💻 4. Coding Rules for Orchestration & Squad Agent Scripts
 
 All automation and orchestration launcher scripts inside `08-Squad-Agent/` must adhere to these strict rules:
 

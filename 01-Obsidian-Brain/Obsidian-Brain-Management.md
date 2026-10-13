@@ -98,7 +98,7 @@ Click on each level below to explore its specific **Magnitude of Abstraction**, 
 *   **[[03-Tech-Stack/01-Obsidian-Brain/07-Core-KMS|📐 Level 07: Core KMS]]** — *Type: Default Immutable*. Magnitude: Global Ontology Scope. Governs default agent templates and the Sovereignty engine.
 
 ### 🛠️ Active Utilities
-*   **[[03-Tech-Stack/01-Obsidian-Brain/08-Base-Scripts|📐 Level 08: Squad Agent]]** — *Type: Active Utility / Executable Scaffolding*. Magnitude: System-Wide Control. Governs workspace automation, environment setup, and CLI integrations.
+*   **[[03-Tech-Stack/01-Obsidian-Brain/08-Squad-Agent|📐 Level 08: Squad Agent]]** — *Type: Active Utility / Executable Scaffolding*. Magnitude: System-Wide Control. Governs workspace automation, environment setup, and CLI integrations.
 
 ### 🔍 Cognitive Retrieval
 *   **[[03-Tech-Stack/01-Obsidian-Brain/09-RAG-Engine|📐 Level 09: RAG Engine]]** — *Type: Cognitive Retrieval Memory*. Magnitude: Vector Memory Scope. Governs vector/lexical database indexing and watchers.
