@@ -57,8 +57,8 @@ Level 00 is the foundation layer:
 
 Level 00 boot and lifecycle are driven and verified by the base orchestration script:
 
-### 🚀 Launcher Engine (`start_squad.py`)
-*   **Script**: [start_squad.py](../../08-Base-Scripts/start_squad.py) (located in `08-Base-Scripts/` and running from the workspace root).
+### 🚀 Launcher Engine (`squad-agent`)
+*   **Command**: `python3 08-Squad-Agent/main.py squad-agent` (backed by [start_squad.py](../../08-Squad-Agent/src/core/start_squad.py) in `08-Squad-Agent/`).
 *   **Operation**: Reads `MODE-MANUAL.md` to switch protocols, configures MCP filesystem permissions based on active zone isolation rules, and launches the AI client (Gemini, Claude, or Deepseek API).
 
 ### ⚙️ Workspace Variable Sync

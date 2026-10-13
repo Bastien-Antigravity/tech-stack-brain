@@ -61,5 +61,5 @@ Level 01 is governed and monitored by the following tools:
 *   **Operation**: Evaluates development session logs, tracks context window debt, and publishes new `STRAT-XXX` audits when architectural drift or design debt is detected.
 
 ### 🚨 Auditing and Validation (`vault-sentinel.py`)
-*   **Script**: [vault-sentinel.py](../../08-Base-Scripts/vault-sentinel.py)
+*   **Script**: [vault-sentinel.py](../../08-Squad-Agent/src/auditing/brain_health_audit.py)
 *   **Operation**: Analyzes Level 01 strategic audits and the anti-backlog registry to ensure that lower-level implementations do not introduce banned design patterns or duplicate solved issues.

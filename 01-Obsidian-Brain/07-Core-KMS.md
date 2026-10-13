@@ -55,13 +55,13 @@ Level 07 is progressively runnable and requires preceding levels to be present:
 Level 07 contains or governs the core scripts and libraries that keep the master vault compliant:
 
 ### 🛡️ The Sovereignty Validation Engine (`sovereignty.py`)
-*   **Script**: [sovereignty.py](../../08-Base-Scripts/lib/sovereignty.py) (colocated inside the L07 validation libraries).
+*   **Script**: [sovereignty.py](../../08-Squad-Agent/src/lib/sovereignty.py) (colocated inside the L07 validation libraries).
 *   **Operation**: The centralized library that audits note tags, checks double-bracket wikilinks, enforces YAML frontmatter, and verifies agent `[SCAN]` blocks against [tag_taxonomy.md](../../07-Core-KMS/tag_taxonomy.md).
 
 ### 🤖 Prompt Compiler (`convert_agents.py`)
-*   **Script**: [convert_agents.py](../../08-Base-Scripts/convert_agents.py) (colocated inside L07).
+*   **Script**: [convert_agents.py](../../08-Squad-Agent/src/fleet/convert_agents.py) (colocated inside L07).
 *   **Operation**: Compiles human-editable agent files under `Role-Prompts/` into system-level CLI configs (Gemini, Claude, Deepseek).
 
 ### 🚨 Real-time Workspace Auditor (`vault-sentinel.py`)
-*   **Script**: [vault-sentinel.py](../../08-Base-Scripts/vault-sentinel.py) (colocated inside L07).
+*   **Script**: [vault-sentinel.py](../../08-Squad-Agent/src/auditing/brain_health_audit.py) (colocated inside L07).
 *   **Operation**: Spawns a lightweight watcher daemon that executes sovereignty validations on any modified markdown files, alerting the operator immediately of any structural lint errors.

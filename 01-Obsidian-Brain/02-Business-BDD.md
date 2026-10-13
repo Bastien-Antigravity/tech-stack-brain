@@ -59,5 +59,5 @@ Level 02 is managed and verified by the following tools:
 *   **Operation**: Gathers requirements, writes Gherkin feature tests, and validates that proposed implementation plans fully cover all acceptance criteria.
 
 ### ⚙️ Multi-Folder Precedence Prompt Compiler (`convert_agents.py`)
-*   **Script**: [convert_agents.py](../../08-Base-Scripts/convert_agents.py)
+*   **Script**: [convert_agents.py](../../08-Squad-Agent/src/fleet/convert_agents.py)
 *   **Operation**: Automatically scans the `02-Business-BDD/Role-Prompts/` folder during agent compilation. Since it scans L02 before L07, the colocated QA Specialist prompt automatically overrides the default/fallback QA prompt inside L07 KMS.

@@ -156,7 +156,7 @@ All new microservices and major feature modifications must proceed through the s
 ```mermaid
 flowchart TD
     BDD["1. Business BDD Spec<br/>(02-Business-BDD/02-Behavior-Specs)"] --> RAG["2. RAG Intelligence Discovery<br/>(09-RAG-Engine query)"]
-    RAG --> SCAF["3. Deterministic Scaffolding<br/>(08-Base-Scripts scaffold-microservice)"]
+    RAG --> SCAF["3. Deterministic Scaffolding<br/>(08-Squad-Agent scaffold-microservice)"]
     SCAF --> IMPL["4. Implementation via SDKs<br/>(microservice-toolbox & safe-socket)"]
     IMPL --> REG["5. Fleet Registration (6 Touchpoints)<br/>(service-registry, inventory, native.yaml, etc.)"]
     REG --> VERIF["6. Automated Verification<br/>(unit tests, linting, preflight-check)"]
@@ -176,10 +176,10 @@ flowchart TD
   ```
 - Eliminates context loss, prevents duplicate abstraction layers, and guarantees interface parity.
 
-### 3. Automated Scaffolding Tooling (`08-Base-Scripts`)
-- Use the canonical CLI scaffolder in `08-Base-Scripts`:
+### 3. Automated Scaffolding Tooling (`08-Squad-Agent`)
+- Use the canonical CLI scaffolder in `08-Squad-Agent`:
   ```bash
-  python3 08-Base-Scripts/main.py scaffold-microservice --name <name> --lang <go|python|rust> --port <port>
+  python3 08-Squad-Agent/main.py scaffold-microservice --name <name> --lang <go|python|rust> --port <port>
   ```
 - This automatically generates:
   - Language skeleton (`cmd/`, `src/core`, `src/interfaces`, `src/models`, `tests/`)

@@ -64,5 +64,5 @@ Level 05 is governed and executed by the following scripts:
 *   **Operation**: Coordinates multi-repository updates, verifies deployment pipelines, and logs pipeline completions.
 
 ### ⚙️ Automation Launcher (`fleet-manager.py` / `fleet-commander.py`)
-*   **Scripts**: Located inside `08-Base-Scripts/fleet-commander.py` and `05-Fleet-Operation/` scripts.
+*   **Scripts**: Located inside `08-Squad-Agent/src/fleet/fleet_commander.py` and `05-Fleet-Operation/` scripts.
 *   **Operation**: Automates Git commands (submodule updates, mass branching, and cross-repo health audits) using Python's standard library.

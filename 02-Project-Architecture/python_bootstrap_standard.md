@@ -83,5 +83,5 @@ from microservice_toolbox.logger import UniLog
 ### Reference Implementation Examples
 
 - **RAG Engine**: [09-RAG-Engine/src/bootstrap/\_\_init\_\_.py](../../09-RAG-Engine/src/bootstrap/__init__.py)
-- **Base Scripts**: [08-Base-Scripts/src/bootstrap/\_\_init\_\_.py](../../08-Base-Scripts/src/bootstrap/__init__.py)
+- **Squad Agent**: [08-Squad-Agent/src/bootstrap/\_\_init\_\_.py](../../08-Squad-Agent/src/bootstrap/__init__.py)
 - **Agent Factory**: [10-Agent-Factory/src/utils/logger.py](../../10-Agent-Factory/src/utils/logger.py)

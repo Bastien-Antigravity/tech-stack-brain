@@ -23,11 +23,14 @@ Our microservices communicate through four primary channels: gRPC for control, N
 - **Toolbox**: Use `microservice-toolbox` gRPC server builder for Rust services. Use `cfg.GetGRPCListenAddr(name)` for address resolution.
 
 ### 2. NATS Asynchronous Bus
-- **Role**: Primary asynchronous ingestion bus for high-throughput data streams.
+- **Role**: Primary asynchronous ingestion bus for high-throughput data streams and fleet coordination.
 - **Pattern**: Pub/Sub for market data, order books, and events.
+- **Authoritative Subject Prefix**: `bastien-antigravity` (all subjects follow `${subject_prefix}.<domain>.<event>`).
 - **Handling**: Use asynchronous subscribers to avoid blocking the network thread.
-- **Container**: Uses the `nats:2.12.6-alpine3.22` image with monitoring on port 8222.
+- **Container & Native Supervision**: Uses the `nats:2.12.6-alpine3.22` image or native binary. Supervised by `watchdog-agent` via pure CLI flags (`-js`, `-sd <dir>`, `-p <port>`, `-a <ip>`, `-m <http_port>`, `-n <name>`) eliminating static `nats-server.conf` files.
 - **Connection Standard**: All services connecting to the NATS bus MUST use the standardized connection builders from `microservice-toolbox` (`Connect` for Go, `connect` for Python and Rust). This unifies event logging (using connection ClientID prefixes), reconnect timeouts, and liveness check options across the fleet.
+- **Wire Security (TLS / mTLS)**: For multi-node or non-loopback networks outside `127.0.0.1`, `watchdog-agent` injects `--tls`, `--tlscert`, `--tlskey`, `--tlsverify`, `--tlscacert`. Client connectors in `microservice-toolbox` configure trusted root CAs and client certificates (`nats.RootCAs` / `nats.ClientCert` in Go, `ssl.SSLContext` in Python, `async_nats::ConnectOptions::require_tls` in Rust).
+- **Polyglot Boundary**: Go, Python, and Rust provide full `messaging` client connectors. C++ and VBA intentionally omit `messaging/` to avoid dead code and heavy external C runtime dependencies (`cnats`/`libuv`), communicating instead via SafeSocket TCP (`conn_manager`) or direct gRPC alerts (`notification`).
 
 ### 3. Cap'n Proto Transport (safe-socket) [HARDENED]
 - **Role**: Binary serialization for log messages between services and `log-server`.

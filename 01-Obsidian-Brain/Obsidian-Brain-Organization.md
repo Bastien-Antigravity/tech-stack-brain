@@ -28,7 +28,7 @@ obsidian-brain (Workspace Root)
 ├── 05-Fleet-Operation/       # L05: Ops, git control, & deployments
 ├── 06-Microservices/         # L06: Architecture Hub notes mapping repos
 ├── 07-Core-KMS/              # L07: Playbooks & Tag Taxonomies
-├── 08-Base-Scripts/          # Core execution, launchers, & validation scripts
+├── 08-Squad-Agent/           # Core execution, launchers, & validation scripts
 └── 09-RAG-Engine/            # L09: Local vector database & code search
 ```
 
@@ -80,7 +80,7 @@ To ensure that each Git submodule can be developed and audited in isolation, eve
 
 ## 💻 4. Coding Rules for Orchestration & Base Scripts
 
-All automation and orchestration launcher scripts inside `08-Base-Scripts/` must adhere to these strict rules:
+All automation and orchestration launcher scripts inside `08-Squad-Agent/` must adhere to these strict rules:
 
 ### A. The Virtual Environment Re-Execution Ritual
 To prevent dependency errors when run directly from the native shell, every Python script must contain a venv re-execution block at the top:

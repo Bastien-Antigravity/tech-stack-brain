@@ -8,9 +8,9 @@ tags:
 - '#state/active'
 - '#zone/1-nexus'
 ---
-# 📐 Level 08 - Base Scripts
+# 📐 Level 08 - Squad Agent
 
-This document defines the architecture, governance principles, and management scripts for **Level 08: Base Scripts** within the Bastien-Antigravity ecosystem.
+This document defines the architecture, governance principles, and management scripts for **Level 08: Squad Agent** within the Bastien-Antigravity ecosystem.
 
 ---
 
@@ -27,15 +27,15 @@ Level 08 houses the **primary vault automation scripts, preflight validators, an
 
 ## 🧱 2. Merged Filesystem & Git Submodule Colocation
 
-*   **Submodule Mapping**: Maps physically to the `08-Base-Scripts` Git repository.
+*   **Submodule Mapping**: Maps physically to the `08-Squad-Agent` Git repository (`squad-agent-brain`).
 *   **Logical Merge**: Mounts within the root of the master workspace:
     ```
     obsidian-brain (Workspace Root)
-    └── 08-Base-Scripts/           # Merged repository mount
+    └── 08-Squad-Agent/            # Merged repository mount
         ├── clients/               # AI clients integrations (deepseek, gemini, etc.)
         ├── lib/                   # Validation libraries and helper scripts
         ├── convert_agents.py      # Compile agent prompt configurations
-        ├── start_squad.py         # Multi-agent squad launcher and coordinator
+        ├── main.py (squad-agent)  # Multi-agent squad launcher and coordinator
         └── vault-sentinel.py      # Background vault auditor and watcher daemon
     ```
 *   **Colocation Rule**: All launcher frameworks, client SDK wrappers, and helper libraries (`lib/sovereignty.py`) are stored physically inside this capability folder, ensuring they are versioned and checked out together.
@@ -52,7 +52,7 @@ Level 08 is progressively runnable and requires preceding levels to be present:
 
 ## 🐍 4. Python Management & Automation Suite
 
-All automation and orchestration launcher scripts inside `08-Base-Scripts/` must adhere to these strict coding rules:
+All automation and orchestration launcher scripts inside `08-Squad-Agent/` must adhere to these strict coding rules:
 
 ### A. The Virtual Environment Re-Execution Ritual
 Every python script must locate and run in the local `.venv` by walking up the directory structure.

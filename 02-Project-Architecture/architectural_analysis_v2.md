@@ -95,7 +95,7 @@ Rights are governed by a dual-enforcement mechanism:
 ### 3. How to Interact with Personas (Services vs CLIs)
 Interaction is designed to be highly modular and support multiple entry-points:
 - **Web UI Service (`ui.py`)**: A local web application built on Chainlit. It mounts the `EngineFacade` and exposes a chat interface. It acts as a local web service where incoming messages are fed to the `EngineFacade`'s memory pipeline and routed to the provider.
-- **CLI Chat Wrapper**: Procedural CLI loops (launched via `start_squad.py`) that invoke native executable wrappers (Gemini SDK/CLI) pointing to the compiled adapter folders.
+- **CLI Chat Wrapper**: Procedural CLI loops (launched via `squad-agent` / `main.py`) that invoke native executable wrappers (Gemini SDK/CLI) pointing to the compiled adapter folders.
 - **Model Context Protocol (MCP)**: Future-facing modularity allows exposing the personas as MCP tools themselves, letting external orchestrators call specific subagents (e.g., `call_qa_agent(code)` or `call_architect_agent(design)`) as modular micro-services.
 
 ---

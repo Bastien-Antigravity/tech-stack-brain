@@ -304,22 +304,22 @@ flowchart TD
 
 ---
 
-## 🚀 7. Automated Scaffolding Tooling (`08-Base-Scripts`)
+## 🚀 7. Automated Scaffolding Tooling (`08-Squad-Agent`)
 
 To eliminate manual boilerplate creation and guarantee compliance with all 12 root files, developers and AI agents **MUST** use the automated scaffolding CLI:
 
 ```bash
 # Scaffold a new Go microservice
-python3 08-Base-Scripts/main.py scaffold-microservice --name market-observer --lang go --port 8092 --desc "Real-time ticker stream ingestor"
+python3 08-Squad-Agent/main.py scaffold-microservice --name market-observer --lang go --port 8092 --desc "Real-time ticker stream ingestor"
 
 # Scaffold a new Python microservice
-python3 08-Base-Scripts/main.py scaffold-microservice --name fundamental-analysis --lang python --port 8093 --desc "Financial metrics and SEC filing parser"
+python3 08-Squad-Agent/main.py scaffold-microservice --name fundamental-analysis --lang python --port 8093 --desc "Financial metrics and SEC filing parser"
 
 # Scaffold a new Rust microservice
-python3 08-Base-Scripts/main.py scaffold-microservice --name log-aggregator --lang rust --port 9030 --desc "High-throughput log buffer"
+python3 08-Squad-Agent/main.py scaffold-microservice --name log-aggregator --lang rust --port 9030 --desc "High-throughput log buffer"
 
 # Preview fabrication without writing to disk
-python3 08-Base-Scripts/main.py scaffold-microservice --name orderbook-aggregator --lang go --dry-run
+python3 08-Squad-Agent/main.py scaffold-microservice --name orderbook-aggregator --lang go --dry-run
 ```
 
 ### What the Scaffolding Engine Automates:
