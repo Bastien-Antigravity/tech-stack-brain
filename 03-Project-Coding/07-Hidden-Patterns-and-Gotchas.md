@@ -20,7 +20,7 @@ Python: self.logger = ensure_safe_logger(logger)
 C++:    logger = EnsureSafeLogger(logger);
 ```
 - **Tier 1 (Libraries & Reusable SDKs)**: Prevents nil-pointer panics (`SIGSEGV`) when components are used in unit tests or CLI scripts without a full logger setup. Eliminates boilerplate `if logger != nil` checks.
-- **Tier 2 (Production Microservices)**: Microservices MUST initialize via `BootstrapService` which guarantees a real `ILogger`. Using `EnsureSafeLogger` in non-test microservice production code is strictly prohibited (`PRODUCTION_MOCK_POLLUTION`).
+- **Tier 2 (Production Microservices)**: Microservices MUST initialize via `BootstrapService` which guarantees a real `Logger`. Using `EnsureSafeLogger` in non-test microservice production code is strictly prohibited (`PRODUCTION_MOCK_POLLUTION`).
 - **Strict Mode**: Setting `STRICT_LOGGER=true` forces `EnsureSafeLogger` to panic / raise `RuntimeError` immediately if passed `nil`, preventing silent no-op log leaks in production.
 
 ## 2. gRPC Port Convention: `base_port + 1`

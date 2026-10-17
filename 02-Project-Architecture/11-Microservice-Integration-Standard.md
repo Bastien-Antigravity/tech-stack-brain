@@ -24,7 +24,7 @@ The core ecosystem (`Bastien-Antigravity-base`) consists of 14 foundational repo
 | :--- | :--- | :--- |
 | `distributed-config` | Core distributed config engine (`libdistconf`, CGO bridge) | Go / CGO |
 | `config-server` | Central configuration server daemon & REST/gRPC distributor | Go |
-| `universal-logger` | Standardized multi-sink logging abstraction (`ILogger`) | Go / Python / Rust |
+| `universal-logger` | Standardized multi-sink logging abstraction (`Logger`) | Go / Python / Rust |
 | `flexible-logger` | Legacy/extended logging engine and adapters | Go |
 | `log-server` | High-throughput centralized log streaming daemon | Rust |
 | `safe-socket` | High-reliability framed TCP transport library | Go / Rust / Python |
@@ -132,7 +132,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 ## 4. Inter-Service Communication Standards
 
 ### 1. Centralized Logging (`universal-logger` / `log-server`)
-- All components write logs through the unified `ILogger` interface.
+- All components write logs through the unified `Logger` interface.
 - In production / networked profiles, logs stream over TCP using framed packets (`safe-socket`) to `log-server` on port `9020`.
 
 ### 2. Remote Telemetry & C2 (`tele-remote`)
