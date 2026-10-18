@@ -55,6 +55,7 @@ graph TD
     - `MarketEvent`: Low-latency L1/L2 data envelope.
     - `OHLCV`: Standardized time-series bars.
     - `Signal`: Unified strategy signals (Buy/Sell/Exit).
+- **Dynamic Versioning Subsystem (`pkg/version`, `Version.hpp`, `Toolbox.bas`)**: Standardized semver resolution from `VERSION.txt` across Go, Python, Rust, C++, and VBA. Microservices resolve version via `appConfig.GetVersion()` (Go/Rust/Python/C++/VBA), `version.Get()`, or `Toolbox.GetVersion()`, eliminating ad-hoc relative path scanning loops and hardcoded version strings.
 - **The Mirroring Mandate**: Go is the source of truth. Features MUST be ported to Python, Rust, and C++ in the same development cycle to maintain parity.
 
 ---

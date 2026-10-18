@@ -25,6 +25,16 @@ tags:
 ## ⚙️ Configuration & Merging
 - **Recursive Merging**: Use a `deep_merge` logic for matching YAML/Mapping values to ensure layered configuration consistency across the ecosystem.
 
+## 📦 Dynamic Versioning Single Source of Truth (`VERSION.txt`)
+- **Single Source of Truth**: Rust crates and servers must read runtime version information from `VERSION.txt` at the workspace/repo root via `microservice-toolbox` (`app_config.get_version()` or `microservice_toolbox::version::get_version()`). Hardcoding versions in source code is strictly prohibited (`HARDCODED_VERSION_VIOLATION`).
+- **Build Hook (`build.rs`)**: Reads `VERSION.txt` (or `../VERSION.txt`) and sets:
+  ```rust
+  println!("cargo:rustc-env=APP_VERSION={}", version.trim());
+  println!("cargo:rerun-if-changed=VERSION.txt");
+  ```
+- **Cargo Integration**: Specify `build = "build.rs"` in `Cargo.toml`.
+- **Runtime Access**: Use `config.get_version()` or `pub const VERSION: &str = env!("APP_VERSION");` for logging and telemetry.
+
 ## 🏷 Identity & Logging
 - **Static Identity**: Every struct implementing logic should have a `Name` static property (or field) used for logging traceability.
 

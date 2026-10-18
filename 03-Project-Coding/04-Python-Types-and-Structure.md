@@ -28,6 +28,12 @@ tags:
 - **Dependency Management**: Pinned `requirements.txt`.
 - **Imports**: Use relative imports within the package hierarchy.
 
+## 📦 Dynamic Versioning Single Source of Truth (`VERSION.txt`)
+- **Single Source of Truth**: Python components, services, and packaging manifests must resolve their version dynamically from `VERSION.txt` at the repository root via `microservice-toolbox` (`app_config.get_version()` or `from microservice_toolbox.version import get_version`). Hardcoding static version strings in code or status responses is strictly prohibited (`HARDCODED_VERSION_VIOLATION`).
+- **Toolbox Engine (`microservice_toolbox.version`)**: Automatically climbs parent directories, checks `APP_VERSION` environment overrides, and caches results with zero performance overhead.
+- **Fail-Safe Fallback**: Any fallback default must strictly be `"0.0.1"`, never hardcoded `"1.0.0"`.
+- **Packaging**: `setup.py` / `pyproject.toml` builders must parse `VERSION.txt` dynamically at packaging time.
+
 ## 📥 Import Aliasing & Visibility
 
 To distinguish standard actions from local variables, use descriptive aliasing for common functional imports:

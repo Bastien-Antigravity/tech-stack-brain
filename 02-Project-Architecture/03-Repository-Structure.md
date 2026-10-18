@@ -188,7 +188,7 @@ Compiled language repositories (Go, Rust, C++) MUST provide a root `Makefile` im
 ### Canonical Go Makefile Template:
 ```makefile
 VERSION ?= $(shell cat VERSION.txt 2>/dev/null || echo "0.0.1")
-LDFLAGS := -s -w -X 'github.com/Bastien-Antigravity/$(NAME)/src/core.ServerVersion=$(VERSION)'
+LDFLAGS := -s -w -X 'github.com/Bastien-Antigravity/microservice-toolbox/go/pkg/version.BuildVersion=$(VERSION)'
 
 .PHONY: all build test race vet version clean
 
@@ -219,10 +219,22 @@ clean:
 	@rm -rf bin/ dist/ build/
 ```
 
-### Critical Rules for Makefiles:
-1. **Dynamic Versioning**: Always extract version via `$(shell cat VERSION.txt 2>/dev/null || echo "0.0.1")`.
-2. **Never Mask Errors**: Strict prohibition of `|| true` or `2>/dev/null` on `go build`, `go test`, or `cargo test`. Failures must bubble up to CI/CD and terminal output immediately.
-3. **Deterministic Output**: Compiled binaries must be placed in `./bin/<service-name>`.
+### Critical Rules for Dynamic Versioning & Tooling Purity:
+1. **Single Source of Truth (`VERSION.txt`) & Unified Toolbox**: Every repository maintains `VERSION.txt` at its root. Microservices MUST use `microservice-toolbox`'s dedicated versioning subsystem (`appConfig.GetVersion()` / `version.Get()`) rather than writing bespoke relative path scanning loops. Hardcoding static version numbers in source code controllers, telemetry endpoints, or greetings is strictly forbidden (`HARDCODED_VERSION_VIOLATION`).
+2. **Go Versioning Standard**:
+   - Access version dynamically via `appConfig.GetVersion()` or `toolbox_version.Get()`.
+   - Optionally inject at compile time via `Makefile`: `LDFLAGS := -s -w -X 'github.com/Bastien-Antigravity/microservice-toolbox/go/pkg/version.BuildVersion=$(VERSION)'`.
+   - All status APIs (`GetStatus`), Telegram menus, and startup logs must expose this version.
+3. **Rust Versioning Standard**:
+   - Access version dynamically via `config.get_version()` or `microservice_toolbox::version::get_version()`.
+   - In `build.rs`, set `cargo:rustc-env=APP_VERSION=<version>` and `cargo:rerun-if-changed=VERSION.txt`.
+   - Declare `build = "build.rs"` in `Cargo.toml`.
+   - In Rust source code, bind `pub const VERSION: &str = env!("APP_VERSION");` or read from `config.get_version()`.
+4. **Python Versioning Standard**:
+   - Microservices and packages resolve version via `self.config.get_version()` or `from microservice_toolbox.version import get_version`.
+   - `setup.py` / status payloads dynamically consume `self.config.get_version()`.
+5. **Never Mask Errors**: Strict prohibition of `|| true` or `2>/dev/null` on `go build`, `go test`, or `cargo test`. Failures must bubble up to CI/CD and terminal output immediately.
+6. **Deterministic Output**: Compiled binaries must be placed in `./bin/<service-name>`.
 
 ---
 

@@ -31,6 +31,12 @@ tags:
 - **Clean Metadata**: When detecting source information (caller info), always trim the path using `filepath.Base()` to keep log entries efficient and readable.
 - **Component Identity**: Every struct implementing logic should have a `Name string` field, initialized during construction, and used as a prefix for all logs.
 
+## 📦 Dynamic Versioning Single Source of Truth (`VERSION.txt`)
+- **Single Source of Truth**: Microservices derive their runtime version strictly from `VERSION.txt` at the repository root via `microservice-toolbox` (`appConfig.GetVersion()` or `version.Get()`). Hardcoding version numbers in code or status responses is strictly prohibited (`HARDCODED_VERSION_VIOLATION`).
+- **Toolbox Engine (`go/pkg/version`)**: Automatically climbs parent directories, inspects `APP_VERSION` environment overrides, and caches results with zero lock contention.
+- **Build Injection**: `Makefile` can pass `-ldflags="-s -w -X 'github.com/Bastien-Antigravity/microservice-toolbox/go/pkg/version.BuildVersion=$(VERSION)'"` where `VERSION ?= $(shell cat VERSION.txt 2>/dev/null || echo "0.0.1")`.
+- **Telemetry Exposure**: Return `appConfig.GetVersion()` in `/api/v1/status` and gRPC `GetStatus` payloads.
+
 ## Concurrency Patterns (from source code)
 
 ### Goroutine Conventions
