@@ -103,38 +103,43 @@ To run a squad agent workshop for a new brain inside Docker:
 ```yaml
   # --- AI Squad Agent Workshop for Satellite Brain ---
   squad-agent-satellite:
-    image: ghcr.io/bastien-antigravity/squad-agent:develop
-    container_name: squad-agent-satellite
+    image: ghcr.io/bastien-antigravity/squad-agent-brain:${TAG:-latest}
+    container_name: squad-agent-${BRAIN_ID:-satellite-brain}
     restart: unless-stopped
-    profiles: [ "squad", "all" ]
-    depends_on:
-      timescale-db: { condition: service_healthy }
-      nats-server: { condition: service_healthy }
+    ports:
+      - "${HOST_IP:-127.0.0.1}:${SA_PORT:-8095}:8085"
+      - "${HOST_IP:-127.0.0.1}:${SA_GRPC_PORT:-8097}:8087"
     environment:
-      - DOCKER_ENV=true
-      - TARGET_BRAIN_ID=satellite-brain
-      - NATS_IP=nats-server
-      - NATS_PORT=4222
-      - TS_IP=timescale-db
-      - TS_PORT=5432
-      - TS_DBNAME=obsidiandb
-      - RG_IP=rag-engine
-      - RG_REST_PORT=8093
-      - BASTIEN_PRIVATE_KEY_PATH=/etc/bastien/private.pem
+      - BRAIN_ID=${BRAIN_ID:-satellite-brain}
+      - TARGET_BRAIN_ID=${BRAIN_ID:-satellite-brain}
+      - SA_PORT=8085
+      - SA_GRPC_PORT=8087
+      - DISCORD_BOT_TOKEN=${DISCORD_BOT_TOKEN:-}
+      - DISCORD_CHANNEL_ID=${DISCORD_CHANNEL_ID:-}
     volumes:
-      - /path/to/satellite-brain:/workspace/satellite-brain:rw
-      - ./modes/docker/config/services/squad-agent.yaml:/app/standalone.yaml:ro
-      - /etc/bastien/private.pem:/etc/bastien/private.pem:ro
+      - ../:/app/brain:rw
+      - ./standalone.yaml:/app/standalone.yaml:ro
     networks:
       - teleremote-network
 ```
 
-### Automatic Ecosystem Integration
-When the container launches:
-1. **Database Isolation**: Auto-creates and binds to PostgreSQL schema `satellite-brain` inside `obsidiandb`.
-2. **NATS Messaging**: Auto-subscribes to `bastien-antigravity.squad.chat`.
-3. **RAG Access**: Auto-targets `satellite-brain` partition while retaining capability to federate with `obsidian-brain`.
-4. **Log Aggregation**: Connects to `log-server:9020` over SafeSocket TCP.
+### Automatic Ecosystem Integration & Filesystem Invariants
+When a satellite brain container launches:
+1. **Container Filesystem Boundary Invariant**:
+   - Each satellite brain is an autonomous, self-contained unit.
+   - Its local microservices and domain code live strictly inside `/app/brain/06-Microservices/<service-name>/`.
+   - Its local BDD specifications live strictly inside `/app/brain/02-Business-BDD/02-Behavior-Specs/<service-name>/`.
+   - Central agents in `obsidian-brain` **never perform cross-container disk I/O**. All coding, compiling (`go build`, `cargo check`, `pytest`), and test execution for a satellite brain are handled by that satellite brain's **local developer and QA agents**.
+2. **Network-Only Push RAG Indexing**:
+   - Central `rag-engine` never mounts or reads satellite disk files.
+   - The satellite's local `DocIndexerAgent` scans its local `/app/brain/` markdown files and pushes chunks over HTTP REST: `POST http://rag-engine:8093/api/v1/index/document` with `brain_id`.
+   - Central `rag-engine` indexes the embeddings into PostgreSQL with `brain_id = 'satellite-brain'`.
+3. **Database Schema & Vector Partitioning**:
+   - Conversational state binds to PostgreSQL schema `08-Squad-Agent` with `brain_id = 'satellite-brain'` partition filter.
+4. **Dynamic NATS Messaging & Zero Crosstalk**:
+   - Auto-subscribes to isolated topic `bastien-antigravity.{brain_id}.squad.chat`.
+5. **Real-Time Discord Channel Mirroring**:
+   - `discord-client` mirrors squad events live into a designated Discord channel with role avatars (🤖 Orchestrator, 🛠️ Developer, 🧪 QA, 📐 Architect, 📈 Trader) and forwards user prompts over NATS.
 
 ---
 
@@ -142,21 +147,31 @@ When the container launches:
 
 ```mermaid
 sequenceDiagram
-    participant User as Developer / Chat UI
-    participant AgentA as Agent (Satellite Brain)
+    participant User as Developer / Chat UI / Discord
+    participant SatAgent as Satellite Agent (trading-brain)
     participant NATS as nats-server:4222
-    participant AgentB as Agent (Core Obsidian Brain)
+    participant RootArch as Root Architect (obsidian-brain)
     participant RAG as Central RAG Engine
 
-    User->>AgentA: Issue command
-    AgentA->>NATS: Publish turn to bastien-antigravity.squad.chat
-    NATS-->>AgentB: Broadcast event
-    AgentA->>RAG: POST /api/v1/query (brain_id='satellite-brain')
-    RAG-->>AgentA: Return satellite context
-    AgentA->>RAG: POST /api/v1/query (brain_id='obsidian-brain')
-    RAG-->>AgentA: Return core architecture context
-    AgentA->>User: Formulate coordinated response
+    User->>SatAgent: Issue feature request in trading-brain room
+    SatAgent->>RAG: POST /api/v1/query (brain_id='trading-brain')
+    RAG-->>SatAgent: Return domain strategy specs
+    Note over SatAgent: Satellite developer needs fleet architectural standard
+    SatAgent->>NATS: Publish to bastien-antigravity.squad.chat.agent.architect<br/>(@root:architect What is the fleet port/framing standard?)
+    NATS-->>RootArch: Delivers cross-brain tag
+    RootArch-->>NATS: Replies to reply_topic (bastien-antigravity.trading-brain.squad.chat)
+    NATS-->>SatAgent: Delivers fleet standard response
+    Note over SatAgent: Local developer implements code in trading-brain/06-Microservices/
+    SatAgent->>User: "Feature implemented and verified in sandbox."
 ```
 
-1. **Intra-Brain**: Agents inside the same brain communicate over NATS pub/sub on `bastien-antigravity.squad.chat` filtered by `session_id`.
-2. **Cross-Brain**: Agents across different brains can query each other's knowledge partitions through central RAG, or exchange messages across brain-specific NATS subjects.
+### Addressing Rules & Tag Routing:
+1. **Intra-Brain Chat (`@role`)**:
+   - Plain tags like `@developer`, `@orchestrator`, `@trader` remain strictly inside the local brain room `bastien-antigravity.{brain_id}.squad.chat`. Zero crosstalk leaks into the root room.
+2. **Cross-Brain Delegation (`@{target_brain}:{role}`)**:
+   - Compound tags route across brain rooms:
+     - `@root:developer` or `@obsidian-brain:developer`: Satellite agent delegates engineering tasks to the central root developer.
+     - `@root:architect`: Satellite agent queries central fleet architecture standards.
+     - `@trading-brain:trader`: Root developer asks the satellite domain expert for business rule clarification.
+   - The message payload carries `source_brain_id` and `reply_topic`, guaranteeing responses route directly back to the originating brain room.
+
