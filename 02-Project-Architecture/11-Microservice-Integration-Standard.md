@@ -244,4 +244,18 @@ List of primary configuration keys controlling behavior.
 ❌ **NEVER** commit unencrypted plaintext credentials or tokens.  
 ❌ **NEVER** bypass `microservice-toolbox` with ad-hoc flag or config parsing.  
 ❌ **NEVER** invoke `os.Exit()` directly deep inside library logic. Propagate errors to `main()` or call lifecycle shutdown hooks.  
-❌ **NEVER** leave broken relative symlinks for `standalone.yaml`.
+❌ **NEVER** leave broken relative symlinks for `standalone.yaml`.  
+❌ **NEVER** restart processes solely to apply configuration parameter or model changes when live hot-reloading is supported.
+
+---
+
+## 8. Dynamic Fleet Hot-Reloading Contract (Zero-Downtime Reconfiguration)
+
+To maintain fleet resilience and continuous operation, all microservices must implement live configuration hot-reloading:
+
+1. **Callback Registration**: During bootstrap, register an update callback on the `AppConfig` instance:
+   - Go: `appConfig.OnLiveConfUpdate(func(update map[string]interface{}) { ctrl.OnLiveConfigUpdate(update) })`
+   - Python: `config.on_live_conf_update(lambda update: controller.on_live_config_update(update))`
+   - Rust: `config.on_live_conf_update(...)`
+2. **Dynamic Parameter Refresh**: Re-read runtime parameters (e.g. AI models, log levels, timeouts, thresholds, rate limits, API keys) dynamically upon each event loop turn or incoming request.
+3. **Zero Restart Policy**: Parameter tweaks pushed from `config-server` must apply immediately in volatile memory without restarting the host process, dropping active TCP sockets, or resetting supervision states.

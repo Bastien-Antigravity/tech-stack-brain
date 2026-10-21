@@ -145,5 +145,19 @@ All `microservice-toolbox` implementations must surface raw engine-level errors 
 - **Strict Exception Handling**: Toolboxes should **throw/raise/return** the exact error string retrieved from `GetLastError()` on bridge failure.
 - **No Silencing**: Swallowing bridge errors (e.g., returning original ciphertext on decryption failure) is strictly forbidden.
 
+### 12. Dynamic Fleet Hot-Reloading Directive (v2.1+)
+All microservices across the ecosystem (Go, Python, Rust, C++) that consume operational configuration parameters, AI models, logging levels, timeouts, thresholds, or dynamic credentials MUST implement dynamic hot-reloading without restarting daemon processes:
+
+1. **Callback Registration**:
+   - **Go**: `appConfig.OnLiveConfUpdate(func(update map[string]interface{}) { ... })`
+   - **Python**: `config.on_live_conf_update(lambda update: controller.on_live_config_update(update))`
+   - **Rust**: `config.on_live_conf_update(callback)`
+2. **Per-Turn Live Resolution**:
+   - For request-driven and event-driven components (e.g. AI Squad Agents, RAG enrichment, WebSocket publishers), re-read dynamic capability parameters (`model_name`, `thinking_level`, `api_key`) directly from active configuration on each turn/request cycle.
+3. **Zero-Downtime Guarantee**:
+   - Modifying settings via `config-server` (or local file watches in development) must take effect on the very next processing cycle without terminating TCP connections, dropping NATS subscriptions, or crashing background workers.
+4. **Scaffolding Enforcement**:
+   - All repositories scaffolded via `python3 08-Squad-Agent/main.py scaffold-microservice` generate `OnLiveConfUpdate` listeners and controller handlers by default.
+
 > [!NOTE]
 > **RSA Encryption (`ENC(...)`)** is now a cross-language standard. You can safely use encrypted secrets in shared configuration files across the entire fleet.

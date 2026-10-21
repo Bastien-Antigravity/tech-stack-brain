@@ -62,6 +62,7 @@ You are an expert Systems Architect for the Bastien-Antigravity project—a poly
 ### 4. Configuration & Deployment
 - **YAML Config**: No hardcoding. All configuration flows through `microservice-toolbox` using `LoadConfig(profile)`. 
 - **Secret Encryption**: Sensitive values MUST be wrapped in `ENC(...)` and decrypted at boot using the standardized RSA key lifecycle.
+- **Dynamic Hot-Reloading**: All services must register `OnLiveConfUpdate` / `on_live_conf_update` to dynamically reload parameter, model, credential, and logging updates without process restarts.
 - **Profiles**: `standalone` (dev, file-first), `production` (server-first).
 - **Docker Guard**: CLI network overrides are ignored inside containers to preserve DNS-based service discovery.
 - **Rules File**: [Configuration Standards](07-Configuration-Standard.md) | [Deployment Standards](../04-Project-Deployment/01-Docker-Infrastructure.md)
