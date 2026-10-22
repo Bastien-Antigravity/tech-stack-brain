@@ -98,12 +98,16 @@ To prevent port collision across native host execution and Docker containers:
 | `nats-server` | `4222` (TCP), `8222` (HTTP) | NATS | `4222`, `8222` |
 | `timescale-db` | `5432` | PostgreSQL | `5432` |
 | `rag-engine` | `8090` (MCP), `8082` (Dash), `8091` (gRPC) | SSE / HTTP / gRPC | `8090`, `8082`, `8091` |
+| `squad-agent` | `8085` (REST/MFE), `8087` (gRPC) | HTTP / gRPC | `8085`, `8087` |
 
 ---
 
-## 4. Zero Plaintext Secrets in Containers
+## 4. Configuration Separation & Zero Plaintext Secrets
 
-1. **Production Slices**:
+1. **Capability vs. Local Slice Separation**:
+   - **Central Authority (`config-server`)**: Advertises *network capabilities* (service aliases, ports, shared broker/database endpoints) across `teleremote-network`. It does NOT duplicate service-private internal logic.
+   - **Service-Private Slices (`modes/docker/config/services/<service>.yaml`)**: Each microservice mounts its own minimal configuration slice holding its internal parameters (e.g. LLM models, private tokens, local workers) and connects to `config-server:3306` to receive shared capabilities dynamically.
+2. **Production Slices**:
    Service configuration is mounted read-only from `docker-deployment/modes/docker/config/services/<service>.yaml`.
 2. **Ciphertext Standard**:
    All passwords, API keys, and bot tokens must use `ENC(...)` ciphertext.
