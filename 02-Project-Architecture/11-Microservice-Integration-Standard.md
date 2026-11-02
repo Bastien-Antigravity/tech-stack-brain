@@ -139,9 +139,19 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 - Distributed worker components register their interactive UI schemas and push alerts to `tele-remote` via gRPC on port `1863`.
 - `tele-remote` provides the Telegram user interface with zero-latency caching and dynamic background sync.
 
-### 3. OpenMFE Dynamic Web UI (`web-interface`)
-- Frontends and REST microservices export micro-frontends (MFEs) dynamically registering with `web-interface` (port `5000`) via `POST /api/v1/register`.
-- Default port for `web-interface` is always **`5000`** (never `8000` or `8080`).
+### 3. OpenMFE Dynamic Web UI & Declarative Specification (`web-interface`)
+- Microservices export declarative user interface specifications (`ServiceSpec`) dynamically registering with `web-interface` (port `5000`) via `POST /api/v1/register`.
+- Default port for `web-interface` is always **`5000`** (resolved dynamically via `appConfig.GetListenAddr("web_interface")`, never hardcoded).
+- **3-Tier Service Taxonomy**:
+  - `L1 - Base Fleet`: Core infrastructure daemons (`watchdog-agent`, `config-server`, `notif-server`, RAG Dashboard). Rendered in Fleet Control right drawer (`#Sidenav`).
+  - `L2 - Domain Services`: Trading, market analysis, worker engines. Rendered in Left Sidebar (`#Sidebar`).
+  - `L3 - Secure Controls`: Administrative, KMS, and AI Squad controls (`squad-agent`). Rendered in Fleet Control right drawer (`#Sidenav`).
+- **Standardized Polyglot Registration Contract**:
+  - **Go**: `spec.PublishWithLifecycle(appConfig, logger, lm, capability, spec.ServiceSpec{...})`
+  - **Python**: `spec.publish_with_lifecycle(app_config, logger, lm, capability, spec=ServiceSpec(...))`
+  - **Rust**: `spec::publish_with_lifecycle(&app_config, logger, Some(&lm), capability, ServiceSpec{...})`
+  - **C++**: `SpecPublisher::PublishWithLifecycle(appConfig, logger, &lm, capability, ServiceSpec{...})`
+- **Ownership Standard**: The microservice is the authoritative owner of its spec metadata (`Name`, `Tag`, `URL`, `Layer`, `Category`, `Description`, `DocLink`, `Protocol`, and directly formatted `Framing`). Background publishing retries indefinitely with exponential backoff until `web-interface` is online.
 
 ### 4. Framed TCP Transport (`safe-socket`)
 - Used for low-overhead, high-throughput streaming (e.g., between agents and `log-server`).

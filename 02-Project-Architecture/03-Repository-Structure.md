@@ -312,7 +312,7 @@ flowchart TD
 | **5** | `docker-deployment/scripts/common.py` | Add entry in `SERVICES_SPEC` list for `fleet.sh` compilation (`./fleet.sh compile`) and lifecycle tracking. |
 | **6** | `obsidian-brain/05-Fleet-Operation/00-Repo-Control/service-registry.json` | Register service name, Docker image, default port, protocol, archetype, and classification. |
 | **7** | `obsidian-brain/05-Fleet-Operation/00-Repo-Control/inventory.json` | Register repository path, remote URL, branch (`develop`), and archetype (`level1-microservice`). |
-| **8** | Dynamic UI & Remote C2 *(if applicable)* | - **OpenMFE**: Auto-registers with `web-interface` via `POST /api/v1/register`.<br/>- **Tele-Remote**: Binds to port `1863` via gRPC for Telegram alerts and interactive menus. |
+| **8** | Dynamic UI & Remote C2 *(if applicable)* | - **OpenMFE & Service Spec**: Publishes declarative specification and registers with `web-interface` via `spec.PublishWithLifecycle` / `spec.publish_with_lifecycle` (POST `/api/v1/register`).<br/>- **Tele-Remote**: Binds to port `1863` via gRPC for Telegram alerts and interactive menus. |
 
 ---
 
