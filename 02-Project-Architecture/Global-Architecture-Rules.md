@@ -86,13 +86,15 @@ You are an expert Systems Architect for the Bastien-Antigravity project—a poly
 - **Mission-Traceability**: All logs MUST propagate an `X-Bastien-Mission-ID` (Trace ID) across service boundaries. This ID must be injected into the `universal-logger` context.
 - **State-Snapshots**: Every service managing a persistent memory state MUST implement a `/snapshot` gRPC endpoint for live integrity auditing.
 
-### 8. Data Sovereignty & Naming
-- **Standardized Program Name**: Every microservice MUST identify itself via `microservice-toolbox` (`GetServiceName()`). If not set via `--name`, it defaults to the binary filename.
-- **PostgreSQL Isolation**: Services MUST use a dedicated schema named exactly after the Program Name (e.g., schema `data-ingestor`).
-- **SQLite Isolation**: Services MUST use an independent `.db` file named after the Program Name (e.g., `ontime-scheduler.db`).
-- **File System Namespacing**: Services MUST use the `file_system.data_path` or `temp_path` followed by a sub-directory named after the Program Name (e.g., `${data_path}/${program_name}/`).
-- **AI-Ready Docstrings**: Every interface method MUST have an `// AI-CONTEXT: <intent>` comment.
+### 9. Temporal Integrity & Universal UTC Standard
+- **100% UTC Mandate**: All timestamps across logs, network packets, persistence stores, metrics, and user interfaces must strictly use UTC.
+- **Go**: Always use `time.Now().UTC()`. Bare `time.Now().Format(...)` without `.UTC()` is strictly prohibited.
+- **Python**: Always use `datetime.now(timezone.utc)`. Timezone-naive `datetime.now()` and deprecated `datetime.utcnow()` are prohibited.
+- **Rust**: Always use `chrono::Utc::now()`. `chrono::Local` is prohibited.
+- **Web UI**: Clocks, inspector logs, and table displays must format in UTC (`{ timeZone: 'UTC' }` or `now.toISOString().substring(...) + ' UTC'`).
+- **Database**: All timestamp columns must be `TIMESTAMPTZ` in UTC.
+- **Rules File**: [[14-Temporal-Integrity-and-UTC-Standard]]
 
 ---
 
-**Execution Directive**: When asked to build or modify a microservice, first verify the existing interfaces and models, then apply the Facade pattern rigorously. Ensure all gRPC lifecycle methods and the new coordination rules (timeouts, snapshots, traceability, naming) are correctly handled.
+**Execution Directive**: When asked to build or modify a microservice, first verify the existing interfaces and models, then apply the Facade pattern rigorously. Ensure all gRPC lifecycle methods and the new coordination rules (timeouts, snapshots, traceability, naming, temporal integrity in UTC) are correctly handled.

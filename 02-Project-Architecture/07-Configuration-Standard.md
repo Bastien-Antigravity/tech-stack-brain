@@ -159,5 +159,16 @@ All microservices across the ecosystem (Go, Python, Rust, C++) that consume oper
 4. **Scaffolding Enforcement**:
    - All repositories scaffolded via `python3 08-Squad-Agent/main.py scaffold-microservice` generate `OnLiveConfUpdate` listeners and controller handlers by default.
 
+### 13. AppConfig Pre-Validation & Zero Redundant Over-Checking (v2.2+)
+Microservices bootstrap with `BootstrapService`, which loads, parses, expands, and validates configurations via `microservice-toolbox` and `distributed-config`:
+- **Pre-Validated State**: On daemon boot, all parameters within `capabilities` and `local` blocks are already environment-expanded, validated against port collisions, and structurally safe.
+- **Direct Capability Extraction**:
+  - In Go: Use `appConfig.GetCapability(name, &targetStruct)`. Do not re-parse `GetListenAddr` via `net.SplitHostPort` when the capability struct already provides the host/port fields.
+  - In Python: Use `app_config.get_capability(name, target_model)`.
+  - In Rust: Use `app_config.get_capability(name)`.
+- **Zero Redundant Secret Checks**: `appConfig.DecryptSecret(ciphertext)` natively detects `ENC(...)` tokens. It decrypts ciphertext and returns unencrypted strings unchanged. Callers MUST NOT perform manual prefix checks (`strings.HasPrefix(val, "ENC(")`).
+- **Prohibition of Mock/Static Arrays in Dynamic Endpoints**: Handlers reporting fleet or capability stats (e.g. tele-remote, monitoring dashboards) MUST derive client services and active menus dynamically from `appConfig.Config.Capabilities` and the OpenMFE registry. Hardcoded client slices or fake telemetry arrays are strictly forbidden.
+- **Zero `"<nil>"` Checks**: Rely on clean typed assertions and nil pointer safety provided by `EnsureSafeLogger` and standard Go struct unmarshaling.
+
 > [!NOTE]
 > **RSA Encryption (`ENC(...)`)** is now a cross-language standard. You can safely use encrypted secrets in shared configuration files across the entire fleet.
