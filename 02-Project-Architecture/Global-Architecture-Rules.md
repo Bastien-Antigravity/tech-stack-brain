@@ -95,6 +95,13 @@ You are an expert Systems Architect for the Bastien-Antigravity project—a poly
 - **Database**: All timestamp columns must be `TIMESTAMPTZ` in UTC.
 - **Rules File**: [[14-Temporal-Integrity-and-UTC-Standard]]
 
+### 10. Safe-by-Design Concurrency & Debloat Mandate
+- **Zero Redundant Primitives**: Code must never introduce mutexes, locks, or defensive double-checking around structures that are already provably safe by design.
+- **Hardware & Memory Primitives**: Atomic types (`atomic.Int64`, `atomic.Pointer`, `AtomicU64`) and module-level immutable constants require zero mutex wrapping.
+- **CSP Ownership Transfer**: Message channels in Go and Rust transfer memory ownership; receiving routines must not acquire locks on transferred payloads.
+- **Compiler Proofs**: All code changes are verified using mechanical analyzers (`nilaway`, `clippy`, `ruff`, mutation testing).
+- **Rules File**: [[15-Safe-By-Design-Invariants]]
+
 ---
 
 **Execution Directive**: When asked to build or modify a microservice, first verify the existing interfaces and models, then apply the Facade pattern rigorously. Ensure all gRPC lifecycle methods and the new coordination rules (timeouts, snapshots, traceability, naming, temporal integrity in UTC) are correctly handled.

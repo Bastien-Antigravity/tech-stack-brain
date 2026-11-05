@@ -1,5 +1,5 @@
 ---
-title: "Architecture Blueprint: Code-Doc Semantic Synchronizer (FEAT-010)"
+title: 'Architecture Blueprint: Code-Doc Semantic Synchronizer (FEAT-010)'
 type: architecture
 status: active
 microservice: tech-stack-brain

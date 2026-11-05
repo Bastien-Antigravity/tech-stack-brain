@@ -2,6 +2,11 @@
 microservice: 03-Tech-Stack
 type: governance
 status: active
+tags:
+- '#service/03-Tech-Stack'
+- '#type/governance'
+- '#state/active'
+- '#zone/3-fleet'
 ---
 
 # ⚡ AI Initialization: 03-Tech-Stack

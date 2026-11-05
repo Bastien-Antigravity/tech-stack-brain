@@ -10,6 +10,7 @@ tags:
 - '#service/09-rag-engine'
 - '#state/active'
 - '#type/architecture'
+- '#service/ecosystem-wide'
 ---
 
 # 🧠 Multi-Brain Partitioning and Distributed Squad Standard

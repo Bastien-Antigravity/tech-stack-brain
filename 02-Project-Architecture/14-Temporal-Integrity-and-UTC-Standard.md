@@ -8,6 +8,7 @@ tags:
 - '#layer/standard'
 - '#type/architecture'
 - '#state/active'
+- '#service/ecosystem-wide'
 ---
 
 # 14. Temporal Integrity & Universal UTC Standard
