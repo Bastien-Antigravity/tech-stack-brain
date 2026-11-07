@@ -156,6 +156,18 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 ### 4. Framed TCP Transport (`safe-socket`)
 - Used for low-overhead, high-throughput streaming (e.g., between agents and `log-server`).
 - Employs 4-byte length-prefixed framing and 30-second heartbeat pings to detect half-open sockets.
+- Includes a lock-free atomic telemetry wrapper (`src/facade/telemetry_wrapper.go`, `safesocket.SetTelemetryEnabled`, `safesocket.SetTelemetryHook`) that feeds real-time connection and channel telemetry into `microservice-toolbox` WireTap with zero mutex overhead.
+
+### 5. Real-Time Transport WireTap & 3-Tier Mesh Topology (`microservice-toolbox/wiretap` & `web-interface`)
+- **Lock-Free Atomic WireTap**: Controlled via `common.wiretap_enabled` in `native.yaml` / `AppConfig` and toggleable live from the `web-interface` Transport Mesh toolbar (`POST /api/v1/topology/wiretap/toggle`).
+- **Automatic SDK Instrumentation**:
+  - `BootstrapService` (Go) and `init_microservice` / `configure_from_config` (Python) automatically bind WireTap to `safe-socket`, `teleremote` (gRPC port 1863), `notification` (gRPC port 1027), `network` (gRPC server interceptors), and `messaging` (NATS subjects).
+  - Pre-validated string parameters are read directly from `AppConfig` (`GetListenAddr("web_interface")`, `GetLocal("wiretap_enabled")`) with zero fallback chains or silent `except Exception: pass` blocks.
+- **3-Tier Topology Separation in `web-interface`**:
+  - **Tier 1 (`src/router/base_ecosystem.go`)**: Strictly the 11 Standard Base Microservices (`L1–L3`).
+  - **Tier 2 (`src/router/mesh_topology.go`)**: OpenMFE-registered microservices and future `> L3` (`L4+`) domain services.
+  - **Tier 3 (`src/router/mesh_topology.go`)**: Real-time `wiretap.Snapshot()` engine that dynamically synthesizes uncataloged `L4+` microservices, external clients/gateways (`EXT`, e.g., `antigravity_ide` MCP client, `telegram_cloud` Bot API), live edges (`LiveObserved: true`), particle streams, and segregated logical channels (`frames` and `bytes`).
+  - **Zero Hardcoding for New Microservices**: Adding a new repository or microservice (`> L3` or any tier) requires **zero code changes** in `web-interface` — its node, edges, and segregated channels appear automatically via `spec.PublishWithLifecycle` and WireTap.
 
 ---
 

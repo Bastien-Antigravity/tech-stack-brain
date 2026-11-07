@@ -67,11 +67,16 @@ ragAddr := appConfig.GetRESTAddr("rag_engine")
 
 If the capability or required port cannot be resolved from configuration or service discovery, the component must fail-fast with an informative error rather than silently defaulting to loopback ports.
 
-### Dynamic Brain Identifier Resolution
-Microservices and squad agents resolve their active partition namespace dynamically:
-1. `TARGET_BRAIN_ID` or `BRAIN_ID` environment variable.
-2. `capabilities.squad_agent.target_brain_id` in YAML configuration.
-3. Explicit runtime invocation parameter.
+### Dynamic Brain Identifier Resolution (Precedence Order)
+Microservices and squad agents resolve their active partition namespace dynamically using an explicit hierarchy designed to prevent dirty shell session pollution:
+1. **Explicit Runtime Argument**: `brain_id` passed directly into a tool or function call.
+2. **Ecosystem Configuration (AppConfig)**: `capabilities.squad_agent.target_brain_id` from `standalone.yaml` (Primary persistent source of truth).
+3. **Environment Fallback**: `TARGET_BRAIN_ID` or `BRAIN_ID` (Permits containerized overrides in Docker compose or CI/CD pipelines without modifying YAML files on disk).
+4. **Canonical Fallback**: Default to `'obsidian-brain'`.
+
+> [!IMPORTANT]
+> **Why Configuration Precedes Environment Variables**:
+> In local development terminals, shell sessions frequently retain stale exported variables (`export BRAIN_ID=...`). Checking `AppConfig` before environment variables ensures local edits in `standalone.yaml` are honored immediately, while still allowing headless containers (`docker-compose.yaml`) to inject `TARGET_BRAIN_ID` when the YAML field is omitted.
 
 Omitting `brain_id` in document indexing or unmerging immediately raises a `400 Bad Request` or `ValueError` to prevent unintentional pollution of root vaults.
 
