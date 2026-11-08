@@ -33,6 +33,9 @@ Used to manage the transition between internal container DNS and host-side loopb
 | **TimescaleDB** | `DB_IP` | `DB_PORT` | - | - |
 | **Scheduler** | `SC_IP` | `SC_PORT` | `SC_GRPC_PORT` | - |
 
+> [!NOTE]
+> **Single Host Convention**: Each microservice is addressed by a single canonical host/IP variable (`<SERVICE>_IP`). Dedicated `*_GRPC_IP` variables are strictly prohibited/redundant; both `microservice-toolbox` and `distributed-config` resolve capability addresses using the canonical `*_IP` whenever `grpc_ip` is omitted. Only port variables (`*_PORT`, `*_GRPC_PORT`, `*_REST_PORT`) vary per protocol.
+
 ### 2. Deployment Control
 - `TAG`: Defines the Docker image version (e.g., `develop`, `latest`, or `v1.2.3`).
 - `ENV_PROD`: Boolean flag used by services to enable production-only optimizations or safety gates.
