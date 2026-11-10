@@ -117,3 +117,9 @@ The `LogWriter` implements **Dynamic Batching**. It automatically scales the bat
 - **Protocol Security**: `TcpServer` enforces a mandatory Handshake immediately upon connection. Anonymous or un-framed data results in immediate disconnection.
 - **Retry Logic**: Disk writes are protected by a retry mechanism (default 3 attempts) to handle transient I/O issues.
 - **Strict Framing**: `SafeSocket` ensures that even malformed TCP clients won't crash the server.
+
+### 5. Persistent Error Log Shipping (TimescaleDB Hypertable)
+While raw debug and info streams are handled high-speed in memory ring buffers and local append-only log files by `log-server`, critical operational events (`level >= ERROR`) are autonomously extracted and persisted in a TimescaleDB hypertable (`fleet_error_logs`).
+- **Shipper Subsystem**: Embedded within `watchdog-agent/src/shipper/` (or run as dedicated `log-shipper` in Docker).
+- **Decoupled Architecture**: Log producers simply write to their local log files without synchronous database network overhead. The shipper handles batch ingestion, cursor checkpointing, and retry on database downtime.
+- See detailed standard: [[16-Fleet-Error-Log-Persistence-Standard.md]].
