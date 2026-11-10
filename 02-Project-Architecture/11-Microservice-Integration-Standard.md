@@ -28,7 +28,7 @@ The core ecosystem (`Bastien-Antigravity-base`) consists of 14 foundational repo
 | `flexible-logger` | Legacy/extended logging engine and adapters | Go |
 | `log-server` | High-throughput centralized log streaming daemon | Rust |
 | `safe-socket` | High-reliability framed TCP transport library | Go / Rust / Python |
-| `microservice-toolbox` | Universal cross-language bootstrap, config, and lifecycle facade | Go / Python / Rust |
+| `microservice-toolbox` | Universal cross-language bootstrap, config, contracts, and lifecycle facade | Go / Python / Rust / C/C++ |
 | `notif-server` | Multi-channel dispatch engine (Telegram, Discord, Webhooks) | Go |
 | `tele-remote` | Remote C2 & telemetry bridge for Telegram bot interfaces | Go |
 | `web-interface` | Central monitoring dashboard & OpenMFE host | Go / TypeScript / JS |
@@ -105,6 +105,21 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 ```
 
+### C++ Lifecycle Pattern:
+```cpp
+#include "microservice_toolbox/config/AppConfig.hpp"
+#include "microservice_toolbox/lifecycle/LifecycleManager.hpp"
+#include "microservice_toolbox/spec/spec.hpp"
+
+int main(int argc, char** argv) {
+    auto appConfig = microservice_toolbox::config::LoadConfig("standalone", argc, argv);
+    microservice_toolbox::lifecycle::LifecycleManager lm;
+    // Populate ServiceSpec + ExchangeContract descriptors and run controller
+    lm.Wait();
+    return 0;
+}
+```
+
 ---
 
 ## 3. Configuration & Symlink Architecture
@@ -147,11 +162,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
   - `L2 - Domain Services`: Trading, market analysis, worker engines. Rendered in Left Sidebar (`#Sidebar`).
   - `L3 - Secure Controls`: Administrative, KMS, and AI Squad controls (`squad-agent`). Rendered in Fleet Control right drawer (`#Sidenav`).
 - **Standardized Polyglot Registration Contract**:
-  - **Go**: `spec.PublishWithLifecycle(appConfig, logger, lm, capability, spec.ServiceSpec{...})`
-  - **Python**: `spec.publish_with_lifecycle(app_config, logger, lm, capability, spec=ServiceSpec(...))`
-  - **Rust**: `spec::publish_with_lifecycle(&app_config, logger, Some(&lm), capability, ServiceSpec{...})`
-  - **C++**: `SpecPublisher::PublishWithLifecycle(appConfig, logger, &lm, capability, ServiceSpec{...})`
-- **Ownership Standard**: The microservice is the authoritative owner of its spec metadata (`Name`, `Tag`, `URL`, `Layer`, `Category`, `Description`, `DocLink`, `Protocol`, and directly formatted `Framing`). Background publishing retries indefinitely with exponential backoff until `web-interface` is online.
+  - **Go**: `spec.PublishWithLifecycle(appConfig, logger, lm, capability, spec.ServiceSpec{..., Contracts: ...})` + `go/pkg/spec/contracts.go`
+  - **Python**: `spec.publish_with_lifecycle(app_config, logger, lm, capability, spec=ServiceSpec(..., contracts=...))` + `microservice_toolbox/contracts.py`
+  - **Rust**: `spec::publish_with_lifecycle(&app_config, logger, Some(&lm), capability, ServiceSpec{..., contracts, ..Default::default()})`
+  - **C++**: `SpecPublisher::PublishWithLifecycle(appConfig, logger, &lm, capability, ServiceSpec{..., contracts})` + `cpp/include/microservice_toolbox/spec/contracts.hpp`
+  - **C11/C99**: `cpp/include/microservice_toolbox/spec/contracts.h` (`MtExchangeContract`, `MtContractsEnvelope`, `mt_contracts_envelope_to_json`)
+- **Authoritative Exchange Contracts & Ownership Standard**: The microservice is the authoritative owner of its spec metadata and `ExchangeContract[]` descriptors (derived from live routes/tools and embedded `.proto`/`.capnp`/SQL DDLs). HTTP services expose `GET /api/v1/contracts`, while binary/gRPC services publish `Contracts` via `ServiceSpec` (or gRPC `GetExchangeContracts`), and `web-interface` renders one tab per contract type via `BastienMFEContracts` inside `.openmfe-tabs-bar` (`div[3]`). Static assets are served with `Cache-Control: no-cache, must-revalidate` (no hardcoded `?v=` CSS query strings), and offline services render `reliable: false` rather than fabricated schemas.
 
 ### 4. Framed TCP Transport (`safe-socket`)
 - Used for low-overhead, high-throughput streaming (e.g., between agents and `log-server`).
@@ -201,12 +217,13 @@ flowchart TD
 ### 3. Automated Scaffolding Tooling (`08-Squad-Agent`)
 - Use the canonical CLI scaffolder in `08-Squad-Agent`:
   ```bash
-  python3 08-Squad-Agent/main.py scaffold-microservice --name <name> --lang <go|python|rust> --port <port>
+  python3 08-Squad-Agent/main.py scaffold-microservice --name <name> --lang <go|python|rust|cpp> --port <port>
   ```
 - This automatically generates:
-  - Language skeleton (`cmd/`, `src/core`, `src/interfaces`, `src/models`, `tests/`)
+  - Language skeleton (`cmd/`/`src/rest` for Go, `src/core`, `src/interfaces`, `src/models`, `src/contracts`, `tests/`)
+  - Authoritative Exchange Contract & OpenMFE wiring (`GET /api/v1/contracts`, `ServiceSpec.Contracts`, and `mfe.js` using `BastienMFEElement` + `BastienMFEContracts`)
   - The 12 mandatory root files/folders adhering to [[03-Repository-Structure|Repository Structure Standard]]
-  - Starter unit tests (`controller_test.go` / `test_basic.py` / `test_basic.rs`) ensuring immediate test passing
+  - Starter unit tests (`controller_test.go` + `rest_handler_test.go` / `test_basic.py` / `test_basic.rs` / `test_basic.cpp`) ensuring immediate test passing
   - The human onboarding folder (`quick-overview/`) with ignore files
   - Initial BDD specification note in `02-Business-BDD/02-Behavior-Specs/<name>/FEAT-001-Initialization.md`.
 

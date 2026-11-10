@@ -72,7 +72,7 @@ Every newly created microservice repository in the workspace **MUST** contain th
 │   ├── interfaces/               # Abstract interfaces (zero direct cyclic imports)
 │   ├── models/                   # Shared typed structs & telemetry payloads
 │   ├── config/                   # Typed capability schemas
-│   ├── rest/                     # REST HTTP handlers & OpenMFE asset host (if applicable)
+│   ├── rest/                     # REST HTTP handlers, contracts.go (/api/v1/contracts), and embedded OpenMFE mfe.js (if applicable)
 │   └── server/                   # SafeSocket TCP or gRPC network servers (if applicable)
 ├── quick-overview/               # Human onboarding documentation (isolated from AI)
 │   ├── Architecture-Overview.md
@@ -110,6 +110,7 @@ Every newly created microservice repository in the workspace **MUST** contain th
 │   ├── core/                     # Domain controllers and worker execution logic
 │   ├── interfaces/               # Abstract base classes (ABCs) & typing.Protocol
 │   ├── models/                   # Domain models and dataclasses (e.g. StatusPayload)
+│   ├── rest/                     # REST handlers, contracts.py (/api/v1/contracts), and mfe.js (if applicable)
 │   └── lib/                      # Shared helper utilities
 ├── tests/
 │   ├── conftest.py               # Shared pytest fixtures
@@ -144,6 +145,7 @@ Every newly created microservice repository in the workspace **MUST** contain th
 <service-name>/
 ├── src/
 │   ├── main.rs                   # Entry point with Tokio async runtime & config loader
+│   ├── contracts.rs              # ExchangeContract descriptors built via microservice_toolbox::spec
 │   ├── core/                     # Async engines and ring/reorder buffers
 │   ├── servers/                  # Tokio SafeSocket TCP listener & gRPC handlers
 │   ├── models/                   # Typed structs
@@ -174,6 +176,26 @@ Every newly created microservice repository in the workspace **MUST** contain th
 ├── VERSION.txt                   # Version identifier (e.g. 0.0.1)
 ├── Makefile                      # Standard CLI automation with dynamic versioning
 └── README.md
+```
+
+### C/C++ Services (`C++17` / `C11`)
+```text
+<service-name>/
+├── src/
+│   ├── main.cpp                  # Entry point using AppConfig, LifecycleManager & SpecPublisher
+│   ├── core/
+│   │   └── controller.hpp        # Domain worker controller & live config reload handler
+│   └── contracts/
+│       └── contracts.hpp         # ExchangeContract descriptors via microservice_toolbox/spec/contracts.hpp (or contracts.h for pure C11)
+├── tests/
+│   └── test_basic.cpp            # C++ unit test suite verifying contracts & ServiceSpec JSON
+├── quick-overview/               # Human onboarding (isolated from AI)
+├── .github/                      # CI/CD workflows and dependabot
+├── standalone.yaml               # Symlink to native.yaml
+├── Dockerfile                    # Multi-stage builder (libdistconf + g++ -std=c++17) & Alpine runtime
+├── docker-compose.yml            # Local fragment compose
+├── AGENTS.md / AI-Init.md / AI-Project-DNA.md / AI-Session-State.md / TODO.md
+├── .gitignore / VERSION.txt / Makefile / README.md
 ```
 
 ---
@@ -230,7 +252,10 @@ clean:
    - In `build.rs`, set `cargo:rustc-env=APP_VERSION=<version>` and `cargo:rerun-if-changed=VERSION.txt`.
    - Declare `build = "build.rs"` in `Cargo.toml`.
    - In Rust source code, bind `pub const VERSION: &str = env!("APP_VERSION");` or read from `config.get_version()`.
-4. **Python Versioning Standard**:
+4. **C++ Versioning Standard**:
+   - Access version dynamically via `appConfig->GetVersion()` or `microservice_toolbox::version::GetVersion()`.
+   - Inject `-DAPP_VERSION=\"$(VERSION)\"` in the C++ `Makefile`.
+5. **Python Versioning Standard**:
    - Microservices and packages resolve version via `self.config.get_version()` or `from microservice_toolbox.version import get_version`.
    - `setup.py` / status payloads dynamically consume `self.config.get_version()`.
 5. **Never Mask Errors**: Strict prohibition of `|| true` or `2>/dev/null` on `go build`, `go test`, or `cargo test`. Failures must bubble up to CI/CD and terminal output immediately.
@@ -330,17 +355,21 @@ python3 08-Squad-Agent/main.py scaffold-microservice --name fundamental-analysis
 # Scaffold a new Rust microservice
 python3 08-Squad-Agent/main.py scaffold-microservice --name log-aggregator --lang rust --port 9030 --desc "High-throughput log buffer"
 
+# Scaffold a new C++ microservice
+python3 08-Squad-Agent/main.py scaffold-microservice --name feed-engine --lang cpp --port 9055 --desc "Low-latency C++ feed processor"
+
 # Preview fabrication without writing to disk
 python3 08-Squad-Agent/main.py scaffold-microservice --name orderbook-aggregator --lang go --dry-run
 ```
 
 ### What the Scaffolding Engine Automates:
-1. Generates the language directory skeleton (`cmd/`, `src/core`, `src/interfaces`, `src/models`, `tests/`).
+1. Generates the language directory skeleton (`cmd/`/`src/rest` for Go, `src/core`, `src/interfaces`, `src/models`, `src/contracts`, `tests/`).
 2. Creates all 12 mandatory root files (`standalone.yaml` symlink, `Dockerfile`, `docker-compose.yml`, `AGENTS.md`, `AI-Session-State.md`, `.golangci.yml`, `Makefile`, `README.md`, `VERSION.txt`, `go.mod`/`requirements.txt`/`Cargo.toml`, `.gitignore`, `.github/`).
-3. Generates working starter unit tests (`controller_test.go` with mock logger for Go, `test_basic.py` for Python, `test_basic.rs` for Rust) ensuring `make test` or `pytest` immediately succeeds.
-4. Creates human onboarding zone `quick-overview/` with `.geminiignore`, `.mcpignore`, and `.aiignore`.
-5. Establishes the initial BDD behavior specification in `02-Business-BDD/02-Behavior-Specs/<name>/FEAT-001-Initialization.md`.
-6. Prints the exact copy-paste configuration snippets for all 8 Ecosystem Integration Touchpoints.
+3. Wires OpenMFE `ServiceSpec` + `ExchangeContract` registration (`GET /api/v1/contracts` and `mfe.js` using `BastienMFEElement` + `BastienMFEContracts` inside `.openmfe-tabs-bar` for HTTP-enabled services).
+4. Generates working starter unit tests (`controller_test.go` + `rest_handler_test.go` for Go, `test_basic.py` for Python, `test_basic.rs` for Rust, `test_basic.cpp` for C++) ensuring `make test` or `pytest` immediately succeeds.
+5. Creates human onboarding zone `quick-overview/` with `.geminiignore`, `.mcpignore`, and `.aiignore`.
+6. Establishes the initial BDD behavior specification in `02-Business-BDD/02-Behavior-Specs/<name>/FEAT-001-Initialization.md`.
+7. Prints the exact copy-paste configuration snippets for all 8 Ecosystem Integration Touchpoints.
 
 ---
 
