@@ -32,9 +32,10 @@ tags:
 - **Component Identity**: Every struct implementing logic should have a `Name string` field, initialized during construction, and used as a prefix for all logs.
 
 ## 📦 Dynamic Versioning Single Source of Truth (`VERSION.txt`)
-- **Single Source of Truth**: Microservices derive their runtime version strictly from `VERSION.txt` at the repository root via `microservice-toolbox` (`appConfig.GetVersion()` or `version.Get()`). Hardcoding version numbers in code or status responses is strictly prohibited (`HARDCODED_VERSION_VIOLATION`).
-- **Toolbox Engine (`go/pkg/version`)**: Automatically climbs parent directories, inspects `APP_VERSION` environment overrides, and caches results with zero lock contention.
-- **Build Injection**: `Makefile` can pass `-ldflags="-s -w -X 'github.com/Bastien-Antigravity/microservice-toolbox/go/pkg/version.BuildVersion=$(VERSION)'"` where `VERSION ?= $(shell cat VERSION.txt 2>/dev/null || echo "0.0.1")`.
+- **Single Source of Truth (`VERSION.txt` ONLY via `AppConfig`)**: Microservices derive their version strictly through the dedicated `appConfig.GetVersion()` method, failing fast if `VERSION.txt` is missing. Runtime `APP_VERSION` / `SERVICE_VERSION` environment overrides, `"0.0.1"` fallbacks, ad-hoc `VERSION.txt` scanning loops, and hardcoded version strings are strictly prohibited (`HARDCODED_VERSION_VIOLATION`).
+- **Toolbox Engine (`go/pkg/version`)**: Backing `appConfig.GetVersion()`, reads strictly from `VERSION.txt` (or compile-time `BuildVersion` injected via `-ldflags` from `VERSION.txt`) with zero lock contention.
+- **Standard Tools First**: Use `go/pkg/spec` (`PublishWithLifecycle` + `BuildSpecFromConfig` auto-enriching `version`, `URL`, `Framing` ports, `ports`, `node`, `Health`), `contracts.go` (`ExtractProtoTextOperations`, `ExtractCapnpOperations`, `RenderProtoIDL`), `go/pkg/wiretap` (auto-initialized by `BootstrapService`), and `go/pkg/notification` rather than hand-rolling registration/schema/telemetry plumbing.
+- **Cold-Path Validation & `AppConfig` Trust**: Validate config/capabilities once at startup and trust pre-validated `AppConfig` strings directly on hot paths without redundant nil checks or silent defaults.
 - **Telemetry Exposure**: Return `appConfig.GetVersion()` in `/api/v1/status` and gRPC `GetStatus` payloads.
 
 ## Concurrency Patterns (from source code)

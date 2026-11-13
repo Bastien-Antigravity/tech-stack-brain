@@ -16,7 +16,7 @@ The platform runs as a set of Docker containers orchestrated by `docker-compose`
 
 ## Motivation (Why?)
 - **Environment Isolation**: Ensures identical behavior across development, sandbox, and production.
-- **Docker Guard**: The `microservice-toolbox` uses a "Docker Guard" to detect the environment and automatically switch between local loopback (`127.0.0.1`) and internal DNS (`timescale-db`), ensuring seamless cross-environment mobility.
+- **Docker Guard & Environment Profiles**: Environment-specific YAML profiles (`native.yaml` for loopback `127.0.0.1` vs `docker/config/services/*.yaml` for internal DNS like `timescale-db`) control capability addresses verbatim. Inside containers, `microservice-toolbox` activates **CLI Docker Guard** to ignore `--host`/`--port`/`--grpc_host`/`--grpc_port` CLI flags so container DNS YAML configuration is never overwritten (without rewriting `AppConfig` IPs to `0.0.0.0`).
 
 ## Examples
 ### Infrastructure Services

@@ -31,10 +31,9 @@ Our microservices avoid hardcoded parameters. All settings are sourced from a la
 The fleet utilizes a **Universal Configuration Template** located in `docker-deployment/modes/local/config/native.yaml`.
 - **Single Source of Truth**: All repositories symlink their local `standalone.yaml` directly to this authoritative profile.
 - **Environment Driven**: The YAML uses `${VAR:-default}` templates for all IP addresses and ports, allowing a single file to support Local, Docker, and isolated macOS (`127.0.0.2`) deployments simultaneously.
-- **The "Chain of Truth" (Priority)**:
-  1. **Environment Variables**: Highest priority (forced overrides).
-  2. **Config File**: Canonical source for static settings.
-  3. **Hardcoded Fallbacks**: Safe defaults (`127.0.0.1`) used for skeleton generation.
+- **The "Chain of Truth" & Fail-Fast Guarantee**:
+  1. **Validated Overrides (`CLI` / `Environment` / `YAML`)**: Configuration is validated once at boot (`LoadConfig`) and exposes safe pre-validated strings.
+  2. **Zero Runtime Fallbacks**: Missing required capabilities, ports, or `VERSION.txt` MUST fail fast on the cold path. Never substitute runtime hardcoded IP/port/version fallbacks (`"127.0.0.1"`, `"0.0.0.0"`, `"0.0.1"`). (`docker-compose` / YAML templates may declare `${VAR:-default}` infrastructure parameters in config files themselves, never in application fallback branches.)
 
 ### 3. Unified Shared Engine Architecture (v1.9.92+)
 - To ensure absolute behavioral parity and memory-space unification, all non-Go languages (Python, Rust, C++, VBA) utilize the **Unified Shared Engine** (`libdistconf` / `libunilog` / `libnotif`).
@@ -67,8 +66,8 @@ Utilities located in `/cmd` (e.g., `config-tool`) MUST follow the same flag-base
 - **Incorrect**: `config-tool encrypt public.pem "secret"`
 - **Correct**: `config-tool encrypt --key public.pem --token "secret"`
 
-### 5. Docker Guard
-When running inside Docker (detected via `/.dockerenv` or `DOCKER_ENV` env var), all CLI network overrides (`--host`, `--port`, `--grpc_host`, `--grpc_port`) are **silently ignored** to preserve Docker's DNS-based service discovery.
+### 5. CLI Docker Guard & Config-Only Bindings
+When running inside Docker (detected via `/.dockerenv` or `DOCKER_ENV` env var), all CLI network overrides (`--host`, `--port`, `--grpc_host`, `--grpc_port`) are **silently ignored** to preserve Docker's DNS-based service discovery from YAML config. `connectivity.Resolver` preserves configured `AppConfig` IPs, hostnames, and ports **verbatim** (zero automatic `0.0.0.0` or interface-IP rewriting) and fails fast if empty.
 
 ### 6. Capability-Based Configuration
 Configuration is organized around **capabilities** — named service entries in YAML:

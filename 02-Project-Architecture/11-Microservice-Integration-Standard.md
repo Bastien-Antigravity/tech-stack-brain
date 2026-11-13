@@ -51,14 +51,23 @@ import (
     "os"
     toolbox_bootstrap "github.com/Bastien-Antigravity/microservice-toolbox/go/pkg/bootstrap"
     toolbox_lifecycle "github.com/Bastien-Antigravity/microservice-toolbox/go/pkg/lifecycle"
+    toolbox_spec "github.com/Bastien-Antigravity/microservice-toolbox/go/pkg/spec"
 )
 
 func main() {
-    // 1. Initialize configuration and logger in a single call
+    // 1. Initialize configuration and logger in a single call (auto-wires WireTap)
     appConfig, log := toolbox_bootstrap.BootstrapService("my-service")
     defer log.Close()
 
-    log.Info("Starting my-service under profile: %s", appConfig.Profile)
+    log.Info("Starting my-service (version %s) under profile: %s", appConfig.GetVersion(), appConfig.Profile)
+
+    // 2. Setup lifecycle manager & register ServiceSpec + Exchange Contracts
+    lm := toolbox_lifecycle.NewManagerWithLogger(log)
+    _ = toolbox_spec.PublishWithLifecycle(appConfig, log, lm, "my_capability", toolbox_spec.ServiceSpec{
+        Name: "My Service", Tag: "my-service-mfe", Layer: "L2", Category: "Domain Services",
+        Description: "...", DocLink: "obsidian-brain/06-Microservices/my-service.md",
+        Protocol: "TCP / REST", Framing: "Port %s TCP / Port %s REST",
+    })
 
     // 2. Extract typed capabilities
     var cap MyCapability
@@ -81,40 +90,58 @@ func main() {
 }
 ```
 
-### Python Lifecycle Pattern:
+### Python Lifecycle Pattern (`init_microservice` + `spec` + `contracts` + `WireTap`):
 ```python
-from microservice_toolbox import load_config
-from universal_logger import get_logger
+from microservice_toolbox.contracts import ExchangeContract, build_contracts_envelope, extract_fastapi_operations
+from microservice_toolbox.spec import ServiceSpec, publish_with_lifecycle
+from microservice_toolbox.utils.init import init_microservice
 
-logger = get_logger("my-service")
-app_config = load_config("standalone")
-
-# Access capabilities
+app_config, logger, lm = init_microservice(__file__, app_name="my_service")
+version = app_config.get_version()  # Dedicated AppConfig method (VERSION.txt only)
 db_cap = app_config.get_capability("timescale_db")
-decrypted_pass = app_config.decrypt_secret(db_cap.get("password", ""))
+decrypted_pass = app_config.decrypt_secret(db_cap["password"])
+
+# Build Exchange Contracts with built-in extractors & register via spec
+contracts = [ExchangeContract(id="rest", type="HTTP/1.1 REST", operations=extract_fastapi_operations(app))]
+publish_with_lifecycle(
+    app_config, logger, lm, "my_service",
+    spec=ServiceSpec(name="My Service", tag="my-service-mfe", layer="L2", category="Domain Services",
+                     description="...", doc_link="obsidian-brain/06-Microservices/my-service.md",
+                     protocol="HTTP/1.1 REST", framing="Port %s REST", contracts=contracts),
+)
 ```
 
-### Rust Lifecycle Pattern:
+### Rust Lifecycle Pattern (`AppConfig` + `LifecycleManager` + `spec` + `contracts`):
 ```rust
-use microservice_toolbox::config::load_config;
+use microservice_toolbox::config::AppConfig;
+use microservice_toolbox::lifecycle::LifecycleManager;
+use microservice_toolbox::spec::{publish_with_lifecycle, ServiceSpec};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let app_config = load_config("standalone")?;
-    // Process typed config and run service loop
+    let app_config = AppConfig::load_config("standalone", None)?;
+    let version = app_config.get_version(); // Dedicated AppConfig method (VERSION.txt only)
+    let lm = LifecycleManager::new();
+    // Build ExchangeContracts via microservice_toolbox::contracts and register via publish_with_lifecycle
+    let _ = (version, &lm, publish_with_lifecycle);
     Ok(())
 }
 ```
 
-### C++ Lifecycle Pattern:
+### C++17 Lifecycle Pattern (`AppConfig` + `LifecycleManager` + `SpecPublisher` + `contracts`):
 ```cpp
 #include "microservice_toolbox/config/AppConfig.hpp"
 #include "microservice_toolbox/lifecycle/LifecycleManager.hpp"
 #include "microservice_toolbox/spec/spec.hpp"
+#include "microservice_toolbox/spec/contracts.hpp"
 
 int main(int argc, char** argv) {
     auto appConfig = microservice_toolbox::config::LoadConfig("standalone", argc, argv);
+    std::string version = appConfig->GetVersion(); // Dedicated AppConfig method (VERSION.txt only)
     microservice_toolbox::lifecycle::LifecycleManager lm;
-    // Populate ServiceSpec + ExchangeContract descriptors and run controller
+    microservice_toolbox::spec::ServiceSpec spec;
+    // Populate metadata + contracts (auto-enriches URL, Framing %s ports, version, node, health)
+    microservice_toolbox::spec::SpecPublisher::PublishWithLifecycle(
+        *appConfig, appConfig->GetLogger(), &lm, "my_service", spec);
     lm.Wait();
     return 0;
 }
@@ -167,7 +194,7 @@ int main(int argc, char** argv) {
   - **Rust**: `spec::publish_with_lifecycle(&app_config, logger, Some(&lm), capability, ServiceSpec{..., contracts, ..Default::default()})`
   - **C++**: `SpecPublisher::PublishWithLifecycle(appConfig, logger, &lm, capability, ServiceSpec{..., contracts})` + `cpp/include/microservice_toolbox/spec/contracts.hpp`
   - **C11/C99**: `cpp/include/microservice_toolbox/spec/contracts.h` (`MtExchangeContract`, `MtContractsEnvelope`, `mt_contracts_envelope_to_json`)
-- **Authoritative Exchange Contracts & Ownership Standard**: The microservice is the authoritative owner of its spec metadata and `ExchangeContract[]` descriptors (derived from live routes/tools and embedded `.proto`/`.capnp`/SQL DDLs). HTTP services expose `GET /api/v1/contracts`, while binary/gRPC services publish `Contracts` via `ServiceSpec` (or gRPC `GetExchangeContracts`), and `web-interface` renders one tab per contract type via `BastienMFEContracts` inside `.openmfe-tabs-bar` (`div[3]`). Static assets are served with `Cache-Control: no-cache, must-revalidate` (no hardcoded `?v=` CSS query strings), and offline services render `reliable: false` rather than fabricated schemas.
+- **Authoritative Exchange Contracts & Ownership Standard**: The microservice is the authoritative owner of its spec metadata and `ExchangeContract[]` descriptors (built via `microservice-toolbox` `contracts` extractors over live routes/tools and embedded `.proto`/`.capnp`/SQL DDLs). Calling `BuildSpecFromConfig` / `PublishWithLifecycle` automatically enriches `URL`, `%s` port placeholders in `Framing`, `DataStructure` (`version` via `AppConfig.GetVersion()`/`get_version()`, `capability`, `ports`, `node`), `NavRoute`, `Canvas`, and `Health` from `AppConfig`. HTTP services expose `GET /api/v1/contracts`, while binary/gRPC services publish `Contracts` via `ServiceSpec` (or gRPC `GetExchangeContracts`), and `web-interface` renders one tab per contract type via `BastienMFEContracts` inside `.openmfe-tabs-bar` (`div[3]`). Static assets are served with `Cache-Control: no-cache, must-revalidate` (no hardcoded `?v=` CSS query strings), and offline services render `reliable: false` rather than fabricated schemas.
 
 ### 4. Framed TCP Transport (`safe-socket`)
 - Used for low-overhead, high-throughput streaming (e.g., between agents and `log-server`).
@@ -175,9 +202,9 @@ int main(int argc, char** argv) {
 - Includes a lock-free atomic telemetry wrapper (`src/facade/telemetry_wrapper.go`, `safesocket.SetTelemetryEnabled`, `safesocket.SetTelemetryHook`) that feeds real-time connection and channel telemetry into `microservice-toolbox` WireTap with zero mutex overhead.
 
 ### 5. Real-Time Transport WireTap & 3-Tier Mesh Topology (`microservice-toolbox/wiretap` & `web-interface`)
-- **Lock-Free Atomic WireTap**: Controlled via `common.wiretap_enabled` in `native.yaml` / `AppConfig` and toggleable live from the `web-interface` Transport Mesh toolbar (`POST /api/v1/topology/wiretap/toggle`).
+- **Lock-Free Atomic WireTap (Go, Python, Rust, C++17)**: Controlled via `common.wiretap_enabled` (or `local.wiretap_enabled`) in `native.yaml` / `AppConfig` and toggleable live from the `web-interface` Transport Mesh toolbar (`POST /api/v1/topology/wiretap/toggle`), with parity modules across Go (`pkg/wiretap`), Python (`wiretap.py`), Rust (`src/wiretap/mod.rs`), and C++17 (`wiretap/WireTap.hpp`).
 - **Automatic SDK Instrumentation**:
-  - `BootstrapService` (Go) and `init_microservice` / `configure_from_config` (Python) automatically bind WireTap to `safe-socket`, `teleremote` (gRPC port 1863), `notification` (gRPC port 1027), `network` (gRPC server interceptors), and `messaging` (NATS subjects).
+  - `BootstrapService` (Go) and `init_microservice` / `configure_from_config` (Python) automatically bind WireTap to `safe-socket`, `teleremote` (gRPC port 1863), `notification` (gRPC port 1027), `network` (gRPC server interceptors), and `messaging` (NATS subjects); Rust and C++17 services call `wiretap::configure_from_config` / `wiretap::ConfigureFromConfig`.
   - Pre-validated string parameters are read directly from `AppConfig` (`GetListenAddr("web_interface")`, `GetLocal("wiretap_enabled")`) with zero fallback chains or silent `except Exception: pass` blocks.
 - **3-Tier Topology Separation in `web-interface`**:
   - **Tier 1 (`src/router/base_ecosystem.go`)**: Strictly the 11 Standard Base Microservices (`L1–L3`).

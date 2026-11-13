@@ -25,15 +25,10 @@ tags:
 ## ⚙️ Configuration & Merging
 - **Recursive Merging**: Use a `deep_merge` logic for matching YAML/Mapping values to ensure layered configuration consistency across the ecosystem.
 
-## 📦 Dynamic Versioning Single Source of Truth (`VERSION.txt`)
-- **Single Source of Truth**: Rust crates and servers must read runtime version information from `VERSION.txt` at the workspace/repo root via `microservice-toolbox` (`app_config.get_version()` or `microservice_toolbox::version::get_version()`). Hardcoding versions in source code is strictly prohibited (`HARDCODED_VERSION_VIOLATION`).
-- **Build Hook (`build.rs`)**: Reads `VERSION.txt` (or `../VERSION.txt`) and sets:
-  ```rust
-  println!("cargo:rustc-env=APP_VERSION={}", version.trim());
-  println!("cargo:rerun-if-changed=VERSION.txt");
-  ```
-- **Cargo Integration**: Specify `build = "build.rs"` in `Cargo.toml`.
-- **Runtime Access**: Use `config.get_version()` or `pub const VERSION: &str = env!("APP_VERSION");` for logging and telemetry.
+## 📦 Dynamic Versioning (`VERSION.txt` ONLY via `AppConfig`) & Standard Toolbox Modules
+- **Dedicated `AppConfig` Accessor**: Rust microservices MUST access their version via `app_config.get_version()` (backed strictly by `VERSION.txt`, fail-fast if absent). Hardcoding version strings, `"0.0.1"` fallbacks, runtime `APP_VERSION` / `SERVICE_VERSION` env overrides, and ad-hoc `VERSION.txt` readers are strictly prohibited (`HARDCODED_VERSION_VIOLATION`).
+- **Built-In Standard Tools**: Use `microservice_toolbox::spec` (`publish_with_lifecycle`, `build_spec_from_config`), `microservice_toolbox::contracts` (`ExchangeContract`, `ContractsEnvelope`, `extract_proto_operations`, `extract_capnp_operations`, `build_contracts_envelope`), `microservice_toolbox::wiretap` (`configure_from_config`, `set_enabled`/`is_enabled`, `record_event`, `snapshot`), `microservice_toolbox::notification`, `microservice_toolbox::lifecycle`, `microservice_toolbox::connectivity`, and `microservice_toolbox::business` instead of hand-rolling registration, IDL parsers, or telemetry clients.
+- **Cold-Path Validation**: Validate configuration and capabilities once at startup; trust `AppConfig` string outputs verbatim inside handlers with zero silent fallbacks.
 
 ## 🏷 Identity & Logging
 - **Static Identity**: Every struct implementing logic should have a `Name` static property (or field) used for logging traceability.

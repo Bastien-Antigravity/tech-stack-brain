@@ -72,8 +72,35 @@ GetHandler() *network.ConfigProtoHandler
 *distconf.Config  (embedded)
 Resolver, Profile, Logger
 LoadConfig() / LoadConfigWithLogger()
+GetVersion() / get_version() -> string (VERSION.txt ONLY, fail-fast)
 GetListenAddr(capability) -> (string, error)
 GetGRPCListenAddr(capability) -> (string, error)
+GetRESTAddr(capability) -> (string, error)
+GetLocal(key) / UnmarshalLocal(target) / DecryptSecret(ciphertext)
+```
+
+---
+
+## Declarative `ServiceSpec`, `ExchangeContract` & `WireTap` Ecosystem
+
+### `microservice-toolbox spec` & `contracts` (Go, Python, Rust, C++17, C11 Parity)
+```
+Enrichment:  BuildSpecFromConfig(appConfig, capability, baseSpec) -> auto-fills URL, Framing %s ports, DataStructure (version via AppConfig.GetVersion(), capability, ports, node), NavRoute, Canvas, Health
+Lifecycle:   PublishWithLifecycle(appConfig, logger, lm, capability, spec)  // Python/Rust: publish_with_lifecycle; C++: SpecPublisher::PublishWithLifecycle
+Contracts:   ExchangeContract, ContractPeer, ContractOperation, ContractsEnvelope
+             NewContractsEnvelope / build_contracts_envelope / BuildContractsEnvelope
+             DisplayAddress / ResolveContractPort / ReadSchemaFile
+Extractors:  ExtractProtoTextOperations / extract_proto_operations
+             ExtractCapnpOperations / extract_capnp_operations
+             RenderProtoIDL (Go protoreflect) / extract_fastapi_operations (Python FastAPI)
+Pure C11:    contracts.h (MtExchangeContract, MtContractsEnvelope, mt_exchange_contract_to_json, mt_contracts_envelope_to_json, mt_spec_free_string)
+```
+
+### `microservice-toolbox wiretap` (Go, Python, Rust, C++17 Parity)
+```
+Atomic Toggle: SetEnabled(bool) / IsEnabled()   // Python/Rust: set_enabled / is_enabled
+Bootstrap:     ConfigureFromConfig(serviceName, appConfig) / configure_from_config
+Capture/Read:  RecordEvent(...) / Snapshot() -> []EdgeReport   // Python/Rust: record_event / snapshot
 ```
 
 ---
@@ -132,14 +159,22 @@ LoadNotifSender(notifiersConf) -> map[string][]string
 
 | Method | Go | Rust | Python | C++ | VBA |
 |--------|-----|------|--------|-----|-----|
-| Load config | `LoadConfig(profile, flags)` | `load_config(profile)` | `load_config(profile, flags)` | `LoadConfig(profile, flags)` | `LoadConfig(profile)` |
+| Load config | `LoadConfig(profile, flags)` | `AppConfig::load_config(profile, None)` | `load_config(profile, flags)` | `LoadConfig(profile, argc, argv)` | `ac.LoadConfig profile` |
+| Version | `ac.GetVersion()` | `ac.get_version()` | `ac.get_version()` | `ac->GetVersion()` | `ac.GetVersion()` |
 | Listen addr | `GetListenAddr(cap)` | `get_listen_addr(cap)` | `get_listen_addr(cap)` | `GetListenAddr(cap)` | `GetListenAddr(cap)` |
 | gRPC addr | `GetGRPCListenAddr(cap)` | `get_grpc_listen_addr(cap)` | `get_grpc_listen_addr(cap)` | `GetGRPCListenAddr(cap)` | `GetGRPCListenAddr(cap)` |
+| REST addr | `GetRESTAddr(cap)` | `get_rest_addr(cap)` | `get_rest_addr(cap)` | `GetRESTAddr(cap)` | `GetRESTAddr(cap)` |
+| Connectivity | `Resolver.ResolveBindAddr` | `Resolver::resolve_bind_addr` | `Resolver.resolve_bind_addr` | `Resolver::ResolveBindAddr` | - |
+| Lifecycle | `Manager.Register/Wait` | `LifecycleManager::register/wait` | `LifecycleManager.register/wait` | `LifecycleManager::Register/Wait` | - |
+| Business | `WrapMarketEvent` | `wrap_market_event` | `wrap_market_event` | `WrapMarketEvent` | - |
+| Spec Publish | `PublishWithLifecycle` | `publish_with_lifecycle` | `publish_with_lifecycle` | `SpecPublisher::PublishWithLifecycle` | - |
+| Contracts | `NewContractsEnvelope` | `new_contracts_envelope` | `new_contracts_envelope` | `NewContractsEnvelope` (+ `contracts.h` C11) | - |
+| WireTap | `ConfigureFromConfig` | `configure_from_config` | `configure_from_config` | `ConfigureFromConfig` | - |
 | Deep merge | `DeepMerge(dst, src)` | `deep_merge(dst, src)` | `deep_merge(dst, src)` | `DeepMerge(dst, src)` | In-Memory Mirror |
 | Safe logger | `EnsureSafeLogger(l)` | `ensure_safe_logger(l)` | `ensure_safe_logger(l)` | `EnsureSafeLogger(l)` | - |
 | Notif Client | `NewClient(ac, l)` | `from_config(ac, l)` | `from_config(ac, l)` | `FromConfig(ac, l)` | `NewNotificationClientFromConfig(cfg)` |
 | Send Alert | `SendAlert(ctx, lvl, msg, ...)` | `send_alert(lvl, msg, tags)` | `send_alert(lvl, msg, *tags)` | `SendAlert(lvl, msg, tags)` | `SendAlert(lvl, msg, tagsCSV)` |
 
-> **Rule**: Go is the source of truth. Rust, Python, C++, and VBA implement 100% identical semantics. `EnsureSafeLogger` panics/throws in strict mode (`STRICT_LOGGER=true`). Python, Rust, C++, and VBA integrate with notif-server via the compiled `libnotif` C ABI bridge from `notif-server`.
+> **Rule**: Go is the source of truth. Rust, Python, C++17, C11 (`contracts.h`), and VBA maintain behavioral parity. `EnsureSafeLogger` is for Tier 1 SDK libraries & tests only (strictly forbidden in Tier 2 microservice production code; panics/throws when `STRICT_LOGGER=true`). Python, Rust, C++, and VBA integrate with `notif-server` via the compiled `libnotif` C ABI bridge from `notif-server`.
 
 

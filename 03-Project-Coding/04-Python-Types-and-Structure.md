@@ -28,10 +28,10 @@ tags:
 - **Dependency Management**: Pinned `requirements.txt`.
 - **Imports**: Use relative imports within the package hierarchy.
 
-## 📦 Dynamic Versioning Single Source of Truth (`VERSION.txt`)
-- **Single Source of Truth**: Python components, services, and packaging manifests must resolve their version dynamically from `VERSION.txt` at the repository root via `microservice-toolbox` (`app_config.get_version()` or `from microservice_toolbox.version import get_version`). Hardcoding static version strings in code or status responses is strictly prohibited (`HARDCODED_VERSION_VIOLATION`).
-- **Toolbox Engine (`microservice_toolbox.version`)**: Automatically climbs parent directories, checks `APP_VERSION` environment overrides, and caches results with zero performance overhead.
-- **Fail-Safe Fallback**: Any fallback default must strictly be `"0.0.1"`, never hardcoded `"1.0.0"`.
+## 📦 Dynamic Versioning (`VERSION.txt` ONLY via `AppConfig`) & Standard Toolbox Modules
+- **Dedicated `AppConfig` Accessor**: Python services MUST resolve their version via `app_config.get_version()` (or `app_config.version`). Hardcoding static version strings (`"0.0.1"`, `"1.0.0"`), checking runtime `APP_VERSION` / `SERVICE_VERSION` env overrides, or writing bespoke `VERSION.txt` scanning loops is strictly prohibited (`HARDCODED_VERSION_VIOLATION`).
+- **Standard Tools First**: Use `init_microservice`, `microservice_toolbox.spec` (`publish_with_lifecycle`, `build_spec_from_config`), `microservice_toolbox.contracts` (`ExchangeContract`, `ContractsEnvelope`, `extract_fastapi_operations`, `extract_proto_operations`, `extract_capnp_operations`, `build_contracts_envelope`), `microservice_toolbox.wiretap`, `microservice_toolbox.notification`, `microservice_toolbox.lifecycle`, and `microservice_toolbox.connectivity` rather than hand-rolling boilerplate.
+- **Fail-Fast Cold-Path Validation**: Raise an immediate error (`RuntimeError`) if `VERSION.txt` or a required `AppConfig` capability is missing — **never** substitute silent `"0.0.1"` / `"127.0.0.1"` / `"0.0.0.0"` fallbacks. Trust pre-validated `AppConfig` strings directly on hot paths without redundant `hasattr` / `isinstance` / `try/except: pass` clutter (check optionality only on genuinely optional parameters).
 - **Packaging**: `setup.py` / `pyproject.toml` builders must parse `VERSION.txt` dynamically at packaging time.
 
 ## 📥 Import Aliasing & Visibility

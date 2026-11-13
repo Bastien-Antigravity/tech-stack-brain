@@ -52,19 +52,21 @@ You are an expert Systems Architect for the Bastien-Antigravity project—a poly
 - **Resilience**: Use `ConnectNonBlocking` (from `microservice-toolbox`) for all background reconnection logic to prevent startup deadlocks.
 - **Rules File**: [Coding Style Standards](../03-Project-Coding/00-Coding-Style-Guide.md)
 
-### 3. Shared Libraries & Toolbox
-- **microservice-toolbox**: Polyglot (Go/Rust/Python) library providing standardized CLI argument parsing, **RSA secret decryption (v1.9.1+)**, and **ConnectNonBlocking (v1.2.2+)** reconnection primitives. **Go is the source of truth for API parity.**
-- **universal-logger**: Standardized logging facade (Go/C++) with bootstrap initialization. Use `bootstrap.InitWithOptions` for advanced metadata injection and configuration synchronization.
+### 3. Shared Libraries & Toolbox (Standard Tools First)
+- **microservice-toolbox**: Polyglot (Go/Rust/Python/C++17/C11/VBA) facade providing standardized configuration (`LoadConfig`, `AppConfig.GetVersion()` / `get_version()`, `DecryptSecret`), service bootstrap (`BootstrapService` / `init_microservice`), declarative `ServiceSpec` + auto-enriched `BuildSpecFromConfig` / `PublishWithLifecycle`, `ExchangeContract` & IDL/FastAPI extractors (`contracts.go`, `contracts.py`, `rust::contracts`, `contracts.hpp`, `contracts.h`), lock-free `WireTap` transport telemetry, `NotificationClient`, `TeleClient`, NATS `messaging`, `conn_manager`, config-verbatim `connectivity.Resolver`, LIFO `lifecycle.Manager`, `network` gRPC builders, `business` models (`WrapMarketEvent`), and `serializers`. **Go is the source of truth for API parity.** Services MUST use these standard tools directly rather than hand-rolling registration loops, schema parsers, telemetry shippers, or version readers.
+- **universal-logger**: Standardized logging facade (Go/C++/Python/Rust/VBA) wrapping `flexible-logger` canonical levels (`NOTSET=0` .. `WARNING=9`, `ERROR=10`, `CRITICAL=11`). Use `bootstrap.InitWithOptions` for advanced metadata injection and configuration synchronization.
 - **distributed-config**: Go library for YAML-based configuration with environment variable expansion, **native RSA secret decryption (ENC(...) pattern)**, and config-server sync.
 - **safe-socket**: Universal high-performance transport (TCP/UDP/SHM) with **Infinite Wait (v1.9.0+)**. Use `SetIdleTimeout(0)` for persistent backbone connections to disable idle timers; pair with a manual `HeartbeatInterval` if active **Zombie Detection** is required in forever-wait mode. Maintains **Adaptive Heartbeat (2.5x ratio)** by default for non-zero timeouts.
-- **Rules File**: [Shared Libraries Reference](Core-Libraries-and-Toolbox.md)
+- **Rules File**: [Core Libraries & Toolbox](../03-Project-Coding/Core-Libraries-and-Toolbox.md)
 
-### 4. Configuration & Deployment
-- **YAML Config**: No hardcoding. All configuration flows through `microservice-toolbox` using `LoadConfig(profile)`. 
+### 4. Configuration, Versioning & Deployment
+- **YAML Config**: No hardcoding. All configuration flows through `microservice-toolbox` using `LoadConfig(profile)`, which validates required config upfront and exposes clean string values.
+- **Trust Validated `AppConfig` & Zero Silent Fallback**: `AppConfig` is already validated and in string format at boot. Consumers MUST rely directly on `AppConfig` getters (`GetListenAddr`, `GetGRPCListenAddr`, `GetRESTAddr`, `GetLocal`, `GetVersion` / `get_version`) without redundant type/nil/quote re-checks or silent fallback values (`"127.0.0.1"`, `"0.0.0.0"`, `"0.0.1"`, hardcoded ports/URLs). Only genuinely optional parameters may check presence/defaults.
+- **`VERSION.txt` ONLY via Dedicated `AppConfig` Method**: Microservices resolve their version strictly through `appConfig.GetVersion()` (Go/C++/VBA) or `app_config.get_version()` (Python/Rust), failing fast if `VERSION.txt` is missing. Runtime `APP_VERSION` / `SERVICE_VERSION` environment overrides, bespoke `VERSION.txt` directory loops, and `"0.0.1"` fallbacks are strictly prohibited.
 - **Secret Encryption**: Sensitive values MUST be wrapped in `ENC(...)` and decrypted at boot using the standardized RSA key lifecycle.
 - **Dynamic Hot-Reloading**: All services must register `OnLiveConfUpdate` / `on_live_conf_update` to dynamically reload parameter, model, credential, and logging updates without process restarts.
 - **Profiles**: `standalone` (dev, file-first), `production` (server-first).
-- **Docker Guard**: CLI network overrides are ignored inside containers to preserve DNS-based service discovery.
+- **Docker Guard & Config-Only Bindings**: Inside containers (`/.dockerenv` or `DOCKER_ENV=true`), Docker Guard ignores CLI network overrides (`--host`, `--port`, `--grpc_host`, `--grpc_port`) to preserve YAML/DNS discovery. `connectivity.Resolver` and network servers preserve configured `AppConfig` IP/host/port values **verbatim** and NEVER rewrite them to `0.0.0.0`.
 - **Rules File**: [Configuration Standards](07-Configuration-Standard.md) | [Deployment Standards](../04-Project-Deployment/01-Docker-Infrastructure.md)
 
 ### 5. Networking & Communications
@@ -95,7 +97,8 @@ You are an expert Systems Architect for the Bastien-Antigravity project—a poly
 - **Database**: All timestamp columns must be `TIMESTAMPTZ` in UTC.
 - **Rules File**: [[14-Temporal-Integrity-and-UTC-Standard]]
 
-### 10. Safe-by-Design Concurrency & Debloat Mandate
+### 10. Safe-by-Design Concurrency, Cold-Path Validation & Debloat Mandate
+- **Cold-Path Fail-Fast Validation vs. Hot-Path Purity**: Validate configuration, `VERSION.txt`, schemas, and boundaries once on the cold path (startup, ingress, registration) and fail fast immediately on missing required values. Never duplicate validation, quote-trimming loops, `hasattr`/`isinstance` fallback ladders, or nil checks inside hot paths or on trusted internal framework contracts (`AppConfig`, Cap'n Proto/Protobuf schemas).
 - **Zero Redundant Primitives**: Code must never introduce mutexes, locks, or defensive double-checking around structures that are already provably safe by design.
 - **Hardware & Memory Primitives**: Atomic types (`atomic.Int64`, `atomic.Pointer`, `AtomicU64`) and module-level immutable constants require zero mutex wrapping.
 - **CSP Ownership Transfer**: Message channels in Go and Rust transfer memory ownership; receiving routines must not acquire locks on transferred payloads.

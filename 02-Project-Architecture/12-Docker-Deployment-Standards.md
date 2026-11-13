@@ -67,8 +67,8 @@ COPY --from=builder /<service-name>-bin /<service-name>/<service-name>
 ENTRYPOINT ["/<service-name>/<service-name>"]
 ```
 
-### C. Host-Native Supervisor Exclusions
-Processes designed strictly as native OS supervisors (specifically `watchdog-agent`) operate directly on host PIDs and host symlinks. They are managed natively under Mode 1 (`./fleet.sh local`) and are excluded from Docker fleet execution.
+### C. Host-Native Supervisor vs. Containerized Log Shipper
+`watchdog-agent`'s process-supervision daemon (`--mode=all` / `--supervise=true`) operates on native host PIDs and host symlinks under Mode 1 (`./fleet.sh local`). Inside Docker/Production compose stacks, the same image runs strictly in stateless shipper mode (`log-shipper` via `--mode=shipper`, `--supervise=false`, `--rest=false`), tailing the shared `fleet-logs` volume into `obsidiandb` (`watchdog_agent.fleet_error_logs`).
 
 ---
 
@@ -119,3 +119,17 @@ To prevent port collision across native host execution and Docker containers:
    ```
 4. **Zero-Knowledge Web Interface**:
    Public-facing dashboards (`web-interface`) **MUST NOT** mount the master private key `/etc/bastien/private.pem`.
+
+---
+
+## 5. Canonical Log Directory Standard (`LOG_DIR` & `DOCKER_ENV`)
+
+All Go/Python (`flexible-logger` / `universal-logger`) and Rust (`log-server`) services resolve their file log destination using one deterministic precedence chain:
+
+1. **Explicit `LOG_DIR` Environment Variable (Highest Priority)**: Always honored verbatim across native, Docker, and test environments.
+2. **Docker Auto-Detection (`DOCKER_ENV=true`)**: When `LOG_DIR` is unset and `DOCKER_ENV=true`:
+   - Microservices (`flexible-logger`) default to `/var/log/fleet/<service_name>` (`<service_name>.log`).
+   - Aggregator (`log-server`) defaults to `/var/log/log-server` (`_main.log`).
+3. **Native Host Default**: `<executable_parent>/logs` (`*/logs/*.log`).
+
+Compose stacks explicitly mount `fleet-logs:/var/log/fleet/<service>` with `LOG_DIR=/var/log/fleet/<service>` on microservice containers, keep `log-server` on its own persistent `log-server-logs:/var/log/log-server` volume so aggregated `_main.log` files do not duplicate per-container logs in `/var/log/fleet`, and mount `fleet-logs:/var/log/fleet:ro` on `log-shipper` (whose own logs write to `shipper-state` via `LOG_DIR=/watchdog-agent/state/logs`).

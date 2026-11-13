@@ -27,31 +27,26 @@ tags:
 - **Variables**: `camelCase` — `rowIdx`, `configHandle`.
 - **Global Constants**: `SCREAMING_SNAKE_CASE`.
 
-## 📦 FFI Declarations Example
+## 📦 Standard VBA Toolbox Usage (`AppConfig.cls` & `NotificationClient.cls`)
 ```vba
-' Module: MTB_Bridge
-#If Win64 Then
-    Public Declare PtrSafe Function Toolbox_LoadConfig Lib "libdistconf.dll" (ByVal profile As String, ByVal path As String) As LongPtr
-    Public Declare PtrSafe Function Toolbox_GetLastError Lib "libdistconf.dll" () As String
-#Else
-    Public Declare Function Toolbox_LoadConfig Lib "libdistconf.dll" (ByVal profile As String, ByVal path As String) As Long
-#End If
-
-' Usage Pattern
+' Import AppConfig.cls, NotificationClient.cls, DistConf.bas, Toolbox.bas
 Public Sub SyncAppConfig()
     On Error GoTo ErrorHandler
-    
-    Dim hnd As LongPtr
-    hnd = Toolbox_LoadConfig("standalone", "")
-    
-    if hnd = 0 Then
-        MsgBox "Config Error: " & Toolbox_GetLastError(), vbCritical
-    End If
-    
+
+    Dim ac As New AppConfig
+    ac.LoadConfig "standalone"
+
+    Debug.Print ac.GetVersion()
+    Debug.Print ac.GetListenAddr("market_observer")
+
+    Dim notif As NotificationClient
+    Set notif = Toolbox.NewNotificationClientFromConfig(ac)
+    notif.Send "VBA workbook synchronized", "telegram"
+
 ExitPoint:
     Exit Sub
 ErrorHandler:
-    MsgBox "VBA Runtime Error: " & Err.Description
+    MsgBox "Toolbox Runtime Error: " & Err.Description, vbCritical
     Resume ExitPoint
 End Sub
 ```

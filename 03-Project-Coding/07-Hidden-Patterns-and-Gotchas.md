@@ -23,8 +23,8 @@ C++:    logger = EnsureSafeLogger(logger);
 - **Tier 2 (Production Microservices)**: Microservices MUST initialize via `BootstrapService` which guarantees a real `Logger`. Using `EnsureSafeLogger` in non-test microservice production code is strictly prohibited (`PRODUCTION_MOCK_POLLUTION`).
 - **Strict Mode**: Setting `STRICT_LOGGER=true` forces `EnsureSafeLogger` to panic / raise `RuntimeError` immediately if passed `nil`, preventing silent no-op log leaks in production.
 
-## 2. gRPC Port Convention: `base_port + 1`
-When no explicit gRPC config exists, ALL three languages fall back to `port + 1`. If you set port `9020`, gRPC will bind to `9021`.
+## 2. Explicit Fail-Fast Port Requirements (No `base_port + 1` Silent Fallback)
+`GetGRPCListenAddr` (`GetGRPCAddress`) and `GetRESTAddr` (`GetRESTAddress`) do **not** silently guess `base_port + 1` when `grpc_port` or `rest_port` is omitted — they fail fast with an explicit error. Always define explicit `grpc_port` / `rest_port` keys under `capabilities.<service>` in YAML when a service exposes those listeners, and avoid port collisions (enforced at boot by `ValidateUniquePorts`).
 
 ## 3. Broadcast Sends are Fire-and-Forget
 In `config-server`, broadcast writes spawn a goroutine per client with **no error handling** on `Write()`. Failed sends are silently dropped.
@@ -50,8 +50,8 @@ The FFI logic is decoupled into a "Smart Bridge" (`src/cgo_bridge` in `distribut
 *   **Why**: The Go runtime starts background threads (GC/Scheduler) that do not support shutdown. Unloading the library while these threads are active causes an indefinite hang or crash.
 *   **Solution**: Use "load-once" patterns (e.g., leaked static references in Rust).
 
-## 9. Domain-Specific Log Levels
-Custom levels beyond standard: `Stream`, `Logon`, `Logout`, `Trade`, `Schedule`, `Report`. These are **financial services / market data** domain levels.
+## 9. Canonical Domain Log Levels (`flexible-logger`)
+Canonical constants beyond `DEBUG`/`INFO`/`WARNING`/`ERROR`/`CRITICAL`: `STREAM`, `LOGON`, `LOGOUT`, `TRADE`, `SCHEDULE`, `REPORT` (`0..11` in `flexible-logger/src/models/level.go`). Non-canonical aliases (`WARN`, `CRIT`, `FATAL`, `TRACE`, `NOTICE`, `ALERT`, `EMERG`, `PANIC`) do NOT exist.
 
 ## 10. Config File Naming Inconsistency
 Some config files use prefix (`config_preprod.yaml`) and others don't (`standalone.yaml`). Be aware when switching profiles.

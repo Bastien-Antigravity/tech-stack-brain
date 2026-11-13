@@ -46,16 +46,19 @@ graph TD
 ---
 ## 1. microservice-toolbox
 **Module**: `github.com/Bastien-Antigravity/microservice-toolbox/go`
-**Languages**: Go, Rust, Python, C++, VBA
-**Role**: The standardized entry point for all microservice configuration, resilience, and networking.
+**Languages**: Go, Rust, Python, C++17, pure C11 (`contracts.h`), VBA
+**Role**: The standardized entry point for all microservice bootstrapping, configuration, contracts, telemetry, resilience, and networking. Never reimplement these tools inside microservices.
 
 ### Key Features
-- **Smart Loader**: Implements the "Hierarchy of Truth" (CLI > ENV > YAML > Config-Server).
+- **Smart Loader & `AppConfig` (`config`, `bootstrap`)**: Implements the "Hierarchy of Truth" (CLI > ENV > YAML > Config-Server), `BootstrapService` / `init_microservice`, `DecryptSecret`, `OnLiveConfUpdate`, unique-port validation, and **CLI Docker Guard** (`--host`/`--port`/`--grpc_host`/`--grpc_port` ignored inside containers).
 - **Business Data Standards**: Unified models defined in `schemas/business`:
     - `MarketEvent`: Low-latency L1/L2 data envelope.
     - `OHLCV`: Standardized time-series bars.
     - `Signal`: Unified strategy signals (Buy/Sell/Exit).
-- **Dynamic Versioning Subsystem (`pkg/version`, `Version.hpp`, `Toolbox.bas`)**: Standardized semver resolution from `VERSION.txt` across Go, Python, Rust, C++, and VBA. Microservices resolve version via `appConfig.GetVersion()` (Go/Rust/Python/C++/VBA), `version.Get()`, or `Toolbox.GetVersion()`, eliminating ad-hoc relative path scanning loops and hardcoded version strings.
+- **Dedicated Versioning (`appConfig.GetVersion()` / `app_config.get_version()`)**: Exposed directly on `AppConfig` across **Go, Python, Rust, C++17, and VBA**, resolving strictly from `VERSION.txt` (fail-fast if missing; zero runtime `APP_VERSION`/`SERVICE_VERSION` overrides, zero `"0.0.1"` fallbacks, and zero ad-hoc `VERSION.txt` scanning loops in services).
+- **Declarative `ServiceSpec` & `ExchangeContract`s (`spec`, `contracts`)**: Auto-enriches `URL`, `%s` port substitution in `Framing`, `DataStructure` (`version` via `AppConfig.GetVersion()`, `capability`, `ports`, `node`), `NavRoute`, `Canvas`, and `Health` during `BuildSpecFromConfig` / `PublishWithLifecycle`, plus built-in IDL/route extractors (`ExtractProtoTextOperations`/`extract_proto_operations`, `ExtractCapnpOperations`/`extract_capnp_operations`, `RenderProtoIDL`, `extract_fastapi_operations`) across Go, Python, Rust, C++17, and pure C11 (`contracts.h`).
+- **Real-Time Transport WireTap (`wiretap`)**: Lock-free per-edge & segregated channel telemetry (`SetEnabled`/`IsEnabled`, `ConfigureFromConfig`, `RecordEvent`, `Snapshot`) across **Go, Python, Rust, and C++17**, auto-initialized by `BootstrapService` / `init_microservice`.
+- **Resilience, Connectivity, Lifecycle & Direct Alerts**: Infinite-retry `conn_manager`, config-verbatim `connectivity.Resolver` (no `0.0.0.0` rewrite), LIFO `lifecycle.Manager`, gRPC `network` server builders, `teleremote` client, NATS `messaging` connector, and `NotificationClient` (via `libnotif`).
 - **The Mirroring Mandate**: Go is the source of truth. Features MUST be ported to Python, Rust, and C++ in the same development cycle to maintain parity.
 
 ---
