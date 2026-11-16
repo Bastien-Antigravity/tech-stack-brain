@@ -34,13 +34,21 @@ tags:
 - **Fail-Fast Cold-Path Validation**: Raise an immediate error (`RuntimeError`) if `VERSION.txt` or a required `AppConfig` capability is missing — **never** substitute silent `"0.0.1"` / `"127.0.0.1"` / `"0.0.0.0"` fallbacks. Trust pre-validated `AppConfig` strings directly on hot paths without redundant `hasattr` / `isinstance` / `try/except: pass` clutter (check optionality only on genuinely optional parameters).
 - **Packaging**: `setup.py` / `pyproject.toml` builders must parse `VERSION.txt` dynamically at packaging time.
 
-## 📥 Import Aliasing & Visibility
+## 📥 Granular Functional Imports & camelCase Aliasing (The "Bastien" Pattern)
 
-To distinguish standard actions from local variables, use descriptive aliasing for common functional imports:
-
-- **Standard Library**: Prefer aliased functional imports over module imports to distinguish standard actions from local variables.
-  - Example: `from math import pow as mathPow`, `from time import sleep as timeSleep`, `from os.path import join as osPathJoin`.
-- **Internal Helpers**: `from src.helpers.proxy import getHttpProxy`.
+- **Prohibit Whole-Module Imports**: NEVER write `import os`, `import sys`, `import re`, `import json`, `import time`, `import subprocess`, or `import asyncio` outside the entrypoint `bootstrap_microservice` block.
+- **Granular & camelCase Aliased (`[module][SymbolName]`)**: Import **only** the required functions, classes, or types from standard library and external packages, and alias every symbol using `[module][SymbolName]` camelCase:
+  - `from math import pow as mathPow`
+  - `from time import sleep as timeSleep, time as timeTime`
+  - `from os.path import join as osPathJoin, exists as osPathExists`
+  - `from json import dumps as jsonDumps, loads as jsonLoads`
+  - `from datetime import datetime as dtDateTime, timezone as dtTimezone`
+  - `from typing import Any as typeAny, Dict as typeDict, List as typeList, Optional as typeOptional`
+- **Combined Single-Line Imports per Module**: When importing multiple symbols from the same module, combine them onto a **single line** (never split `from typing import ...` across multiple lines).
+- **Do NOT Alias Local/Internal Libraries**: The camelCase aliasing rule applies **strictly** to external dependencies and standard libraries. Never alias internal project imports:
+  - *Correct*: `from src.helpers.proxy import getHttpProxy` or `from .storage import Storage`
+  - *Incorrect*: `from .storage import Storage as intStorage`
+- **Never use wildcard imports** (`from module import *`).
 
 ## 🎨 Visual Formatting & Documentation
 
@@ -98,66 +106,114 @@ raise ValueError(f"capability {capability} not found")
 ## Examples
 
 ```python
-from abc import ABC, abstractmethod
-from typing import Optional
+#!/usr/bin/env python
+# coding:utf-8
 
-class DataProcessor(ABC):
-    @abstractmethod
-    def process_data(self, payload: dict) -> bool:
+"""
+ESSENTIAL PROCESS:
+Defines abstract data processor contract and configuration loader wrapper.
+
+DATA FLOW:
+1. Validates input payload dictionary via abstract contract.
+2. Instantiates AppConfig from profile and optional CLI flags.
+
+KEY PARAMETERS:
+- profile: Configuration profile identifier.
+"""
+
+from abc import ABC as abcABC, abstractmethod as abcAbstractMethod
+from typing import Any as typeAny, Dict as typeDict, Optional as typeOptional
+
+# -----------------------------------------------------------------------------------------------
+
+class DataProcessor(abcABC):
+    @abcAbstractMethod
+    def process_data(self, *, payload: typeDict[str, typeAny]) -> bool:
         pass
 
-# Semantic helper to match Go LoadConfig()
-def load_config(profile, specific_flags=None):
-    return AppConfig(profile, specific_flags)
+# -----------------------------------------------------------------------------------------------
 
-# Private method convention
+def load_config(profile: str, *, specific_flags: typeOptional[typeDict[str, typeAny]] = None) -> "AppConfig":
+    return AppConfig(profile=profile, specific_flags=specific_flags)
+
+# -----------------------------------------------------------------------------------------------
+
 class AppConfig:
-    def _load_from_file(self, filename):
+    Name = "AppConfig"
+
+    def _load_from_file(self, filename: str) -> None:
         ...
-    def _apply_cli_overrides(self):
+
+    # -----------------------------------------------------------------------------------------------
+    def _apply_cli_overrides(self) -> None:
         ...
+
+    # -----------------------------------------------------------------------------------------------
     @staticmethod
-    def deep_merge(dst, src):
+    def deep_merge(dst: typeDict[str, typeAny], src: typeDict[str, typeAny]) -> typeDict[str, typeAny]:
         ...
 ```
 
 ## 🚀 Async Microservice Pattern
 
 ```python
-import asyncio
-from microservice_toolbox.utils.logger import ensure_safe_logger
+#!/usr/bin/env python
+# coding:utf-8
 
-async def main():
-    config = load_config("standalone")
-    logger = ensure_safe_logger(None)
-    
+"""
+ESSENTIAL PROCESS:
+Asynchronous microservice worker loop using structured TaskGroup concurrency.
+
+DATA FLOW:
+1. Bootstraps microservice configuration and UniLog logger.
+2. Spawns AsyncService inside asyncio TaskGroup with strong task references.
+
+KEY PARAMETERS:
+- config: Validated AppConfig instance.
+- logger: UniLog instance.
+"""
+
+from asyncio import Event as asyncioEvent, TaskGroup as asyncioTaskGroup, run as asyncioRun, sleep as asyncioSleep
+from typing import Any as typeAny
+
+from microservice_toolbox.utils.bootstrap import init_microservice
+
+# -----------------------------------------------------------------------------------------------
+
+async def main() -> None:
+    ctx = init_microservice("async_service")
+    config = ctx.config
+    logger = ctx.logger
+
     # Mandatory background task tracking (Strong Reference Rule)
     background_tasks = set()
-    
-    async with asyncio.TaskGroup() as tg:
-        # Start core service
-        srv = AsyncService(config, logger)
+
+    async with asyncioTaskGroup() as tg:
+        srv = AsyncService(config=config, logger=logger)
         task = tg.create_task(srv.run())
-        
-        # Keep reference until done
+
         background_tasks.add(task)
         task.add_done_callback(background_tasks.discard)
 
+# -----------------------------------------------------------------------------------------------
+
 class AsyncService:
     Name = "AsyncService"
-    
-    def __init__(self, config, logger):
+
+    def __init__(self, *, config: typeAny, logger: typeAny) -> None:
         self.config = config
         self.logger = logger
-        self._stop_event = asyncio.Event()
+        self._stop_event = asyncioEvent()
 
-    async def run(self):
-        self.logger.info(f"{self.Name} : Starting async loop")
+    # -----------------------------------------------------------------------------------------------
+    async def run(self) -> None:
+        self.logger.info("{0} : Starting async loop".format(self.Name))
         while not self._stop_event.is_set():
             await self._do_work()
-            await asyncio.sleep(1.0)
-            
-    async def _do_work(self):
+            await asyncioSleep(1.0)
+
+    # -----------------------------------------------------------------------------------------------
+    async def _do_work(self) -> None:
         # Always use non-blocking calls (e.g., aiohttp, create_subprocess_exec)
         pass
 ```

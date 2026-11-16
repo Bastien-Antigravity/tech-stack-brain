@@ -45,8 +45,12 @@ You are an expert Systems Architect for the Bastien-Antigravity project—a poly
 
 ### 2. Coding Style & Performance
 - **Naming**: 
-    - **Rust/Go**: Follow language-idiomatic naming (PascalCase for Types, camelCase/snake_case for members). **No mandatory prefixes** (M/I).
-    - **Python**: Models MAY start with `M` (e.g., `MMarketData`) for clarity in large frameworks.
+    - **Rust/Go**: Follow language-idiomatic naming (PascalCase for Types, camelCase/snake_case for members). Struct models in `/src/models/` start with `M` (`MStructData`) and Go interfaces in `/src/interfaces/` start with `I` (`IBase`).
+    - **Python**: Models in `/src/models/` start with `M` (e.g., `MMarketData`); interfaces do NOT use `I`-prefix.
+- **Python Granular Functional Imports & camelCase Aliasing ("Bastien" Pattern)**:
+    - Never import whole modules (`import os`, `import sys`, `import re`, `import json`, `import time`, `import subprocess`) outside the entrypoint bootstrap block.
+    - Always import individual functions/classes/types and alias stdlib/external symbols using `[module][SymbolName]` camelCase combined on a single line per module (`from os.path import join as osPathJoin, exists as osPathExists`, `from json import dumps as jsonDumps, loads as jsonLoads`, `from typing import Any as typeAny, Optional as typeOptional`). Never alias local/internal project imports (`from .storage import Storage`).
+- **Go 4-Block Import Structure**: Separate Go imports into 4 blocks: (0) Standard Library, (1) Local Packages, (2) Ecosystem Aliased (`toolbox_config`, `safe_socket`, `unilog`), (3) External Packages.
 - **Memory**: Use fixed-length slices/ring-buffers (length 200). NEVER expand arrays infinitely.
 - **Concurrency**: Offload heavy I/O to background Goroutines/Tokio tasks. Be hyper-vigilant against concurrent map read/writes.
 - **Resilience**: Use `ConnectNonBlocking` (from `microservice-toolbox`) for all background reconnection logic to prevent startup deadlocks.

@@ -22,6 +22,7 @@ Every Python process or entry point in the Bastien-Antigravity fleet must adhere
 2. **Normalized Directory**: The current working directory (CWD) of the process must be redirected to the root level of the microservice repository.
 3. **FFI Library Path Alignment (macOS Stability)**: To prevent double Go runtime initialization panics on macOS (`cgocallback` PC mismatch), all environment variables referring to `libunilog` (`LIBUNILOG_PATH` and `LIBDISTCONF_PATH`) must be aligned to point to the exact same absolute dynamic library path before any ctypes wrapper imports.
 4. **Clean Import Paths**: Standard import paths (like the project root, `src/`, and `microservice-toolbox/python` site-packages) must be inserted at the beginning of `sys.path`.
+5. **POSIX Subprocess & Fork Integrity (`GRPC_ENABLE_FORK_SUPPORT=0`, `OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES`)**: Prevents multi-threaded fork crashes (`EXC_BAD_INSTRUCTION` / `SIGILL` on macOS due to `libxpc` assertions and glibc `epoll` deadlocks on Linux). Because child subprocesses only execute external commands (`execve`) and do not share gRPC channels, gRPC's `pthread_atfork` handlers are explicitly disabled across the ecosystem.
 
 ---
 
