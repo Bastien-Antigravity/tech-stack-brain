@@ -78,7 +78,7 @@ All ecosystem components follow a strict initialization pattern:
 - **Static Identify**: Every class must have a `Name` static property.
 - **Logging Prefix**: Use the `Name` property in all logs:
   ```python
-  self.logger.info("{0} : starting process...".format(self.Name))
+  self.logger.info(f"{self.Name} : starting process...")
   ```
 
 
@@ -207,7 +207,7 @@ class AsyncService:
 
     # -----------------------------------------------------------------------------------------------
     async def run(self) -> None:
-        self.logger.info("{0} : Starting async loop".format(self.Name))
+        self.logger.info(f"{self.Name} : Starting async loop")
         while not self._stop_event.is_set():
             await self._do_work()
             await asyncioSleep(1.0)
