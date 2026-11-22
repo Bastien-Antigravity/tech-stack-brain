@@ -76,7 +76,7 @@ graph TD
                    │
                    ▼
     ┌─────────────────────────────┐
-    │       Atomic Sequencer      │
+    │     MPSC FIFO Channel       │
     │  -------------------------- │
     │  (Guarantees Arrival Order) │
     └──────────────┬──────────────┘
@@ -85,13 +85,13 @@ graph TD
     ┌─────────────────────────────┐
     │         LogWriter           │
     │ ┌─────────────────────────┐ │
-    │ │ BTreeMap (Sequencing)   │ │
+    │ │ Single-Authority FIFO   │ │
     │ └────────────┬────────────┘ │
     │ ┌─────────────────────────┐ │
-    │ │ Dynamic Batch Writer    │ │
+    │ │ Dynamic Burst Draining  │ │
     │ └────────────┬────────────┘ │
     │ ┌─────────────────────────┐ │
-    │ │ Retry & Rotation Logic  │ │
+    │ │ TransactionalFileWriter │ │
     │ └────────────┬────────────┘ │
     └──────────────┼──────────────┘
                    │
@@ -105,7 +105,7 @@ graph TD
 ## Key Architectural Decisions
 
 ### 1. Sequencing & Ordering
-We use an `AtomicU64` counter at the core to assign a unique sequence number to every message as it arrives. The `LogWriter` then uses a `BTreeMap` to buffer and re-order these messages, ensuring the final output file is perfectly chronological even under multi-client concurrency.
+`LogWriter::writer_task` acts as the single sequence authority upon dequeue from the MPSC channel. This eliminates pre-channel atomic race conditions and out-of-order reorder stalls, assigning monotonic sequence IDs and draining bursts via `rx.try_recv()` to ensure exact FIFO durability.
 
 ### 2. Protocol Agnosticism
 The `Protocol Handlers` act as a bridge, converting protocol-specific data (Cap'n Proto or gRPC) into our internal `LogEntry` struct. This decoupling allows us to add new input protocols by simply implementing a new handler.
@@ -115,8 +115,9 @@ The `LogWriter` implements **Dynamic Batching**. It automatically scales the bat
 
 ### 4. Robustness & Hardening
 - **Protocol Security**: `TcpServer` enforces a mandatory Handshake immediately upon connection. Anonymous or un-framed data results in immediate disconnection.
-- **Retry Logic**: Disk writes are protected by a retry mechanism (default 3 attempts) to handle transient I/O issues.
-- **Strict Framing**: `SafeSocket` ensures that even malformed TCP clients won't crash the server.
+- **Transactional Disk Recovery**: Disk writes use `TransactionalFileWriter` with in-memory staging, POSIX `ftruncate` rollback on partial writes, and poisoned descriptor recovery.
+- **Fail-Fast Supervision**: Fatal disk failures push `[DISK_FAILURE]` `CRITICAL` (level 11) to `LogRingBuffer` and terminate with exit code 1, triggering `watchdog-agent`'s circuit breaker and Telegram alerts.
+- **Strict Framing**: `SafeSocket` enforces `MAX_MESSAGE_SIZE` (10MB) and handles unexpected EOFs cleanly.
 
 ### 5. Persistent Error Log Shipping (TimescaleDB Hypertable)
 While raw debug and info streams are handled high-speed in memory ring buffers and local append-only log files by `log-server`, critical operational events (`level >= ERROR`) are autonomously extracted and persisted in a TimescaleDB hypertable (`fleet_error_logs`).
