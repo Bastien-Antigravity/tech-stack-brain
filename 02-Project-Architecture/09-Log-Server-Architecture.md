@@ -107,8 +107,9 @@ graph TD
 ### 1. Sequencing & Ordering
 `LogWriter::writer_task` acts as the single sequence authority upon dequeue from the MPSC channel. This eliminates pre-channel atomic race conditions and out-of-order reorder stalls, assigning monotonic sequence IDs and draining bursts via `rx.try_recv()` to ensure exact FIFO durability.
 
-### 2. Protocol Agnosticism
+### 2. Protocol Agnosticism & Canonical Schema SSoT
 The `Protocol Handlers` act as a bridge, converting protocol-specific data (Cap'n Proto or gRPC) into our internal `LogEntry` struct. This decoupling allows us to add new input protocols by simply implementing a new handler.
+- **Platform Schema SSoT**: The Cap'n Proto wire schema (`logger.capnp`) is owned exclusively by `microservice-toolbox` (`microservice-toolbox/schemas/platform/logger.capnp`, `go/pkg/schemas/logger` `LoggerCapnpSchema`, and Rust `microservice_toolbox::contracts::LOGGER_CAPNP_SCHEMA`). `log-server` consumes `LOGGER_CAPNP_SCHEMA` and `extract_capnp_operations(...)` (Go parity: `ExtractCapnpOperations`) for dynamic `web-interface` contract inspection rather than duplicating `logger.capnp` locally.
 
 ### 3. High-Performance Disk I/O
 The `LogWriter` implements **Dynamic Batching**. It automatically scales the batch size up to 1000 messages during high load to minimize syscalls, and scales down to 10 messages during idle periods to maintain real-time responsiveness.

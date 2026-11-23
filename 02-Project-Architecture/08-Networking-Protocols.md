@@ -33,7 +33,13 @@ Our microservices communicate through four primary channels: gRPC for control, N
 - **Polyglot Boundary**: Go, Python, and Rust provide full `messaging` client connectors. C++ and VBA intentionally omit `messaging/` to avoid dead code and heavy external C runtime dependencies (`cnats`/`libuv`), communicating instead via SafeSocket TCP (`conn_manager`) or direct gRPC alerts (`notification`).
 
 ### 3. Cap'n Proto Transport (safe-socket) [HARDENED]
-- **Role**: Binary serialization for log messages between services and `log-server`.
+- **Role**: Binary serialization for log messages between services and `log-server`, and TCP alert dispatch to `notif-server`.
+- **Canonical Platform Schema SSoT (`microservice-toolbox`)**:
+    - `logger.capnp` and `notifier.capnp` are centralized exclusively in `microservice-toolbox`:
+        - Cross-language canonical paths: `microservice-toolbox/schemas/platform/logger.capnp` and `microservice-toolbox/schemas/platform/notifier.capnp`.
+        - Go embedded packages: `github.com/Bastien-Antigravity/microservice-toolbox/go/pkg/schemas/logger` (`LoggerCapnpSchema`) and `github.com/Bastien-Antigravity/microservice-toolbox/go/pkg/schemas/notifier` (`NotifierCapnpSchema`).
+        - Rust constants in `microservice_toolbox::contracts`: `LOGGER_CAPNP_SCHEMA` and `NOTIFIER_CAPNP_SCHEMA`.
+    - Dynamic `web-interface` contract inspection passes these SSoT constants to `ExtractCapnpOperations` / `extract_capnp_operations(...)`. Never duplicate `logger.capnp` or `notifier.capnp` in individual service repositories.
 - **Hardening Rules**:
     - **Framing**: ALL messages must use a 4-byte Big-Endian length prefix.
     - **Identity**: ALL connections must perform a `HelloMsg` handshake immediately upon connection.
