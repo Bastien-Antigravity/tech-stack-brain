@@ -26,8 +26,9 @@ To ensure 100% reproducibility and prevent "it works on my machine" drift, all m
 
 ### Quality Gate Rule
 Every repository MUST implement a `CI/CD` workflow that delegates to the **Centralized Reusable Workflows** in `fleet-operation-brain`:
-- **Universal CI**: All repositories (regardless of language) MUST delegate exclusively to `master-ci.yml`.
-- `master-ci.yml` will automatically perform ecosystem discovery and dynamically spawn parallel matrix jobs for **Go**, **Python**, **Rust**, and **C++** as detected in the repository tree.
+- **Universal CI**: All repositories (regardless of language) MUST delegate `.github/workflows/ci.yml` exclusively to `master-ci.yml@develop`.
+- **Universal GHCR Delivery**: All containerized microservices MUST delegate `.github/workflows/docker-publish.yml` exclusively to `master-docker-publish.yml@develop`, triggered upon `Fleet CI` completion (`workflow_run`) so images are only published after CI passes.
+- `master-ci.yml` automatically performs ecosystem discovery and dynamically spawns parallel matrix jobs for **Go** (`go test -race`), **Python**, **Rust**, **C++**, and **Node/JS** as detected in the repository tree.
 - *Legacy Templates*: `workflow-go.yml`, `workflow-python.yml`, etc., are retained for backward compatibility but should not be used for new microservices.
 
 ---
@@ -108,6 +109,35 @@ You are an expert Systems Architect for the Bastien-Antigravity project—a poly
 - **CSP Ownership Transfer**: Message channels in Go and Rust transfer memory ownership; receiving routines must not acquire locks on transferred payloads.
 - **Compiler Proofs**: All code changes are verified using mechanical analyzers (`nilaway`, `clippy`, `ruff`, mutation testing).
 - **Rules File**: [[15-Safe-By-Design-Invariants]]
+
+### 11. Canonical Logging Semantics & Completeness Contract
+- **12 Canonical Levels Only (`flexible-logger/src/models/level.go`)**:
+  - `DEBUG (1)`: Developer diagnostics.
+  - `STREAM (2)`: High-frequency packet/tick ingress telemetry.
+  - `INFO (3)`: Mandatory cold-path lifecycle checkpoints (boot + version, capability bind addresses, live config hot-reload applied, graceful shutdown start/complete).
+  - `LOGON (4)` / `LOGOUT (5)`: Peer identity handshakes and client session connect/disconnect.
+  - `TRADE (6)` / `SCHEDULE (7)` / `REPORT (8)`: Domain execution, cron triggers, and periodic summaries.
+  - `WARNING (9)`: Recoverable anomalies (retries, backoff, buffer pressure, rejected client input).
+  - `ERROR (10)`: Failed operations where the service remains operational (shipped to TimescaleDB via `watchdog-agent`).
+  - `CRITICAL (11)`: Fatal startup/runtime failures where the service or worker cannot continue (shipped to TimescaleDB + triggers `08-Squad-Agent` AutoRepair).
+- **Zero Unlogged Failures**: Never use non-canonical levels (`WARN`, `FATAL`, `TRACE`, `CRIT`), raw stdlib `log.Fatal`/`print`, or silent `except: pass` / ignored I/O errors.
+- **Rules File**: [[16-Fleet-Error-Log-Persistence-Standard]]
+
+### 12. Strict 2-Zone Test Boundary & Production Hardening Invariants
+- **Zone 1 (Service/Library Unit Tests)**: Must be 100% self-contained in single-repo GitHub Actions checkouts (`t.TempDir()` + `CONFIG_PATH` fixtures; zero reliance on the `standalone.yaml` symlink to `../docker-deployment`, `~/.bastien/keys/`, or `../<sibling-repo>` files).
+- **Zone 2 (`sandbox-testing`)**: Cross-repository file inspections, FFI ABI checks, and multi-daemon orchestration scenarios live exclusively in `sandbox-testing/02-Scenarios/`.
+- **Operational Hardening Matrix (10 Audit Guarantees)**:
+  1. **Explicit Failure Policy**: Declare boundary failure behavior (`Fail-Fast`, `Retry-Backoff`, `Drop-Oldest + WARNING`, `Rollback + ERROR`) in file headers and enforce bounded I/O timeouts.
+  2. **Deterministic Shutdown**: `Close()` / `lifecycle.Manager` hooks must stop ingress, signal workers, close sockets, and wait for all goroutines/tasks to terminate.
+  3. **Authoritative ACK Semantics**: Distinguish `Sent`, `Accepted (ACK)`, and `Durable`; never mutate local authoritative state before server `ACK`.
+  4. **Atomic Persistence & Monotonic Revisions**: Use `.tmp` + fsync + atomic `os.Rename` (or `ftruncate` rollback) and monotonic `uint64` revision checks (`incoming <= current` ignored).
+  5. **Security & Frame Guards**: Enforce `MaxPayloadSize` before buffer allocation; separate `tcp-hello` (identity metadata) from `tls-hello` (encrypted/authenticated); never log plaintext secrets.
+  6. **Cross-Language Protocol Parity**: Verify shared framing (`safe-socket`), Protobuf (`distributed-config`), and Cap'n Proto (`microservice-toolbox`) contracts across Go, Rust, Python, and C++.
+  7. **Adversarial Test Pairing**: Pair every normal-path test with $\ge 1$ fault test (timeout, saturation, malformed frame, concurrent race, crash recovery).
+  8. **Reproducible CI**: Enforce `go test -race`, `go work init` in multi-stage Go/CGO `Dockerfile`s, and zero `|| true` test masking.
+  9. **Doc & `TODO.md` Alignment**: Documented active features must be backed by code and tests; unimplemented features must remain in `TODO.md` or be tagged `[PLANNED]`.
+  10. **Benchmark-Backed Performance Claims**: Quantitative latency/throughput/allocation claims must cite reproducible `Benchmark*` (`-benchmem`) or `criterion` benchmarks.
+- **Rules File**: [[10-Testing-Sandbox-Standards]] | [[12-Docker-Deployment-Standards]]
 
 ---
 

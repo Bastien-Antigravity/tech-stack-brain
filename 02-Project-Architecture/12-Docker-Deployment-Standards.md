@@ -33,8 +33,8 @@ Every microservice that runs containerized must provide a production-ready `Dock
 ### A. Standalone Build Rule
 Running `docker build -t <image> .` from the repository root **MUST** succeed without requiring external filesystem mounts or assuming parent directory access.
 
-### B. Shared Library Resolution for Polyglot & CGO Directives
-Because Go microservices rely on internal ecosystem modules (`microservice-toolbox`, `distributed-config`, `safe-socket`, `universal-logger`, `flexible-logger`) using `go.mod` replace directives, the multi-stage build stage must clone authoritative library versions from the active branch:
+### B. Shared Library Resolution for Polyglot & CGO Directives (`go work init`)
+Because committed `go.mod` files are strictly prohibited from containing local `replace => ../...` directives (`GO_LOCAL_REPLACE_POLLUTION`), Go and CGO multi-stage Dockerfiles must clone the authoritative ecosystem library repositories on `develop` and wire them using `go work init`:
 
 ```dockerfile
 # === BUILD STAGE ===
@@ -46,7 +46,7 @@ RUN apk add --no-cache git gcc musl-dev ca-certificates tzdata
 
 WORKDIR /workspace
 
-# Clone shared library modules for replace directives in builder stage
+# Clone shared library modules for go.work resolution in builder stage
 RUN git clone --depth 1 -b develop https://github.com/Bastien-Antigravity/microservice-toolbox.git /workspace/microservice-toolbox && \
     git clone --depth 1 -b develop https://github.com/Bastien-Antigravity/distributed-config.git /workspace/distributed-config && \
     git clone --depth 1 -b develop https://github.com/Bastien-Antigravity/safe-socket.git /workspace/safe-socket && \
@@ -56,14 +56,19 @@ RUN git clone --depth 1 -b develop https://github.com/Bastien-Antigravity/micros
 WORKDIR /workspace/<service-name>
 COPY . .
 
-RUN go mod tidy && \
-    CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o /<service-name>-bin ./cmd/<service-name>
+RUN cd /workspace && \
+    go work init ./<service-name> ./microservice-toolbox ./distributed-config ./safe-socket ./universal-logger ./flexible-logger && \
+    cd /workspace/<service-name> && \
+    VERSION=$(cat VERSION.txt) && \
+    CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w -X 'github.com/Bastien-Antigravity/microservice-toolbox/go/pkg/version.BuildVersion=${VERSION}'" -o /<service-name>-bin ./cmd/<service-name>
 
 # === RUNTIME STAGE ===
 FROM alpine:3.20
+LABEL org.opencontainers.image.source="https://github.com/Bastien-Antigravity/<service-name>"
 RUN apk add --no-cache ca-certificates tzdata
 WORKDIR /<service-name>
 COPY --from=builder /<service-name>-bin /<service-name>/<service-name>
+COPY --from=builder /workspace/<service-name>/VERSION.txt /<service-name>/VERSION.txt
 ENTRYPOINT ["/<service-name>/<service-name>"]
 ```
 
