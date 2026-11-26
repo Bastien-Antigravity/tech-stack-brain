@@ -13,10 +13,10 @@ tags:
 
 ## Architectural Rule
 
-### Interfaces
-- **Python/Go/Rust**: MUST NOT use an `I`-prefix. Use descriptive nouns (e.g., `Logger`, `DataProcessor`, `Socket`).
-- **C++**: Abstract base classes follow `PascalCase` without prefix.
-- **VBA**: Interface-like Class Modules use `PascalCase` nouns.
+### Interfaces & Models (Zero Hungarian Prefixes)
+- **Python/Go/Rust/C++/VBA**: Interfaces AND Models/DTOs MUST NOT use `I`- or `M`-prefixes. Use idiomatic descriptive nouns qualified by their module/package (`interfaces.Service`, `interfaces.Logger`, `models.StatusPayload`, `models.MarketEvent`).
+- **C++**: Abstract base classes and structs follow `PascalCase` without prefixes.
+- **VBA**: Class Modules use `PascalCase` nouns without prefixes.
 
 ### Functions & Methods
 | Language | Exported/Public | Private/Unexported |

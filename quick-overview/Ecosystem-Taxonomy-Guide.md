@@ -7,10 +7,11 @@ microservice: 03-Tech-Stack
 type: overview
 status: active
 tags:
-- '#service/03-Tech-Stack'
+- '#service/03-tech-stack'
 - '#type/overview'
 - '#state/active'
 - '#ai/ignore'
+- '#zone/3-fleet'
 ---
 # Ecosystem Taxonomy & Classification Guide
 

@@ -14,13 +14,11 @@ tags:
 ## Networking Stack
 Our microservices communicate through four primary channels: gRPC for control, NATS for async messaging, Cap'n Proto for log transport, and WebSockets for metrics.
 
-### 1. gRPC Control Service
-- **Role**: Every microservice exposes a native `ProcessController` proto service for management.
-- **Methods**: Must support `Start()`, `Stop()`, and `Restart()`.
-- **Location**: `src/grpc_control/` (Go) or `proto/` (Rust).
-- **Separation**: Decouple the gRPC socket server scaffolding (`grpc_service.go`) from the underlying execution definitions (`grpc_control.go`).
-- **Health**: Always implement `grpc_health_v1` for service health checks.
-- **Toolbox**: Use `microservice-toolbox` gRPC server builder for Rust services. Use `cfg.GetGRPCListenAddr(name)` for address resolution.
+### 1. gRPC Domain & Control Services
+- **Role**: Microservices that require low-latency RPC control or streaming (`config-server`, `notif-server`, `log-server`, `rag-engine`, `squad-agent`) expose domain-specific gRPC services (`ConfigControl`, `NotifierControl`, `LogBridge`), while OS/container start/stop/restart is handled externally by each node's `watchdog-agent` + NATS + `TeleClient`.
+- **Location**: `src/grpc_control/` or `src/servers/`.
+- **Health**: Implement `grpc_health_v1` (or HTTP `/api/v1/health`) for liveness probes.
+- **Toolbox**: Use `microservice-toolbox` `network` gRPC server builders and `cfg.GetGRPCListenAddr(name)` verbatim.
 
 ### 2. NATS Asynchronous Bus
 - **Role**: Primary asynchronous ingestion bus for high-throughput data streams and fleet coordination.
@@ -87,5 +85,5 @@ To prevent "Zombie Connections" (where a process thinks a socket is alive but it
 
 ### 8. The Log Bridge Pattern
 - **Definition**: A gRPC gateway (Port 9021) used as a bridge for clients without raw TCP access (e.g., Web/JS).
-- **Semantics**: Must be called `LogBridge` to distinguish it from the `ProcessController` (Shadow Port) standard.
+- **Semantics**: Named `LogBridge` (`logservice.LogBridge`) exposing `LogMessage`, `GetTailLogs`, `StreamLogs`, and `GetExchangeContracts`.
 - **Data Flow**: Logs received via the Bridge are mapped to the same internal ordered stream as TCP messages.

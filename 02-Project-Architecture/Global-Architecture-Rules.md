@@ -46,8 +46,8 @@ You are an expert Systems Architect for the Bastien-Antigravity project—a poly
 
 ### 2. Coding Style & Performance
 - **Naming**: 
-    - **Rust/Go**: Follow language-idiomatic naming (PascalCase for Types, camelCase/snake_case for members). Struct models in `/src/models/` start with `M` (`MStructData`) and Go interfaces in `/src/interfaces/` start with `I` (`IBase`).
-    - **Python**: Models in `/src/models/` start with `M` (e.g., `MMarketData`); interfaces do NOT use `I`-prefix.
+    - **Rust/Go**: Follow language-idiomatic naming (PascalCase for Types, camelCase/snake_case for members). Both struct models in `/src/models/` (`StatusPayload`, `MarketEvent`) and interfaces in `/src/interfaces/` (`Service`, `Logger`, `Socket`) use unprefixed descriptive nouns (NO `M` or `I` Hungarian prefixes).
+    - **Python**: Both models in `/src/models/` (`MarketData`, `MicroserviceBuildSpec`) and interfaces/protocols in `/src/interfaces/` use unprefixed `PascalCase` nouns (NO `M` or `I` prefixes).
 - **Python Granular Functional Imports & camelCase Aliasing ("Bastien" Pattern)**:
     - Never import whole modules (`import os`, `import sys`, `import re`, `import json`, `import time`, `import subprocess`) outside the entrypoint bootstrap block.
     - Always import individual functions/classes/types and alias stdlib/external symbols using `[module][SymbolName]` camelCase combined on a single line per module (`from os.path import join as osPathJoin, exists as osPathExists`, `from json import dumps as jsonDumps, loads as jsonLoads`, `from typing import Any as typeAny, Optional as typeOptional`). Never alias local/internal project imports (`from .storage import Storage`).
@@ -61,7 +61,10 @@ You are an expert Systems Architect for the Bastien-Antigravity project—a poly
 - **microservice-toolbox**: Polyglot (Go/Rust/Python/C++17/C11/VBA) facade providing standardized configuration (`LoadConfig`, `AppConfig.GetVersion()` / `get_version()`, `DecryptSecret`), service bootstrap (`BootstrapService` / `init_microservice`), declarative `ServiceSpec` + auto-enriched `BuildSpecFromConfig` / `PublishWithLifecycle`, `ExchangeContract` & IDL/FastAPI extractors (`contracts.go`, `contracts.py`, `rust::contracts`, `contracts.hpp`, `contracts.h`), lock-free `WireTap` transport telemetry, `NotificationClient`, `TeleClient`, NATS `messaging`, `conn_manager`, config-verbatim `connectivity.Resolver`, LIFO `lifecycle.Manager`, `network` gRPC builders, `business` models (`WrapMarketEvent`), and `serializers`. **Go is the source of truth for API parity.** Services MUST use these standard tools directly rather than hand-rolling registration loops, schema parsers, telemetry shippers, or version readers.
 - **universal-logger**: Standardized logging facade (Go/C++/Python/Rust/VBA) wrapping `flexible-logger` canonical levels (`NOTSET=0` .. `WARNING=9`, `ERROR=10`, `CRITICAL=11`). Use `bootstrap.InitWithOptions` for advanced metadata injection and configuration synchronization.
 - **distributed-config**: Go library for YAML-based configuration with environment variable expansion, **native RSA secret decryption (ENC(...) pattern)**, and config-server sync.
-- **safe-socket**: Universal high-performance transport (TCP/UDP/SHM) with **Infinite Wait (v1.9.0+)**. Use `SetIdleTimeout(0)` for persistent backbone connections to disable idle timers; pair with a manual `HeartbeatInterval` if active **Zombie Detection** is required in forever-wait mode. Maintains **Adaptive Heartbeat (2.5x ratio)** by default for non-zero timeouts.
+- **safe-socket**: Universal high-performance transport (TCP/TLS/UDP/SHM) with **Hybrid Mode- & Transport-Aware Idle Timeouts (`ResolveHybridIdleTimeout`)**:
+  - **SHM (`shm`)**: `IdleTimeout = 0` (infinite wait on shared-memory ring buffers, zero frame overhead).
+  - **TCP/TLS (`local` loopback)**: `Server = 10m`, `Client = 60s` (`24s` auto-heartbeat via `2.5x` safety ratio + `30s` OS TCP KeepAlive).
+  - **TCP/TLS (`docker` / multi-host bridge/overlay)**: `Server = 3m`, `Client = 30s` (`12s` auto-heartbeat + `15s` OS TCP KeepAlive to prevent NAT/bridge conntrack drops and reap crashed containers rapidly).
 - **Rules File**: [Core Libraries & Toolbox](../03-Project-Coding/Core-Libraries-and-Toolbox.md)
 
 ### 4. Configuration, Versioning & Deployment
@@ -75,10 +78,10 @@ You are an expert Systems Architect for the Bastien-Antigravity project—a poly
 - **Rules File**: [Configuration Standards](07-Configuration-Standard.md) | [Deployment Standards](../04-Project-Deployment/01-Docker-Infrastructure.md)
 
 ### 5. Networking & Communications
-- **gRPC Control**: Every service MUST implement a standard `ProcessController` proto for lifecycle management.
+- **Process Supervision & Remote Control**: Process start/stop/restart is governed externally by each host's `watchdog-agent` (native or Docker Engine) + `lifecycle.Manager` OS signals (`SIGINT`/`SIGTERM`), bridged across multi-host nodes over NATS (`<prefix>.watchdog.node.<host>.*`) and exposed interactively via `tele-remote` (`TeleClient` on `:1863`). Individual microservices do NOT implement in-process `Start/Stop/Restart` gRPC lifecycle services.
 - **NATS Bus**: Primary asynchronous ingestion/messaging bus.
 - **WebSocket Publishing**: Metrics and real-time updates use non-blocking `WSPublisher`.
-- **Timeout Policy**: Mission-critical persistent sockets SHOULD use `SetIdleTimeout(0)` with high-frequency heartbeats to ensure stability under high load without risking premature disconnection.
+- **Hybrid Timeout Policy**: Persistent sockets use `safe-socket`'s hybrid timeout profile (`0` on SHM; bounded `10m`/`60s` on local TCP; `3m`/`30s` on Docker/multi-host TCP with `2.5x` adaptive heartbeats).
 - **Rules File**: [Networking Standards](08-Networking-Protocols.md)
 
 ### 6. Documentation
@@ -89,9 +92,9 @@ You are an expert Systems Architect for the Bastien-Antigravity project—a poly
 - **Rules File**: [Documentation Standards](Documentation-Requirements.md)
 
 ### 7. Inter-Service Coordination & Resilience
-- **Ghost-Protocol**: No synchronous call shall wait indefinitely. Every gRPC/HTTP request to a sibling service MUST include a hard-deadline context (default 5s) and a "Ghost-Fallback" strategy (cached data or safe default).
-- **Mission-Traceability**: All logs MUST propagate an `X-Bastien-Mission-ID` (Trace ID) across service boundaries. This ID must be injected into the `universal-logger` context.
-- **State-Snapshots**: Every service managing a persistent memory state MUST implement a `/snapshot` gRPC endpoint for live integrity auditing.
+- **Ghost-Protocol**: No synchronous call shall wait indefinitely. Every gRPC/HTTP request to a sibling service MUST include a hard-deadline context (default 5s) and abounded failure policy (`Fail-Fast`, `Retry-Backoff`, or explicit cached fallback).
+- **Mission-Traceability (`X-Bastien-Mission-ID`)**: Cross-service HTTP requests, NATS headers, and `08-Squad-Agent` missions propagate `X-Bastien-Mission-ID` via `microservice-toolbox` `trace` helpers, binding `mission_id` into `universal-logger` metadata automatically.
+- **State Introspection**: Services expose operational health via `/api/v1/status` and live transport metrics via `WireTap.Snapshot()` (stateful matching/order-book engines may optionally expose domain state snapshots).
 
 ### 9. Temporal Integrity & Universal UTC Standard
 - **100% UTC Mandate**: All timestamps across logs, network packets, persistence stores, metrics, and user interfaces must strictly use UTC.
