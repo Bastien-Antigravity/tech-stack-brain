@@ -56,5 +56,6 @@ Canonical constants beyond `DEBUG`/`INFO`/`WARNING`/`ERROR`/`CRITICAL`: `STREAM`
 ## 10. Config File Naming Inconsistency
 Some config files use prefix (`config_preprod.yaml`) and others don't (`standalone.yaml`). Be aware when switching profiles.
 
-## 11. Duplicate GoDoc in Socket Factory
-`safe-socket/src/factory/socket_factory.go` has the `Create` function documented twice (copy-paste artifact). The function body is correct.
+## 11. Darwin CGO `_Thread_local` TLV Bootstrap Thunk & Two-Phase Handshake Isolation
+* **Darwin CGO `_Thread_local` Thunk Gotcha (`safe-socket/src/cgo_bridge`)**: Never access `extern _Thread_local char*` variables directly from Go CGO (`C.last_socket_error`) across package boundaries on macOS/Darwin — CGO resolves the external TLV symbol to the raw `__tlv_bootstrap` instruction stub bytes rather than the pointer value. Always expose C getter/setter/free functions (`get_socket_error()`, `set_socket_error()`, `free_socket_error()`) and pin goroutines via `runtime.LockOSThread()`.
+* **Two-Phase Server Handshake Isolation (`SocketServer.Accept`)**: Never apply long-lived post-handshake server runtime `IdleTimeout` (`10m` local / `3m` Docker) before `proto.WaitInitiation(conn)`. Enforce the tight `HandshakeTimeout` (`200ms`/`500ms`) during synchronous `Accept()` handshake parsing (closing incomplete/corrupt connections immediately so clients reconnect), and upgrade to `IdleTimeout` only after the `HelloMsg` handshake succeeds (see `ADR-003-Safe-Socket-Handshake-Isolation-And-Hybrid-Timeouts`).
